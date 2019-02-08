@@ -12,10 +12,10 @@ use Drupal\Core\Session\AccountInterface;
  * @Block(
  *   id = "oe_search",
  *   admin_label = @Translation("OpenEuropa Search block"),
- *   category = @Translation("Search"),
+ *   category = @Translation("Forms"),
  * )
  */
-class OeSearchBlock extends BlockBase {
+class SearchFormBlock extends BlockBase {
 
   /**
    * {@inheritdoc}
@@ -28,7 +28,7 @@ class OeSearchBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function build() {
-    return \Drupal::formBuilder()->getForm('Drupal\oe_search\Form\OeSearchBlockForm');
+    return \Drupal::formBuilder()->getForm('Drupal\oe_search\Form\SearchForm');
   }
 
 }

@@ -6,7 +6,7 @@ dependencies:
     - oe_search_test
   theme:
     - bartik
-id: openeuropa_search_block
+id: search_form_block
 theme: bartik
 region: header
 weight: 0

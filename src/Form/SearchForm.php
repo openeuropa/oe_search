@@ -10,13 +10,13 @@ use Drupal\Core\Url;
 /**
  * Builds the search form for the OpenEuropa Search block.
  */
-class OeSearchBlockForm extends FormBase {
+class SearchForm extends FormBase {
 
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'oe_search_block_form';
+    return 'search_form';
   }
 
   /**
