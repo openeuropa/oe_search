@@ -22,6 +22,7 @@ drupal:
     # Enable the modules.
     - "./vendor/bin/drush en language -y"
     - "./vendor/bin/drush en oe_search -y"
+    - "./vendor/bin/drush en oe_search_demo -y"
     - "./vendor/bin/drush cr"
   settings:
     settings:

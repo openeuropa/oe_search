@@ -3,7 +3,7 @@ status: true
 dependencies:
   module:
     - oe_search
-    - oe_search_test
+    - oe_search_demo
   theme:
     - bartik
 id: search_form_block

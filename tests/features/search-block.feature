@@ -4,7 +4,6 @@ Feature: Search block
   As an anonymous
   I want to search on ec.europa.eu by submitting search block form
 
-  @oe_search
   Scenario: I could be redirected to ec.europa.eu search page on try to send search request in search block
     Given the following languages are available:
       | languages |
