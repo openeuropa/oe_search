@@ -1,0 +1,6 @@
+name: OpenEuropa Search
+description: Search features for the OpenEuropa project.
+package: OpenEuropa
+
+type: module
+core: 8.x
