@@ -1,10 +1,10 @@
 @api
 Feature: Search block
   In order to be able to showcase Search
-  As an anonymous
-  I want to search on ec.europa.eu by submitting search block form
+  As an anonymous user
+  I want to search on ec.europa.eu by using the search block
 
-  Scenario: I could be redirected to ec.europa.eu search page on try to send search request in search block
+  Scenario: I am redirected to the ec.europa.eu search results page when I use the search block
     Given the following languages are available:
       | languages |
       | en        |
