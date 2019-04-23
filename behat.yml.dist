@@ -7,6 +7,7 @@ default:
         - Drupal\DrupalExtension\Context\MinkContext
         - Drupal\DrupalExtension\Context\DrupalContext
         - Drupal\Tests\oe_search\Behat\SearchContext
+        - Drupal\Tests\oe_search\Behat\LocaleContext
         - OpenEuropa\Behat\TransformationContext:
             pages:
               English home: 'en'

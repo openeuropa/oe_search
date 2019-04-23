@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * OpenEuropa Search module.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Hook_install().
+ */
+function oe_search_install() {
+  if (!\Drupal::moduleHandler()->moduleExists('oe_multilingual')) {
+    return;
+  }
+
+  // Import the translations from the po files.
+  // See also oe_search_modules_installed().
+  _oe_search_translations();
+}

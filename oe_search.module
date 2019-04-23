@@ -6,3 +6,32 @@
  */
 
 declare(strict_types = 1);
+
+use Drupal\locale\Gettext;
+
+/**
+ * Implements hook_modules_installed().
+ */
+function oe_search_modules_installed($modules) {
+  if (!in_array('oe_multilingual', $modules)) {
+    return;
+  }
+
+  // Imports the translations from the po files.
+  // See also oe_search_install().
+  _oe_search_translations();
+}
+
+/**
+ * Helper function to import the provided string translations for the module.
+ */
+function _oe_search_translations(): void {
+  foreach (file_scan_directory(drupal_get_path('module', 'oe_search') . '/translations', '/.*\.po/') as $file) {
+    $file->langcode = $file->name;
+    Gettext::fileToDatabase($file, [
+      'overwrite_options' => [
+        'not_customized' => TRUE,
+      ],
+    ]);
+  }
+}

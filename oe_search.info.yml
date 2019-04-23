@@ -4,3 +4,6 @@ package: OpenEuropa
 
 type: module
 core: 8.x
+
+'interface translation project': oe_search
+'interface translation server pattern': 'translations://%language.po'
