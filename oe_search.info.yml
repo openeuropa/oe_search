@@ -6,4 +6,4 @@ type: module
 core: 8.x
 
 'interface translation project': oe_search
-'interface translation server pattern': 'translations://%language.po'
+'interface translation server pattern': modules/contrib/oe_search/translations/%language.po
