@@ -4,13 +4,12 @@ Feature: Search block
   As an anonymous user
   I want to search on ec.europa.eu by using the search block
 
-  @locale
+  @multilingual
   Scenario: I am redirected to the ec.europa.eu search results page when I use the search block
     Given the following languages are available:
       | languages |
       | en        |
       | fr        |
-    And I import all translations
     And I am on "the English home page"
     When I fill in "Search" with "European Commission"
     And I press "Search"

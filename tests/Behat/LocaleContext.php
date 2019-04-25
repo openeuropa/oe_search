@@ -7,39 +7,26 @@ namespace Drupal\Tests\oe_search\Behat;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
 
 /**
- * The main Search context.
+ * The main Locale context.
  */
 class LocaleContext extends RawDrupalContext {
 
   /**
-   * Imports the translation files from the module.
+   * Install oe_multilingual module.
    *
-   * @Given I import all translations
-   */
-  public function importTranslations(): void {
-    if (!\Drupal::moduleHandler()->moduleExists('locale')) {
-      throw new \Exception('Locale module is not enabled.');
-    }
-
-    _oe_search_translations();
-  }
-
-  /**
-   * Install locale core module.
-   *
-   * @BeforeScenario @locale
+   * @BeforeScenario @multilingual
    */
   public function installLocale() {
-    \Drupal::service('module_installer')->install(['locale']);
+    \Drupal::service('module_installer')->install(['oe_multilingual']);
   }
 
   /**
-   * Uninstall locale core module.
+   * Uninstall oe_multilingual module.
    *
-   * @AfterScenario @locale
+   * @AfterScenario @multilingual
    */
   public function uninstallLocale() {
-    \Drupal::service('module_installer')->uninstall(['locale']);
+    \Drupal::service('module_installer')->uninstall(['oe_multilingual']);
   }
 
 }
