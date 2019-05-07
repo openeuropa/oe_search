@@ -1,8 +1,16 @@
 # Change Log
 
+## [1.1.0](https://github.com/openeuropa/oe_search/tree/1.1.0) (2019-05-07)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.0.0...1.1.0)
+
+**Merged pull requests:**
+
+- OPENEUROPA-1813: Upgrading to 8.7. [\#6](https://github.com/openeuropa/oe_search/pull/6) ([upchuk](https://github.com/upchuk))
+
 ## [1.0.0](https://github.com/openeuropa/oe_search/tree/1.0.0) (2019-04-25)
 **Merged pull requests:**
 
+- Update CHANGELOG.md for release 1.0.0. [\#5](https://github.com/openeuropa/oe_search/pull/5) ([ademarco](https://github.com/ademarco))
 - OPENEUROPA-1624: Fixing form ID. [\#3](https://github.com/openeuropa/oe_search/pull/3) ([upchuk](https://github.com/upchuk))
 - OPENEUROPA-1603: Search block implementation and tests. [\#2](https://github.com/openeuropa/oe_search/pull/2) ([sergepavle](https://github.com/sergepavle))
 - OPENEUROPA-1603: Scaffolding files of module. [\#1](https://github.com/openeuropa/oe_search/pull/1) ([sergepavle](https://github.com/sergepavle))
