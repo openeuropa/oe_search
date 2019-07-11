@@ -15,6 +15,6 @@ Feature: Search block
     Then I should be redirected to "https://ec.europa.eu/search/?QueryText=European%20Commission&swlang=en"
   
     When I am on "the French home page"
-    When I fill in "Search" with "European Commission"
-    And I press "Search"
+    When I fill in "Rechercher" with "European Commission"
+    And I press "Rechercher"
     Then I should be redirected to "https://ec.europa.eu/search/?QueryText=European%20Commission&swlang=fr"

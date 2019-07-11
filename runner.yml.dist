@@ -21,8 +21,10 @@ drupal:
     - "./vendor/bin/drush config-set node.settings use_admin_theme 1 -y"
     # Enable the modules.
     - "./vendor/bin/drush en language -y"
+    - "./vendor/bin/drush en oe_multilingual -y"
     - "./vendor/bin/drush en oe_search -y"
     - "./vendor/bin/drush en oe_search_demo -y"
+    - "./vendor/bin/drush oe-multilingual:import-local-translations"
     - "./vendor/bin/drush cr"
   settings:
     settings:
