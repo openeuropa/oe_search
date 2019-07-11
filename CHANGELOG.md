@@ -1,10 +1,19 @@
 # Change Log
 
+## [1.2.0](https://github.com/openeuropa/oe_search/tree/1.2.0) (2019-07-11)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.1.0...1.2.0)
+
+**Merged pull requests:**
+
+- OPENEUROPA-1794: Add translation for Search. [\#9](https://github.com/openeuropa/oe_search/pull/9) ([imanoleguskiza](https://github.com/imanoleguskiza))
+- OPENEUROPA-1897: Use ci image. [\#8](https://github.com/openeuropa/oe_search/pull/8) ([imanoleguskiza](https://github.com/imanoleguskiza))
+
 ## [1.1.0](https://github.com/openeuropa/oe_search/tree/1.1.0) (2019-05-07)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.0.0...1.1.0)
 
 **Merged pull requests:**
 
+- OPENEUROPA-1813: Create release 1.1.0. [\#7](https://github.com/openeuropa/oe_search/pull/7) ([voidtek](https://github.com/voidtek))
 - OPENEUROPA-1813: Upgrading to 8.7. [\#6](https://github.com/openeuropa/oe_search/pull/6) ([upchuk](https://github.com/upchuk))
 
 ## [1.0.0](https://github.com/openeuropa/oe_search/tree/1.0.0) (2019-04-25)
