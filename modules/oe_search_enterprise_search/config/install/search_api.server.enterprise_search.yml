@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - oe_search_enterprise_search
+id: enterprise_search
+name: 'Enterprise search'
+description: ''
+backend: oe_search_enterprise_search
+backend_config:
+  api_key: europa_default
+  database: DEFAULT
+  ingestion_api_endpoint: 'http://localhost:8080/ingestion-api/'
+  search_api_endpoint: 'http://localhost:8080/search-api/'
