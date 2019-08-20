@@ -1,0 +1,8 @@
+name: OpenEuropa Search Enterprise Search
+description: Integrates with the European Commission Enterprise Search.
+package: OpenEuropa
+type: module
+core: 8.x
+
+dependencies:
+  - search_api:search_api
