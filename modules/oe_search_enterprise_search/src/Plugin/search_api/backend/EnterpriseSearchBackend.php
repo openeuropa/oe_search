@@ -13,6 +13,11 @@ use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\QueryInterface;
+use Http\Adapter\Guzzle6\Client as HttpClient;
+use Http\Factory\Guzzle\RequestFactory;
+use Http\Factory\Guzzle\StreamFactory;
+use OpenEuropa\EnterpriseSearchClient\Api\IngestionApi;
+use OpenEuropa\EnterpriseSearchClient\Client;
 
 /**
  * European Commission Enterprise Search backend for search_api.
@@ -111,6 +116,19 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
     \Drupal::messenger()->addWarning($this->t('Search is not supported yet in %backend backends.', [
       '%backend' => $this->label(),
     ]));
+
+    $configuration = $this->configuration;
+    // Normalise configuration name from Drupal standards.
+    $configuration['apiKey'] = $configuration['api_key'];
+    unset($configuration['api_key']);
+
+    $guzzle_psr = new HttpClient(\Drupal::service('http_client'));
+    $client = new Client($guzzle_psr, new RequestFactory(), new StreamFactory(), $configuration);
+    $api = new IngestionApi($client);
+    $api->ingestText([
+      'uri' => 'http://local.dev',
+      'text' => 'my sharona'
+    ]);
   }
 
 }

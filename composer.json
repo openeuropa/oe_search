@@ -51,7 +51,7 @@
     "autoload": {
         "psr-4": {
             "Drupal\\oe_search\\": "./src/",
-            "Drupal\\EnterpriseSearchClient\\": "./lib/src/"
+            "OpenEuropa\\EnterpriseSearchClient\\": "./lib/src/"
         }
     },
     "autoload-dev": {
