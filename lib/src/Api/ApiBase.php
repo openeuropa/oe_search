@@ -68,8 +68,7 @@ abstract class ApiBase implements ApiInterface {
       $request = $request->withBody($stream);
     }
 
-    //\Drupal::service('http_client')->send($request, ['debug' => TRUE]);
-    $this->client->getHttpClient()->sendRequest($request);
+    $response = $this->client->getHttpClient()->sendRequest($request);
   }
 
   protected function getMultipartStream(array $elements): StreamInterface {

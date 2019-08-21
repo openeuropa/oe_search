@@ -63,6 +63,15 @@ class IngestionApi extends ApiBase {
     return $ingestion;
   }
 
+  public function deleteDocument(string $reference) {
+    $resolver = $this->getOptionResolver();
+    $parameters = $resolver->resolve([]);
+    $parameters['reference'] = $reference;
+
+    $this->send('DELETE', 'rest/ingestion', $parameters);
+
+  }
+
   /**
    * @inheritDoc
    */

@@ -8,6 +8,7 @@ use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\node\Entity\Node;
 use Drupal\search_api\Annotation\SearchApiBackend;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
@@ -18,6 +19,7 @@ use Http\Factory\Guzzle\RequestFactory;
 use Http\Factory\Guzzle\StreamFactory;
 use OpenEuropa\EnterpriseSearchClient\Api\IngestionApi;
 use OpenEuropa\EnterpriseSearchClient\Client;
+use OpenEuropa\EnterpriseSearchClient\ClientInterface;
 
 /**
  * European Commission Enterprise Search backend for search_api.
@@ -90,14 +92,28 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
    * {@inheritDoc}
    */
   public function indexItems(IndexInterface $index, array $items) {
-    // TODO: Implement indexItems() method.
+    $client = $this->getClient();
+    $api = new IngestionApi($client);
+
+    /** @var \Drupal\search_api\Item\ItemInterface[] $items */
+    foreach ($items as $id => $item) {
+      $api->ingestText([
+        'uri' => $item->getOriginalObject()->getValue()->toUrl()->setAbsolute()->toString(),
+        'text' => $item->getOriginalObject()->getValue()->label(),
+        'reference' => $id,
+      ]);
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   public function deleteItems(IndexInterface $index, array $item_ids) {
-    // TODO: Implement deleteItems() method.
+    $client = $this->getClient();
+    $api = new IngestionApi($client);
+    foreach ($item_ids as $item_id) {
+      $api->deleteDocument($item_id);
+    }
   }
 
   /**
@@ -117,6 +133,21 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
       '%backend' => $this->label(),
     ]));
 
+    $client = $this->getClient();
+    $api = new IngestionApi($client);
+    $api->ingestText([
+      'uri' => 'http://local.dev',
+      'text' => 'my sharona'
+    ]);
+  }
+
+  /**
+   * Returns a client instance.
+   *
+   * @return \OpenEuropa\EnterpriseSearchClient\ClientInterface
+   *   The client.
+   */
+  protected function getClient(): ClientInterface {
     $configuration = $this->configuration;
     // Normalise configuration name from Drupal standards.
     $configuration['apiKey'] = $configuration['api_key'];
@@ -124,11 +155,8 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
 
     $guzzle_psr = new HttpClient(\Drupal::service('http_client'));
     $client = new Client($guzzle_psr, new RequestFactory(), new StreamFactory(), $configuration);
-    $api = new IngestionApi($client);
-    $api->ingestText([
-      'uri' => 'http://local.dev',
-      'text' => 'my sharona'
-    ]);
+
+    return $client;
   }
 
 }
