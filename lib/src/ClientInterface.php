@@ -7,6 +7,7 @@ namespace OpenEuropa\EnterpriseSearchClient;
 use Psr\Http\Client\ClientInterface as HttpClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Interface for clients that interact with Enterprise Search API.
@@ -28,6 +29,14 @@ interface ClientInterface {
    *   The request factory.
    */
   public function getRequestFactory(): RequestFactoryInterface;
+
+  /**
+   * Returns the serializer.
+   *
+   * @return \Symfony\Component\Serializer\SerializerInterface
+   *   The serializer.
+   */
+  public function getSerializer(): SerializerInterface;
 
   /**
    * Returns the stream factory.

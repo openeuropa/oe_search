@@ -18,6 +18,7 @@ use Http\Adapter\Guzzle6\Client as HttpClient;
 use Http\Factory\Guzzle\RequestFactory;
 use Http\Factory\Guzzle\StreamFactory;
 use OpenEuropa\EnterpriseSearchClient\Api\IngestionApi;
+use OpenEuropa\EnterpriseSearchClient\Api\SearchApi;
 use OpenEuropa\EnterpriseSearchClient\Client;
 use OpenEuropa\EnterpriseSearchClient\ClientInterface;
 
@@ -129,16 +130,13 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
    * {@inheritDoc}
    */
   public function search(QueryInterface $query) {
+    $client = $this->getClient();
+    $api = new SearchApi($client);
+    $api->search();
+
     \Drupal::messenger()->addWarning($this->t('Search is not supported yet in %backend backends.', [
       '%backend' => $this->label(),
     ]));
-
-    $client = $this->getClient();
-    $api = new IngestionApi($client);
-    $api->ingestText([
-      'uri' => 'http://local.dev',
-      'text' => 'my sharona'
-    ]);
   }
 
   /**

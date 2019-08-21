@@ -9,6 +9,8 @@ use Psr\Http\Client\ClientInterface as HttpClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * The client to interface with the Enterprise Search API calls.
@@ -36,6 +38,9 @@ class Client implements ClientInterface {
    */
   protected $requestFactory;
 
+
+  protected $serializer;
+
   /**
    * The stream factory.
    *
@@ -55,10 +60,11 @@ class Client implements ClientInterface {
    * @param array $configuration
    *   The client configuration.
    */
-  public function __construct(HttpClientInterface $httpClient, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, array $configuration = []) {
+  public function __construct(HttpClientInterface $httpClient, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, array $configuration = [], SerializerInterface $serializer = null) {
     $this->httpClient = $httpClient;
     $this->requestFactory = $requestFactory;
     $this->streamFactory = $streamFactory;
+    $this->serializer = $serializer ?? new Serializer();
 
     $this->configuration = $this->getOptionResolver()->resolve($configuration);
   }
@@ -82,6 +88,13 @@ class Client implements ClientInterface {
    */
   public function getStreamFactory(): StreamFactoryInterface {
     return $this->streamFactory;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getSerializer(): SerializerInterface {
+    return $this->serializer;
   }
 
   /**

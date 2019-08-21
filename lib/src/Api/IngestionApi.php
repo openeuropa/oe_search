@@ -55,9 +55,10 @@ class IngestionApi extends ApiBase {
     $queryKeys = array_flip(['apiKey', 'database', 'uri', 'reference']);
     $queryParameters = array_intersect_key($parameters, $queryKeys);
     $bodyParameters = array_diff_key($parameters, $queryKeys);
-    $this->send('POST', 'rest/ingestion/text', $queryParameters, $bodyParameters, true);
+    $response = $this->send('POST', 'rest/ingestion/text', $queryParameters, $bodyParameters, true);
 
     // Parse response.
+
     $ingestion = new Ingestion();
 
     return $ingestion;
