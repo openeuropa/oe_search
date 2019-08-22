@@ -4,7 +4,10 @@ declare(strict_types = 1);
 
 namespace OpenEuropa\EnterpriseSearchClient\Model;
 
-class Ingestion implements ModelInterface {
+/**
+ * A class that represents an ingestion data transfer object.
+ */
+class Ingestion {
 
   /**
    * The API version.

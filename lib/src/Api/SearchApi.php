@@ -4,11 +4,12 @@ declare(strict_types = 1);
 
 namespace OpenEuropa\EnterpriseSearchClient\Api;
 
+use OpenEuropa\EnterpriseSearchClient\Model\Search;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchApi extends ApiBase {
 
-  public function search(array $parameters = []) {
+  public function search(array $parameters = []): Search {
     $resolver = $this->getOptionResolver();
 
     $resolver->setRequired('text')
@@ -21,6 +22,11 @@ class SearchApi extends ApiBase {
     $queryParameters = array_intersect_key($parameters, $queryKeys);
     $bodyParameters = array_diff_key($parameters, $queryKeys);
     $response = $this->send('POST', 'rest/search', $queryParameters, $bodyParameters, true);
+
+    /** @var Search $search */
+    $search = $this->getSerializer()->deserialize((string) $response->getBody(), Search::class, 'json');
+
+    return $search;
   }
 
   /**

@@ -11,6 +11,7 @@
         "drupal/search_api_solr": "^3.3",
         "http-interop/http-factory-guzzle": "^1.0",
         "symfony/property-access": "^4.3",
+        "symfony/property-info": "^4.3",
         "symfony/serializer": "^3.4"
     },
     "require-dev": {

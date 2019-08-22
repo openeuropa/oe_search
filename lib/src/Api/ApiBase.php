@@ -8,7 +8,10 @@ use GuzzleHttp\Psr7\MultipartStream;
 use OpenEuropa\EnterpriseSearchClient\ClientInterface;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -151,7 +154,8 @@ abstract class ApiBase implements ApiInterface {
   protected function getSerializer(): SerializerInterface {
     if ($this->serializer === NULL) {
       $this->serializer = new Serializer([
-        new ObjectNormalizer(),
+        new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+        new ArrayDenormalizer(),
       ], [
         new JsonEncoder(),
       ]);

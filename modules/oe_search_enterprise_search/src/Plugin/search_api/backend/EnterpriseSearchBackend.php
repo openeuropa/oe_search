@@ -18,6 +18,7 @@ use OpenEuropa\EnterpriseSearchClient\Api\IngestionApi;
 use OpenEuropa\EnterpriseSearchClient\Api\SearchApi;
 use OpenEuropa\EnterpriseSearchClient\Client;
 use OpenEuropa\EnterpriseSearchClient\ClientInterface;
+use OpenEuropa\EnterpriseSearchClient\Model\Document;
 
 /**
  * European Commission Enterprise Search backend for search_api.
@@ -127,9 +128,15 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
    * {@inheritDoc}
    */
   public function deleteAllIndexItems(IndexInterface $index, $datasource_id = NULL) {
-    \Drupal::messenger()->addWarning($this->t('Mass deletion is not supported yet in %backend backends.', [
-      '%backend' => $this->label(),
-    ]));
+    $client = $this->getClient();
+    $api = new SearchApi($client);
+    $search = $api->search();
+
+    $item_ids = array_map(function (Document $document) {
+      return $document->getReference();
+    }, $search->getResults());
+
+    $this->deleteItems($index, $item_ids);
   }
 
   /**
@@ -138,9 +145,12 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
   public function search(QueryInterface $query) {
     $client = $this->getClient();
     $api = new SearchApi($client);
-    $api->search();
+    $search = $api->search();
 
-    \Drupal::messenger()->addWarning($this->t('Search is not supported yet in %backend backends.', [
+    $results = $query->getResults();
+    $results->setResultCount($search->getTotalResults());
+
+    \Drupal::messenger()->addWarning($this->t('Search is not fully supported yet in %backend backends.', [
       '%backend' => $this->label(),
     ]));
   }
