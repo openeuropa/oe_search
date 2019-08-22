@@ -60,11 +60,10 @@ class Client implements ClientInterface {
    * @param array $configuration
    *   The client configuration.
    */
-  public function __construct(HttpClientInterface $httpClient, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, array $configuration = [], SerializerInterface $serializer = null) {
+  public function __construct(HttpClientInterface $httpClient, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, array $configuration = []) {
     $this->httpClient = $httpClient;
     $this->requestFactory = $requestFactory;
     $this->streamFactory = $streamFactory;
-    $this->serializer = $serializer ?? new Serializer();
 
     $this->configuration = $this->getOptionResolver()->resolve($configuration);
   }
@@ -88,13 +87,6 @@ class Client implements ClientInterface {
    */
   public function getStreamFactory(): StreamFactoryInterface {
     return $this->streamFactory;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getSerializer(): SerializerInterface {
-    return $this->serializer;
   }
 
   /**

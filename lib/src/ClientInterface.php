@@ -31,14 +31,6 @@ interface ClientInterface {
   public function getRequestFactory(): RequestFactoryInterface;
 
   /**
-   * Returns the serializer.
-   *
-   * @return \Symfony\Component\Serializer\SerializerInterface
-   *   The serializer.
-   */
-  public function getSerializer(): SerializerInterface;
-
-  /**
    * Returns the stream factory.
    *
    * @return \Psr\Http\Message\StreamFactoryInterface

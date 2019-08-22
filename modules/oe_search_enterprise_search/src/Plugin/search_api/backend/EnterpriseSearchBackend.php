@@ -4,12 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search_enterprise_search\Plugin\search_api\backend;
 
-use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\node\Entity\Node;
-use Drupal\search_api\Annotation\SearchApiBackend;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
@@ -96,14 +93,23 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
     $client = $this->getClient();
     $api = new IngestionApi($client);
 
+    $indexed = [];
     /** @var \Drupal\search_api\Item\ItemInterface[] $items */
     foreach ($items as $id => $item) {
-      $api->ingestText([
-        'uri' => $item->getOriginalObject()->getValue()->toUrl()->setAbsolute()->toString(),
-        'text' => $item->getOriginalObject()->getValue()->label(),
-        'reference' => $id,
-      ]);
+      try {
+        $ingestion = $api->ingestText([
+          'uri' => $item->getOriginalObject()->getValue()->toUrl()->setAbsolute()->toString(),
+          'text' => $item->getOriginalObject()->getValue()->label(),
+          'reference' => $id,
+        ]);
+        $indexed[] = $ingestion->getReference();
+      }
+      catch (\Exception $e) {
+        $this->getLogger()->warning($e->getMessage());
+      }
     }
+
+    return $indexed;
   }
 
   /**

@@ -17,12 +17,17 @@ class IngestionApi extends ApiBase {
    *   The request parameters:
    *   - uri: Link associated with document. Required.
    *   - text: Content to ingest.
-   *   - language: Array of languages in ISO 639-1 format. Defaults to all languages.
+   *   - language: Array of languages in ISO 639-1 format. Defaults to all
+   *   languages.
    *   - metadata: Extra fields to index.
-   *   - reference: The reference of the document. If left empty a random one will be generated.
+   *   - reference: The reference of the document. If left empty a random one
+   *   will be generated.
    *
    * @return \OpenEuropa\EnterpriseSearchClient\Model\Ingestion
    *   The ingestion model.
+   *
+   * @throws \Psr\Http\Client\ClientExceptionInterface
+   *   Thrown if an error happened while processing the request.
    */
   public function ingestText(array $parameters): Ingestion {
     $resolver = $this->getOptionResolver();
@@ -57,9 +62,8 @@ class IngestionApi extends ApiBase {
     $bodyParameters = array_diff_key($parameters, $queryKeys);
     $response = $this->send('POST', 'rest/ingestion/text', $queryParameters, $bodyParameters, true);
 
-    // Parse response.
-
-    $ingestion = new Ingestion();
+    /** @var Ingestion $ingestion */
+    $ingestion = $this->getSerializer()->deserialize((string) $response->getBody(), Ingestion::class, 'json');
 
     return $ingestion;
   }
@@ -70,7 +74,6 @@ class IngestionApi extends ApiBase {
     $parameters['reference'] = $reference;
 
     $this->send('DELETE', 'rest/ingestion', $parameters);
-
   }
 
   /**
@@ -97,13 +100,7 @@ class IngestionApi extends ApiBase {
     $base_path = $this->client->getConfiguration('ingestion_api_endpoint');
     $uri = rtrim($base_path, '/') . '/' . ltrim($path, '/');
 
-    if (!empty($queryParameters)) {
-      $query = http_build_query($queryParameters);
-      $glue = strpos($uri, '?') === false ? '?' : '&';
-      $uri = $uri . $glue . $query;
-    }
-
-    return $uri;
+    return $this->addQueryParameters($uri, $queryParameters);
   }
 
 }
