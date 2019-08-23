@@ -9,17 +9,16 @@ use OpenEuropa\EnterpriseSearchClient\ClientInterface;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Base class for Enterprise Search API requests.
  */
-abstract class ApiBase implements ApiInterface {
+abstract class ApiBase {
 
   /**
    * The API client.
@@ -31,7 +30,7 @@ abstract class ApiBase implements ApiInterface {
   /**
    * The API base parameters.
    *
-   * @todo possibly remove
+   * @todo possibly remove, not used.
    *
    * @var array
    */
@@ -58,7 +57,10 @@ abstract class ApiBase implements ApiInterface {
   }
 
   /**
-   * Prepares the URI for a request.
+   * Prepares the full URI for a request.
+   *
+   * The Enterprise Search has multiple servers where the endpoints are located.
+   * Each API class has knowledge of where its endpoint is located.
    *
    * @param string $path
    *   The path of the request.
@@ -135,6 +137,8 @@ abstract class ApiBase implements ApiInterface {
       $parts[] = [
         'name' => $key,
         'contents' => $value,
+        // This header and filename are not required by the standard, but they
+        // are enforced by the ES API.
         'headers' => [
           'Content-Type' => 'application/json',
         ],
@@ -154,7 +158,7 @@ abstract class ApiBase implements ApiInterface {
   protected function getSerializer(): SerializerInterface {
     if ($this->serializer === NULL) {
       $this->serializer = new Serializer([
-        new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+        new GetSetMethodNormalizer(null, null, new PhpDocExtractor()),
         new ArrayDenormalizer(),
       ], [
         new JsonEncoder(),

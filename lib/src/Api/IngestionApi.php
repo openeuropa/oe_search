@@ -8,6 +8,11 @@ use Http\Factory\Guzzle\UriFactory;
 use OpenEuropa\EnterpriseSearchClient\Model\Ingestion;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Class representing the Ingestion API endpoints.
+ *
+ * @todo Enforce required parameters in the method signature.
+ */
 class IngestionApi extends ApiBase {
 
   /**
@@ -68,12 +73,26 @@ class IngestionApi extends ApiBase {
     return $ingestion;
   }
 
+  /**
+   * Delete a single document.
+   *
+   * @param string $reference
+   *   The document reference.
+   *
+   * @return bool
+   *   True if the item was successfully delete.
+   *
+   * @throws \Psr\Http\Client\ClientExceptionInterface
+   *   Thrown if an error happened while processing the request.
+   */
   public function deleteDocument(string $reference) {
     $resolver = $this->getOptionResolver();
     $parameters = $resolver->resolve([]);
     $parameters['reference'] = $reference;
 
-    $this->send('DELETE', 'rest/ingestion', $parameters);
+    $response = $this->send('DELETE', 'rest/ingestion', $parameters);
+
+    return $response->getStatusCode() === 200;
   }
 
   /**

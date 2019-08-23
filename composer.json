@@ -10,7 +10,6 @@
         "drupal/core": "^8.7",
         "drupal/search_api_solr": "^3.3",
         "http-interop/http-factory-guzzle": "^1.0",
-        "symfony/property-access": "^4.3",
         "symfony/property-info": "^4.3",
         "symfony/serializer": "^3.4"
     },
@@ -31,7 +30,6 @@
         "phpunit/phpunit": "~6.0",
         "zaporylie/composer-drupal-optimizations": "^1.1",
         "php-http/guzzle6-adapter": "^2.0",
-        "symfony/options-resolver": "^4.3",
         "psr/http-client": "^1.0",
         "psr/http-factory": "^1.0",
         "psr/http-message": "^1.0",

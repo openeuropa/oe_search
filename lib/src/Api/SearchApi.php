@@ -7,8 +7,24 @@ namespace OpenEuropa\EnterpriseSearchClient\Api;
 use OpenEuropa\EnterpriseSearchClient\Model\Search;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Class representing the Search API endpoints.
+ */
 class SearchApi extends ApiBase {
 
+  /**
+   * Executes a search.
+   *
+   * @param array $parameters
+   *   The request parameters:
+   *     - text: The text to match in documents. Required.
+   *
+   * @return \OpenEuropa\EnterpriseSearchClient\Model\Search
+   *   The search model.
+   *
+   * @throws \Psr\Http\Client\ClientExceptionInterface
+   *   Thrown if an error happened while processing the request.
+   */
   public function search(array $parameters = []): Search {
     $resolver = $this->getOptionResolver();
 

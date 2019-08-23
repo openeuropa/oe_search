@@ -94,6 +94,9 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
     $client = $this->getClient();
     $api = new IngestionApi($client);
 
+    // @todo Support multiple indexes by generating a reference id that takes
+    //       into account index id and item id. Store the item id as separate
+    //       field.
     $indexed = [];
     /** @var \Drupal\search_api\Item\ItemInterface[] $items */
     foreach ($items as $id => $item) {
@@ -120,7 +123,12 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
     $client = $this->getClient();
     $api = new IngestionApi($client);
     foreach ($item_ids as $item_id) {
-      $api->deleteDocument($item_id);
+      try {
+        $api->deleteDocument($item_id);
+      }
+      catch (\Exception $e) {
+        $this->getLogger()->warning($e->getMessage());
+      }
     }
   }
 
@@ -128,6 +136,8 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
    * {@inheritDoc}
    */
   public function deleteAllIndexItems(IndexInterface $index, $datasource_id = NULL) {
+    // There is no method to bulk delete items in the Enterprise Search API.
+    // Fetch all the documents available and then delete them one by one.
     $client = $this->getClient();
     $api = new SearchApi($client);
     $search = $api->search();
@@ -136,6 +146,7 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
       return $document->getReference();
     }, $search->getResults());
 
+    // @todo Handle datasource.
     $this->deleteItems($index, $item_ids);
   }
 
@@ -143,12 +154,18 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
    * {@inheritDoc}
    */
   public function search(QueryInterface $query) {
+    // @todo Make sure the search is run using the proper index.
     $client = $this->getClient();
     $api = new SearchApi($client);
     $search = $api->search();
 
-    $results = $query->getResults();
-    $results->setResultCount($search->getTotalResults());
+    $result_set = $query->getResults();
+    $result_set->setResultCount($search->getTotalResults());
+
+    foreach ($search->getResults() as $document) {
+      $result_item = $this->fieldsHelper->createItem($query->getIndex(), $document->getReference());
+      $result_set->addResultItem($result_item);
+    }
 
     \Drupal::messenger()->addWarning($this->t('Search is not fully supported yet in %backend backends.', [
       '%backend' => $this->label(),
@@ -167,6 +184,7 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
     $configuration['apiKey'] = $configuration['api_key'];
     unset($configuration['api_key']);
 
+    // @todo Make the client available through a service.
     $guzzle_psr = new HttpClient(\Drupal::service('http_client'));
     $client = new Client($guzzle_psr, new RequestFactory(), new StreamFactory(), $configuration);
 

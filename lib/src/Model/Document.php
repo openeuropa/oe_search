@@ -216,9 +216,9 @@ class Document {
   }
 
   /**
-   * @return string
+   * @return string|null
    */
-  public function getDatabase(): string {
+  public function getDatabase(): ?string {
     return $this->database;
   }
 
@@ -230,9 +230,9 @@ class Document {
   }
 
   /**
-   * @return string
+   * @return string|null
    */
-  public function getDatabaseLabel(): string {
+  public function getDatabaseLabel(): ?string {
     return $this->databaseLabel;
   }
 
@@ -244,9 +244,9 @@ class Document {
   }
 
   /**
-   * @return string
+   * @return string|null
    */
-  public function getGroupById(): string {
+  public function getGroupById(): ?string {
     return $this->groupById;
   }
 
@@ -300,10 +300,10 @@ class Document {
   /**
    * Returns the number of pages in the document.
    *
-   * @return int
+   * @return int|null
    *   The number of pages in the document.
    */
-  public function getPages(): int {
+  public function getPages(): ?int {
     return $this->pages;
   }
 
@@ -340,10 +340,10 @@ class Document {
   /**
    * Returns the document summary.
    *
-   * @return string
+   * @return string|null
    *   The document summary.
    */
-  public function getSummary(): string {
+  public function getSummary(): ?string {
     return $this->summary;
   }
 
@@ -360,7 +360,7 @@ class Document {
   /**
    * Returns the document title.
    *
-   * @return string
+   * @return string|null
    *   The document title.
    */
   public function getTitle(): ?string {

@@ -14,6 +14,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * The client to interface with the Enterprise Search API calls.
+ *
+ * @todo Add methods to allow fluent calls: $client->ingestion()->ingestText(...)
+ * @todo Rename "_endpoint" options as they represent servers.
  */
 class Client implements ClientInterface {
 
@@ -37,9 +40,6 @@ class Client implements ClientInterface {
    * @var \Psr\Http\Message\RequestFactoryInterface
    */
   protected $requestFactory;
-
-
-  protected $serializer;
 
   /**
    * The stream factory.
@@ -109,16 +109,16 @@ class Client implements ClientInterface {
   protected function getOptionResolver(): OptionsResolver {
     $resolver = new OptionsResolver();
 
-    $resolver->setRequired([
+    // All options are strings and required.
+    $options = [
       'apiKey',
       'database',
       'ingestion_api_endpoint',
       'search_api_endpoint',
-    ]);
-    $resolver->setAllowedTypes('apiKey', 'string')
-      ->setAllowedTypes('database', 'string')
-      ->setAllowedTypes('ingestion_api_endpoint', 'string')
-      ->setAllowedTypes('search_api_endpoint', 'string');
+    ];
+    foreach ($options as $option) {
+      $resolver->setRequired($option)->setAllowedTypes($option, 'string');
+    }
 
     return $resolver;
   }

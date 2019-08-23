@@ -10,5 +10,5 @@ backend: oe_search_enterprise_search
 backend_config:
   api_key: europa_default
   database: DEFAULT
-  ingestion_api_endpoint: 'http://localhost:8080/ingestion-api/'
-  search_api_endpoint: 'http://localhost:8080/search-api/'
+  ingestion_api_endpoint: 'http://api:8080/ingestion-api/'
+  search_api_endpoint: 'http://api:8080/search-api/'
