@@ -4,6 +4,7 @@ Feature: Search block
   As an anonymous user
   I want to search on ec.europa.eu by using the search block
 
+  @no-redirects
   Scenario: I am redirected to the ec.europa.eu search results page when I use the search block
     Given the following languages are available:
       | languages |
@@ -13,7 +14,7 @@ Feature: Search block
     When I fill in "Search" with "European Commission"
     And I press "Search"
     Then I should be redirected to "https://ec.europa.eu/search/?QueryText=European%20Commission&swlang=en"
-  
+
     When I am on "the French home page"
     When I fill in "Rechercher" with "European Commission"
     And I press "Rechercher"
