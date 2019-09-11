@@ -27,7 +27,7 @@ class SearchContext extends RawDrupalContext {
   }
 
   /**
-   * Allow redirections after the escenario.
+   * Allow redirections after the scenario.
    *
    * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
    *   The Hook scope.
@@ -43,7 +43,7 @@ class SearchContext extends RawDrupalContext {
    *
    * @When /^I do not follow redirects$/
    */
-  public function iDoNotFollowRedirects() {
+  public function iDoNotFollowRedirects(): void {
     $this->getSession()->getDriver()->getClient()->followRedirects(FALSE);
   }
 
@@ -52,7 +52,7 @@ class SearchContext extends RawDrupalContext {
    *
    * @When /^I follow redirects$/
    */
-  public function iFollowRedirects() {
+  public function iFollowRedirects(): void {
     $this->getSession()->getDriver()->getClient()->followRedirects(TRUE);
   }
 
@@ -64,7 +64,7 @@ class SearchContext extends RawDrupalContext {
    *
    * @Then /^I (?:am|should be) redirected to "([^"]*)"$/
    */
-  public function iAmRedirectedTo($expectedUrl) {
+  public function iAmRedirectedTo(string $expectedUrl): void {
     $headers = $this->getSession()->getResponseHeaders();
     Assert::assertTrue(isset($headers['Location'][0]));
     Assert::assertEquals($expectedUrl, $headers['Location'][0]);
