@@ -27,7 +27,7 @@ class SearchContext extends RawDrupalContext {
   }
 
   /**
-   * Allow redirections after th escenario.
+   * Allow redirections after the escenario.
    *
    * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
    *   The Hook scope.
