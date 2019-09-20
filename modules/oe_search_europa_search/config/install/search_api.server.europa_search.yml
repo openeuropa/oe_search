@@ -2,13 +2,13 @@ langcode: en
 status: true
 dependencies:
   module:
-    - oe_search_enterprise_search
-id: enterprise_search
-name: 'Enterprise search'
+    - oe_search_europa_search
+id: europa_search
+name: 'Europa search'
 description: ''
-backend: oe_search_enterprise_search
+backend: oe_search_europa_search
 backend_config:
   api_key: europa_default
-  database: DEFAULT
+  database: EUROPA
   ingestion_api_endpoint: 'http://api:8080/ingestion-api/'
   search_api_endpoint: 'http://api:8080/search-api/'

@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\oe_search_enterprise_search\Plugin\search_api\backend;
+namespace Drupal\oe_search_europa_search\Plugin\search_api\backend;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -21,15 +21,15 @@ use OpenEuropa\EuropaSearchClient\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
 
 /**
- * European Commission Enterprise Search backend for search_api.
+ * European Commission Europa Search backend for search_api.
  *
  * @SearchApiBackend(
- *   id = "oe_search_enterprise_search",
- *   label = @Translation("EC Enterprise Search"),
- *   description = @Translation("Index items using EC Enterprise Search backend.")
+ *   id = "oe_search_europa_search",
+ *   label = @Translation("EC Europa Search"),
+ *   description = @Translation("Index items using EC Europa Search backend.")
  * )
  */
-class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInterface {
+class EuropaSearchBackend extends BackendPluginBase implements PluginFormInterface {
 
   use PluginFormTrait {
     submitConfigurationForm as traitSubmitConfigurationForm;
@@ -136,7 +136,7 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
    * {@inheritDoc}
    */
   public function deleteAllIndexItems(IndexInterface $index, $datasource_id = NULL) {
-    // There is no method to bulk delete items in the Enterprise Search API.
+    // There is no method to bulk delete items in the Europa Search API.
     // Fetch all the documents available and then delete them one by one.
     $client = $this->getClient();
     $api = new SearchApi($client);

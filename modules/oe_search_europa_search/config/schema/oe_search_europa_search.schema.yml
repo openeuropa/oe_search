@@ -1,6 +1,6 @@
-plugin.plugin_configuration.search_api_backend.oe_search_enterprise_search:
+plugin.plugin_configuration.search_api_backend.oe_search_europa_search:
   type: config_object
-  label: 'EC Enterprise Search settings'
+  label: 'EC Europa Search settings'
   mapping:
     api_key:
       type: string

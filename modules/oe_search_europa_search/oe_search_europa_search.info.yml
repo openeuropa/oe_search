@@ -1,0 +1,12 @@
+name: OpenEuropa Search Europa Search
+description: Integrates with the European Commission Europa Search.
+package: OpenEuropa
+type: module
+core: 8.x
+
+dependencies:
+  - search_api:search_api
+
+config_devel:
+  install:
+    - search_api.server.europa_search
