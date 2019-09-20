@@ -14,11 +14,11 @@ use Drupal\search_api\Query\QueryInterface;
 use Http\Adapter\Guzzle6\Client as HttpClient;
 use Http\Factory\Guzzle\RequestFactory;
 use Http\Factory\Guzzle\StreamFactory;
-use OpenEuropa\EnterpriseSearchClient\Api\IngestionApi;
-use OpenEuropa\EnterpriseSearchClient\Api\SearchApi;
-use OpenEuropa\EnterpriseSearchClient\Client;
-use OpenEuropa\EnterpriseSearchClient\ClientInterface;
-use OpenEuropa\EnterpriseSearchClient\Model\Document;
+use OpenEuropa\EuropaSearchClient\Api\IngestionApi;
+use OpenEuropa\EuropaSearchClient\Api\SearchApi;
+use OpenEuropa\EuropaSearchClient\Client;
+use OpenEuropa\EuropaSearchClient\ClientInterface;
+use OpenEuropa\EuropaSearchClient\Model\Document;
 
 /**
  * European Commission Enterprise Search backend for search_api.
@@ -95,8 +95,8 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
     $api = new IngestionApi($client);
 
     // @todo Support multiple indexes by generating a reference id that takes
-    //       into account index id and item id. Store the item id as separate
-    //       field.
+    //   into account index id and item id. Store the item id as separate
+    //   field.
     $indexed = [];
     /** @var \Drupal\search_api\Item\ItemInterface[] $items */
     foreach ($items as $id => $item) {
@@ -175,7 +175,7 @@ class EnterpriseSearchBackend extends BackendPluginBase implements PluginFormInt
   /**
    * Returns a client instance.
    *
-   * @return \OpenEuropa\EnterpriseSearchClient\ClientInterface
+   * @return \OpenEuropa\EuropaSearchClient\ClientInterface
    *   The client.
    */
   protected function getClient(): ClientInterface {

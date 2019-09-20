@@ -7,11 +7,7 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.1",
-        "drupal/core": "^8.7",
-        "drupal/search_api_solr": "^3.3",
-        "http-interop/http-factory-guzzle": "^1.0",
-        "symfony/property-info": "^4.3",
-        "symfony/serializer": "^3.4"
+        "drupal/core": "^8.7"
     },
     "require-dev": {
         "composer/installers": "~1.5",
@@ -21,19 +17,18 @@
         "drupal/config_devel": "~1.2",
         "drupal/drupal-extension": "~4.0.0@beta",
         "drupal/search_api": "^1.14",
+        "drupal/search_api_solr": "^3.3",
         "drush/drush": "~9.0@stable",
+        "http-interop/http-factory-guzzle": "^1.0",
         "openeuropa/behat-transformation-context": "~0.1",
         "openeuropa/code-review": "~1.0.0-alpha4",
         "openeuropa/drupal-core-require-dev": "^8.7",
+        "openeuropa/europa-search-client": "dev-OPENEUROPA-2277",
         "openeuropa/oe_multilingual": "^1.1",
         "openeuropa/task-runner": "~1.0-beta4",
-        "phpunit/phpunit": "~6.0",
-        "zaporylie/composer-drupal-optimizations": "^1.1",
         "php-http/guzzle6-adapter": "^2.0",
-        "psr/http-client": "^1.0",
-        "psr/http-factory": "^1.0",
-        "psr/http-message": "^1.0",
-        "guzzlehttp/psr7": "^1.6"
+        "phpunit/phpunit": "~6.0",
+        "zaporylie/composer-drupal-optimizations": "^1.1"
     },
     "_readme": [
         "We explicitly require consolidation/robo to allow lower 'composer update --prefer-lowest' to complete successfully.",
