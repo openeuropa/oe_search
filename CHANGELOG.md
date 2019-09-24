@@ -1,10 +1,18 @@
 # Change Log
 
+## [1.3.0](https://github.com/openeuropa/oe_search/tree/1.3.0) (2019-09-24)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.2.0...1.3.0)
+
+**Merged pull requests:**
+
+- OPENEUROPA-2286: Check redirect headers instead of waiting for an external resource. [\#12](https://github.com/openeuropa/oe_search/pull/12) ([imanoleguskiza](https://github.com/imanoleguskiza))
+
 ## [1.2.0](https://github.com/openeuropa/oe_search/tree/1.2.0) (2019-07-11)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.1.0...1.2.0)
 
 **Merged pull requests:**
 
+- Prepare release 1.2.0. [\#10](https://github.com/openeuropa/oe_search/pull/10) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - OPENEUROPA-1794: Add translation for Search. [\#9](https://github.com/openeuropa/oe_search/pull/9) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - OPENEUROPA-1897: Use ci image. [\#8](https://github.com/openeuropa/oe_search/pull/8) ([imanoleguskiza](https://github.com/imanoleguskiza))
 
