@@ -2,10 +2,13 @@
 
 [![Build Status](https://drone.fpfis.eu/api/badges/openeuropa/oe_search/status.svg?branch=master)](https://drone.fpfis.eu/openeuropa/oe_search)
 
-
-The OpenEuropa Search provides a backend for the Search API which uses the "Europa Search" search engine for storing and searching data.
+The OpenEuropa Search provides a simple block that allows to execute a search against the Europa Search portal.
 
 Europa Search is the corporate search engine for the European Commission.
+
+### Future developments planned
+
+- A backend for Search API which uses the "Europa Search" search engine for storing and searching data.
 
 ## Development setup
 
@@ -31,10 +34,10 @@ The development site web root should be available in the `build` directory.
 
 ### Using Docker Compose
 
-Alternatively, you can build a development site using [Docker](https://www.docker.com/get-docker) and 
+Alternatively, you can build a development site using [Docker](https://www.docker.com/get-docker) and
 [Docker Compose](https://docs.docker.com/compose/) with the provided configuration.
 
-Docker provides the necessary services and tools such as a web server and a database server to get the site running, 
+Docker provides the necessary services and tools such as a web server and a database server to get the site running,
 regardless of your local host configuration.
 
 #### Requirements:
@@ -46,7 +49,7 @@ regardless of your local host configuration.
 
 By default, Docker Compose reads two files, a `docker-compose.yml` and an optional `docker-compose.override.yml` file.
 By convention, the `docker-compose.yml` contains your base configuration and it's provided by default.
-The override file, as its name implies, can contain configuration overrides for existing services or entirely new 
+The override file, as its name implies, can contain configuration overrides for existing services or entirely new
 services.
 If a service is defined in both files, Docker Compose merges the configurations.
 
