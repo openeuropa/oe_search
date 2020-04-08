@@ -1,10 +1,24 @@
 # Change Log
 
+## [1.4.0](https://github.com/openeuropa/oe_search/tree/1.4.0) (2020-04-08)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.3.0...1.4.0)
+
+**Merged pull requests:**
+
+- OPENEUROPA-0000: Use drupal/core instead of drupal/core-recommended. [\#20](https://github.com/openeuropa/oe_search/pull/20) ([22Alexandra](https://github.com/22Alexandra))
+- OPENEUROPA-2943: Upgrade to PHP 7.3. [\#19](https://github.com/openeuropa/oe_search/pull/19) ([sergepavle](https://github.com/sergepavle))
+- OPENEUROPA-2604: Drupal 8 recommended project. [\#18](https://github.com/openeuropa/oe_search/pull/18) ([upchuk](https://github.com/upchuk))
+- OPENEUROPA-0000: Correct README information. [\#17](https://github.com/openeuropa/oe_search/pull/17) ([brummbar](https://github.com/brummbar))
+- OPENEUROPA-2258: Undo use of PHP 7.2. [\#16](https://github.com/openeuropa/oe_search/pull/16) ([dxvargas](https://github.com/dxvargas))
+- OPENEUROPA-2464: Use PHP 7.1 in docker-compose. [\#15](https://github.com/openeuropa/oe_search/pull/15) ([dxvargas](https://github.com/dxvargas))
+- OPENEUROPA-2258: Use PHP 7.2 in drone and docker image. [\#13](https://github.com/openeuropa/oe_search/pull/13) ([dxvargas](https://github.com/dxvargas))
+
 ## [1.3.0](https://github.com/openeuropa/oe_search/tree/1.3.0) (2019-09-24)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.2.0...1.3.0)
 
 **Merged pull requests:**
 
+- OPENEUROPA-0000: Update changelog for release 1.3.0. [\#14](https://github.com/openeuropa/oe_search/pull/14) ([brummbar](https://github.com/brummbar))
 - OPENEUROPA-2286: Check redirect headers instead of waiting for an external resource. [\#12](https://github.com/openeuropa/oe_search/pull/12) ([imanoleguskiza](https://github.com/imanoleguskiza))
 
 ## [1.2.0](https://github.com/openeuropa/oe_search/tree/1.2.0) (2019-07-11)
