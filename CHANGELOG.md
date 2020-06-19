@@ -1,10 +1,18 @@
 # Change Log
 
+## [1.5.0](https://github.com/openeuropa/oe_search/tree/1.5.0) (2020-06-19)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.4.0...1.5.0)
+
+**Merged pull requests:**
+
+- OPENEUROPA-3286: Translation of word Search in Lithuanian and Latvian are swapped [\#22](https://github.com/openeuropa/oe_search/pull/22) ([brummbar](https://github.com/brummbar))
+
 ## [1.4.0](https://github.com/openeuropa/oe_search/tree/1.4.0) (2020-04-08)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.3.0...1.4.0)
 
 **Merged pull requests:**
 
+- OPENEUROPA-0000: Update changelog for release 1.4.0. [\#21](https://github.com/openeuropa/oe_search/pull/21) ([sergepavle](https://github.com/sergepavle))
 - OPENEUROPA-0000: Use drupal/core instead of drupal/core-recommended. [\#20](https://github.com/openeuropa/oe_search/pull/20) ([22Alexandra](https://github.com/22Alexandra))
 - OPENEUROPA-2943: Upgrade to PHP 7.3. [\#19](https://github.com/openeuropa/oe_search/pull/19) ([sergepavle](https://github.com/sergepavle))
 - OPENEUROPA-2604: Drupal 8 recommended project. [\#18](https://github.com/openeuropa/oe_search/pull/18) ([upchuk](https://github.com/upchuk))
