@@ -36,7 +36,7 @@ class EuropaSearchService {
   }
 
   /**
-   * {@inheritDoc}
+   * Return Ingestion API.
    */
   public function ingestionApi() {
     $client = $this->getClient();
@@ -46,7 +46,7 @@ class EuropaSearchService {
   }
 
   /**
-   * {@inheritDoc}
+   * Return Search results.
    */
   public function searchApi() {
     $client = $this->getClient();
