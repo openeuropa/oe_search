@@ -1,0 +1,4 @@
+services:
+  oe_search.es_service:
+    class: Drupal\oe_search\EuropaSearchService
+    arguments: ['@config.factory']

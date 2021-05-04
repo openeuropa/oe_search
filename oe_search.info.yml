@@ -3,8 +3,4 @@ description: Search features for the OpenEuropa project.
 package: OpenEuropa
 
 type: module
-core: 8.x
-
-'interface translation project': oe_search
-# The path to the actual translations is defined in
-# oe_search_locale_translation_projects_alter().
+core_version_requirement: ^8.8 || ^9
