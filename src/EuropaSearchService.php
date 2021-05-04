@@ -26,7 +26,7 @@ class EuropaSearchService {
   /**
    * Constructs a ProviderRepository instance.
    *
-   * @param ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
    */
   public function __construct(
