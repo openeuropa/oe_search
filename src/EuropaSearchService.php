@@ -64,6 +64,7 @@ class EuropaSearchService {
    */
   protected function getClient(): ClientInterface {
     $configuration = $this->config->getRawData();
+
     // Normalise configuration name from Drupal standards.
     $configuration['apiKey'] = $configuration['api_key'];
     unset($configuration['api_key']);
