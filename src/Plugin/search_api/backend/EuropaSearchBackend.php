@@ -5,12 +5,14 @@ declare(strict_types = 1);
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Query\QueryInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
+use Solarium\QueryType\Select\Query\Query;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -91,6 +93,12 @@ class EuropaSearchBackend extends BackendPluginBase implements PluginFormInterfa
   }
 
   /**
+   * Form validation handler.
+   */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+  }
+
+  /**
    * Form submission handler.
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
@@ -100,6 +108,43 @@ class EuropaSearchBackend extends BackendPluginBase implements PluginFormInterfa
       ->set('ingestion_api_endpoint', $form_state->getValue('ingestion_api_endpoint'))
       ->set('search_api_endpoint', $form_state->getValue('search_api_endpoint'))
       ->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewSettings() {
+    $info[] = [
+      'label' => $this->t('API key'),
+      'info' => $this->config->get('api_key'),
+    ];
+
+    $info[] = [
+      'label' => $this->t('Database'),
+      'info' => $this->config->get('database'),
+    ];
+
+    $info[] = [
+      'label' => $this->t('Ingestion API endpoint'),
+      'info' => $this->config->get('ingestion_api_endpoint'),
+    ];
+
+    $info[] = [
+      'label' => $this->t('Search API endpoint'),
+      'info' => $this->config->get('search_api_endpoint'),
+    ];
+
+    return $info;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedFeatures() {
+    return [
+      'search_api_facets',
+      'search_api_facets_operator_or'
+    ];
   }
 
   /**
@@ -177,24 +222,89 @@ class EuropaSearchBackend extends BackendPluginBase implements PluginFormInterfa
       $result_set->addResultItem($result_item);
     }
 
+    // @todo Implement FacetAPI from europa-search-client #OEL-97.
+    $this->setFacets($query, $result_set);
+
     \Drupal::messenger()->addWarning($this->t('Search is not fully supported yet in %backend backends.', [
       '%backend' => $this->label(),
     ]));
   }
 
-  /**
-   * Form validation handler.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the plugin form as built
-   *   by static::buildConfigurationForm().
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form. Calling code should pass on a subform
-   *   state created through
-   *   \Drupal\Core\Form\SubformState::createForSubform().
-   */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // @todo Implement validateConfigurationForm() method.
+  protected function setFacets(QueryInterface $query, Query $result_set) {
+    // @todo Implement FacetAPI from europa-search-client #OEL-97.
+    static $index_fulltext_fields = [];
+
+    $facets = $query->getOption('search_api_facets', []);
+    if (empty($facets)) {
+      return;
+    }
+
+    $index = $query->getIndex();
+    $index_id = $index->id();
+
+    $field_names = $this->getLanguageSpecificSolrFieldNames(LanguageInterface::LANGCODE_NOT_SPECIFIED, $index);
+
+    $facet_set = $result_set->getFacetSet();
+    $facet_set->setSort('count');
+    $facet_set->setLimit(10);
+    $facet_set->setMinCount(1);
+    $facet_set->setMissing(FALSE);
+
+    foreach ($facets as $info) {
+      if (empty($field_names[$info['field']])) {
+        continue;
+      }
+      $esc_field = $field_names[$info['field']];
+      $facet_field = NULL;
+
+      // Backward compatibility for facets.
+      $info += ['query_type' => 'search_api_string'];
+
+      switch ($info['query_type']) {
+        case 'search_api_string':
+        default:
+          if (!isset($index_fulltext_fields[$index_id])) {
+            $index_fulltext_fields[$index_id] = $index->getFulltextFields();
+          }
+
+          if (in_array($info['field'], $index_fulltext_fields[$index_id])) {
+            \Drupal::messenger()->addWarning($this->t('Facetting on fulltext fields is not yet supported. Consider to add a string field to the index for that purpose.', [
+              '%backend' => $this->label(),
+            ]));
+          }
+          else {
+            // Create the Europa Search Client facet field object.
+            $facet_field = $facet_set->createFacetField($esc_field)->setField($esc_field);
+          }
+
+          // Set limit, unless it's the default.
+          if ($info['limit'] != 10) {
+            $limit = $info['limit'] ? $info['limit'] : -1;
+            $facet_field->setLimit($limit);
+          }
+          // Set missing, if specified.
+          if ($info['missing']) {
+            $facet_field->setMissing(TRUE);
+          }
+          else {
+            $facet_field->setMissing(FALSE);
+          }
+      }
+
+      // For "OR" facets, add the expected tag for exclusion.
+      if (isset($info['operator']) && strtolower($info['operator']) === 'or') {
+        // The tag "facet:field_name" is defined by the facets module. Therefore
+        // we have to use the Search API field name here to create the same tag.
+        // @see \Drupal\facets\QueryType\QueryTypeRangeBase::execute()
+        // @see https://cwiki.apache.org/confluence/display/solr/Faceting#Faceting-LocalParametersforFaceting
+        $facet_field->setExcludes(['facet:' . $info['field']]);
+      }
+
+      // Set mincount, unless it's the default.
+      if ($info['min_count'] != 1) {
+        $facet_field->setMinCount($info['min_count']);
+      }
+    }
   }
 
 }
