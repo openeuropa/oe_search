@@ -143,7 +143,7 @@ class EuropaSearchBackend extends BackendPluginBase implements PluginFormInterfa
   public function getSupportedFeatures() {
     return [
       'search_api_facets',
-      'search_api_facets_operator_or'
+      'search_api_facets_operator_or',
     ];
   }
 
@@ -230,6 +230,9 @@ class EuropaSearchBackend extends BackendPluginBase implements PluginFormInterfa
     ]));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   protected function setFacets(QueryInterface $query, Query $result_set) {
     // @todo Implement FacetAPI from europa-search-client #OEL-97.
     static $index_fulltext_fields = [];
@@ -255,55 +258,52 @@ class EuropaSearchBackend extends BackendPluginBase implements PluginFormInterfa
         continue;
       }
       $esc_field = $field_names[$info['field']];
-      $facet_field = NULL;
 
       // Backward compatibility for facets.
       $info += ['query_type' => 'search_api_string'];
 
-      switch ($info['query_type']) {
-        case 'search_api_string':
-        default:
-          if (!isset($index_fulltext_fields[$index_id])) {
-            $index_fulltext_fields[$index_id] = $index->getFulltextFields();
-          }
+      $this->setFacetField($esc_field, $index, $index_id, $info, $facet_set);
+    }
+  }
 
-          if (in_array($info['field'], $index_fulltext_fields[$index_id])) {
-            \Drupal::messenger()->addWarning($this->t('Facetting on fulltext fields is not yet supported. Consider to add a string field to the index for that purpose.', [
-              '%backend' => $this->label(),
-            ]));
-          }
-          else {
-            // Create the Europa Search Client facet field object.
-            $facet_field = $facet_set->createFacetField($esc_field)->setField($esc_field);
-          }
+  /**
+   * {@inheritDoc}
+   */
+  protected function setFacetField($esc_field, $index, $index_id, $info, $facet_set, $facet_field = NULL) {
+    if (!isset($index_fulltext_fields[$index_id])) {
+      $index_fulltext_fields[$index_id] = $index->getFulltextFields();
+    }
 
-          // Set limit, unless it's the default.
-          if ($info['limit'] != 10) {
-            $limit = $info['limit'] ? $info['limit'] : -1;
-            $facet_field->setLimit($limit);
-          }
-          // Set missing, if specified.
-          if ($info['missing']) {
-            $facet_field->setMissing(TRUE);
-          }
-          else {
-            $facet_field->setMissing(FALSE);
-          }
-      }
+    if (in_array($info['field'], $index_fulltext_fields[$index_id])) {
+      \Drupal::messenger()->addWarning($this->t('Facetting on fulltext fields is not yet supported. Consider to add a string field to the index for that purpose.', [
+        '%backend' => $this->label(),
+      ]));
+    }
+    else {
+      // Create the Europa Search Client facet field object.
+      $facet_field = $facet_set->createFacetField($esc_field)->setField($esc_field);
+    }
 
-      // For "OR" facets, add the expected tag for exclusion.
-      if (isset($info['operator']) && strtolower($info['operator']) === 'or') {
-        // The tag "facet:field_name" is defined by the facets module. Therefore
-        // we have to use the Search API field name here to create the same tag.
-        // @see \Drupal\facets\QueryType\QueryTypeRangeBase::execute()
-        // @see https://cwiki.apache.org/confluence/display/solr/Faceting#Faceting-LocalParametersforFaceting
-        $facet_field->setExcludes(['facet:' . $info['field']]);
-      }
+    // Set limit, unless it's the default.
+    if ($info['limit'] != 10) {
+      $limit = $info['limit'] ? $info['limit'] : -1;
+      $facet_field->setLimit($limit);
+    }
+    // Set missing.
+    $facet_field->setMissing(isset($info['missing']));
 
-      // Set mincount, unless it's the default.
-      if ($info['min_count'] != 1) {
-        $facet_field->setMinCount($info['min_count']);
-      }
+    // For "OR" facets, add the expected tag for exclusion.
+    if (isset($info['operator']) && strtolower($info['operator']) === 'or') {
+      // The tag "facet:field_name" is defined by the facets module. Therefore
+      // we have to use the Search API field name here to create the same tag.
+      // @see \Drupal\facets\QueryType\QueryTypeRangeBase::execute()
+      // @see https://cwiki.apache.org/confluence/display/solr/Faceting#Faceting-LocalParametersforFaceting
+      $facet_field->setExcludes(['facet:' . $info['field']]);
+    }
+
+    // Set mincount, unless it's the default.
+    if ($info['min_count'] != 1) {
+      $facet_field->setMinCount($info['min_count']);
     }
   }
 
