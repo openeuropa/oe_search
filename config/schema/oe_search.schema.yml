@@ -1,5 +1,5 @@
-oe_search.server:
-  type: mapping
+plugin.plugin_configuration.search_api_backend.search_api_europa_search:
+  type: plugin.plugin_configuration.search_api_backend.*
   label: 'EC Europa Search settings'
   mapping:
     api_key:
@@ -14,3 +14,6 @@ oe_search.server:
     search_api_endpoint:
       type: string
       label: 'Search API endpoint URL'
+    token_api_endpoint:
+      type: string
+      label: 'Token API endpoint URL'
