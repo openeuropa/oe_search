@@ -25,7 +25,7 @@ class ESIngestionPlugin extends PluginBase implements ServiceMockPluginInterface
    * {@inheritdoc}
    */
   public function applies(RequestInterface $request, array $options): bool {
-    return $request->getUri()->getPath() === '/rest/ingestion/text';
+    return $request->getUri()->getHost() === 'api.com' && $request->getUri()->getPath() === '/ingestion';
   }
 
   /**

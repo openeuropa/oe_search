@@ -25,14 +25,14 @@ class ESSearchPlugin extends PluginBase implements ServiceMockPluginInterface {
    * {@inheritdoc}
    */
   public function applies(RequestInterface $request, array $options): bool {
-    return $request->getUri()->getPath() === '/rest/search';
+    return $request->getUri()->getHost() === 'api.com' && $request->getUri()->getPath() === '/search';
   }
 
   /**
    * {@inheritdoc}
    */
   public function getResponse(RequestInterface $request, array $options): ResponseInterface {
-    $response = '[{"accessRestriction": true,"apiVersion": "string","children": ["string"],"content": "string","contentType": "string","database": "string","databaseLabel": "string","groupById": "string","language": "string","metadata": {"additionalProp1": ["string"],"additionalProp2": ["string"],"additionalProp3": ["string"]},"pages": 0,"reference": "string","summary": "string","title": "string","url": "string","weight": 0}]';
+    $response = '[{"accessRestriction": true,"apiVersion": "string","children": [],"content": "string","contentType": "string","database": "string","databaseLabel": "string","groupById": "string","language": "string","metadata": {"additionalProp1": ["string"],"additionalProp2": ["string"],"additionalProp3": ["string"]},"pages": 0,"reference": "string","summary": "string","title": "string","url": "string","weight": 1.1}]';
 
     return new Response(200, [], $response);
   }
