@@ -1,4 +1,5 @@
 api_key: europa_default
 database: EUROPA
-ingestion_api_endpoint: 'http://127.0.0.1:8080/'
-search_api_endpoint: 'http://127.0.0.1:8080/'
+ingestion_api_endpoint: 'http://web:8080/'
+search_api_endpoint: 'http://web:8080/'
+token_api_endpoint: TOKEN
