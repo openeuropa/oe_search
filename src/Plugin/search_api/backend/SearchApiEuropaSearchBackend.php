@@ -70,8 +70,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
+   * @param array $plugin_definition
    *   The plugin implementation definition.
+   * @param \GuzzleHttp\ClientInterface $http_client
+   *   The HTTP client.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
    * @param \Drupal\Core\Render\RendererInterface $renderer
