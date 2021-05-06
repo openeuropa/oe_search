@@ -204,6 +204,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected function getClient(): ClientInterface {
     if (!isset($this->client)) {
       $configuration = array_map(Container::class . '::camelize', $this->getConfiguration());
+      // @todo Refactor this instantiation to a new plugin type in OEL-152.
+      // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
       $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), $configuration);
     }
     return $this->client;
