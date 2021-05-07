@@ -248,8 +248,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         '#type' => 'html_tag',
         '#tag' => 'pre',
         '#value' => implode("\n", $missing_settings),
-        '#prefix' => '<div class="indent">',
-        '#suffix' => '</div>',
       ],
     ];
     $this->messenger()->addWarning($this->renderer->render($warning));
