@@ -48,9 +48,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @var string[]
    */
   const CONNECTION_SETTINGS = [
-    'ingestion_api_endpoint',
-    'search_api_endpoint',
-    'token_api_endpoint',
     'consumer_key',
     'consumer_secret',
   ];
@@ -127,6 +124,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     return [
       'api_key' => NULL,
       'database' => NULL,
+      'ingestion_api_endpoint' => NULL,
+      'search_api_endpoint' => NULL,
+      'token_api_endpoint' => NULL,
     ] + parent::defaultConfiguration();
   }
 
@@ -161,6 +161,30 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#description' => $this->t('The database element correspond to a dataSource that contains the documents.'),
       '#required' => TRUE,
       '#default_value' => $configuration['database'],
+    ];
+
+    $form['ingestion_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Ingestion API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Ingestion API is available.'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['ingestion_api_endpoint'],
+    ];
+
+    $form['search_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Search API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Search API is available.'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['search_api_endpoint'],
+    ];
+
+    $form['token_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Token API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Token API is available.'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['token_api_endpoint'],
     ];
 
     return $form;
@@ -229,10 +253,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function checkMissingSettings(): void {
     $missing_settings = [];
-    $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '[%s]';";
+    $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '%s';";
     foreach ($this->getConnectionSettings() as $setting => $value) {
       if (!$value) {
-        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, str_replace('_', ' ', $setting));
+        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, '&lt;' . $this->t('@name value...', [
+          '@name' => str_replace('_', ' ', $setting),
+        ]) . '&gt;');
       }
     }
 
@@ -240,7 +266,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       return;
     }
 
-    $warning = [
+    $error = [
       [
         '#markup' => $this->t('Missing <code>settings.php</code> entries:'),
       ],
@@ -250,7 +276,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         '#value' => implode("\n", $missing_settings),
       ],
     ];
-    $this->messenger()->addWarning($this->renderer->render($warning));
+    $this->messenger()->addError($this->renderer->render($error));
   }
 
 }
