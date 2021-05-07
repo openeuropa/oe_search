@@ -332,7 +332,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * {@inheritDoc}
+   * Helper method for creating the facet field parameters.
    */
   protected function setFacets(QueryInterface $query, Query $result_set) {
     // @todo Implement FacetAPI from europa-search-client #OEL-148.
@@ -368,7 +368,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * {@inheritDoc}
+   * Helper method for set facet field.
    */
   protected function setFacetField($esc_field, $index, $index_id, $info, $facet_set, $facet_field = NULL) {
     if (!isset($index_fulltext_fields[$index_id])) {
