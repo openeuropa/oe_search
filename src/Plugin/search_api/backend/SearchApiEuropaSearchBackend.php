@@ -256,9 +256,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '%s';";
     foreach ($this->getConnectionSettings() as $setting => $value) {
       if (!$value) {
-        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, '&lt;' . $this->t('@name value...', [
+        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, $this->t('@name value...', [
           '@name' => str_replace('_', ' ', $setting),
-        ]) . '&gt;');
+        ]));
       }
     }
 
