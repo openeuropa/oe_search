@@ -8,12 +8,3 @@ plugin.plugin_configuration.search_api_backend.search_api_europa_search:
     database:
       type: string
       label: 'Database'
-    ingestion_api_endpoint:
-      type: string
-      label: 'Ingestion API endpoint URL'
-    search_api_endpoint:
-      type: string
-      label: 'Search API endpoint URL'
-    token_api_endpoint:
-      type: string
-      label: 'Token API endpoint URL'

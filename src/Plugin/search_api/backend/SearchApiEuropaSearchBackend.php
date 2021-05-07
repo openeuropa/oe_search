@@ -36,6 +36,26 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
+   * Connection info stored as Drupal settings.
+   *
+   * These connection information are sensitive data and may be different on
+   * each environment (i.e. the acceptance machine may use an Europa Search
+   * sandbox instance). For this reason we'll store them as settings in
+   * `settings.php` file rather than config storage. Storing them in config
+   * would be a security concern, as configuration may end up being committed in
+   * VCS and exposed publicly.
+   *
+   * @var string[]
+   */
+  const CONNECTION_SETTINGS = [
+    'ingestion_api_endpoint',
+    'search_api_endpoint',
+    'token_api_endpoint',
+    'consumer_key',
+    'consumer_secret',
+  ];
+
+  /**
    * The HTTP client.
    *
    * @var \GuzzleHttp\ClientInterface
@@ -107,9 +127,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     return [
       'api_key' => NULL,
       'database' => NULL,
-      'ingestion_api_endpoint' => NULL,
-      'search_api_endpoint' => NULL,
-      'token_api_endpoint' => NULL,
     ] + parent::defaultConfiguration();
   }
 
@@ -117,8 +134,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function isAvailable(): bool {
-    // @todo Perform a ping as soon as the functionality is available in client.
-    return $this->getConsumerKey() && $this->getConsumerSecret();
+    // Check that all settings from settings.php are set.
+    // @todo Perform also a ping as soon as the functionality is available.
+    return array_keys(array_filter($this->getConnectionSettings())) === static::CONNECTION_SETTINGS;
   }
 
   /**
@@ -126,6 +144,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $this->checkMissingSettings();
+
     $configuration = $this->getConfiguration();
 
     $form['api_key'] = [
@@ -142,30 +161,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#description' => $this->t('The database element correspond to a dataSource that contains the documents.'),
       '#required' => TRUE,
       '#default_value' => $configuration['database'],
-    ];
-
-    $form['ingestion_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Ingestion API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Ingestion API is available.'),
-      '#required' => TRUE,
-      '#default_value' => $configuration['ingestion_api_endpoint'],
-    ];
-
-    $form['search_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Search API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Search API is available.'),
-      '#required' => TRUE,
-      '#default_value' => $configuration['search_api_endpoint'],
-    ];
-
-    $form['token_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Token API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Token API is available.'),
-      '#required' => TRUE,
-      '#default_value' => $configuration['token_api_endpoint'],
     ];
 
     return $form;
@@ -203,7 +198,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function getClient(): ClientInterface {
     if (!isset($this->client)) {
-      $configuration = array_map(Container::class . '::camelize', $this->getConfiguration());
+      // Merge configuration and settings together.
+      $configuration = $this->getConfiguration() + $this->getConnectionSettings();
+      // The client uses the camelized version of connection data identifiers.
+      $configuration = array_map(Container::class . '::camelize', $configuration);
       // @todo Refactor this instantiation to a new plugin type in OEL-152.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
       $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), $configuration);
@@ -212,51 +210,49 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * Returns the Europa Search consumer key.
+   * Returns the values of connection settings.
    *
-   * @return string|null
-   *   The Europa Search consumer key.
+   * These connection data is considered sensitive and depending on the
+   * environment, thus is stored in `settings.php`, rather than config store.
+   *
+   * @return array
+   *   The values of connection settings.
    */
-  protected function getConsumerKey(): ?string {
-    return $this->settings->get('oe_search')['backend'][$this->getServer()->id()]['consumer_key'] ?? NULL;
+  protected function getConnectionSettings(): array {
+    return array_map(function (string $setting): ?string {
+      return $this->settings->get('oe_search')['backend'][$this->getServer()->id()][$setting] ?? NULL;
+    }, array_combine(static::CONNECTION_SETTINGS, static::CONNECTION_SETTINGS));
   }
 
   /**
-   * Returns the Europa Search consumer secret.
-   *
-   * @return string|null
-   *   The Europa Search consumer secret.
-   */
-  protected function getConsumerSecret(): ?string {
-    return $this->settings->get('oe_search')['backend'][$this->getServer()->id()]['consumer_secret'] ?? NULL;
-  }
-
-  /**
-   * Issues a warning messages if some settings are missing.
+   * Issues a warning messages if some settings are missing from settings.php.
    */
   protected function checkMissingSettings(): void {
     $missing_settings = [];
     $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '[%s]';";
-    if (!$this->getConsumerKey()) {
-      $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), 'consumer_key', 'consumer key');
-    }
-    if (!$this->getConsumerSecret()) {
-      $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), 'consumer_secret', 'consumer secret');
+    foreach ($this->getConnectionSettings() as $setting => $value) {
+      if (!$value) {
+        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, str_replace('_', ' ', $setting));
+      }
     }
 
-    if ($missing_settings) {
-      $warning = [
-        [
-          '#markup' => $this->t('Missing <code>settings.php</code> entries:'),
-        ],
-        [
-          '#type' => 'html_tag',
-          '#tag' => 'pre',
-          '#value' => '  ' . implode("\n  ", $missing_settings),
-        ],
-      ];
-      $this->messenger()->addWarning($this->renderer->render($warning));
+    if (!$missing_settings) {
+      return;
     }
+
+    $warning = [
+      [
+        '#markup' => $this->t('Missing <code>settings.php</code> entries:'),
+      ],
+      [
+        '#type' => 'html_tag',
+        '#tag' => 'pre',
+        '#value' => implode("\n", $missing_settings),
+        '#prefix' => '<div class="indent">',
+        '#suffix' => '</div>',
+      ],
+    ];
+    $this->messenger()->addWarning($this->renderer->render($warning));
   }
 
 }
