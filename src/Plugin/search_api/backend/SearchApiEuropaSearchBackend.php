@@ -5,23 +5,23 @@ declare(strict_types = 1);
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
+use Drupal\search_api\Query\ConditionGroupInterface;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Laminas\Diactoros\RequestFactory;
 use Laminas\Diactoros\StreamFactory;
+use OpenEuropa\EuropaSearchClient\Api\FacetApi;
 use OpenEuropa\EuropaSearchClient\Api\IngestionApi;
 use OpenEuropa\EuropaSearchClient\Api\SearchApi;
 use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
-use Solarium\QueryType\Select\Query\Query;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -314,7 +314,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   public function search(QueryInterface $query): void {
     // @todo Make sure the search is run using the proper index.
     $api = new SearchApi($this->getClient());
+    $apiFacet = new FacetApi($this->getClient());
+    $facet = $apiFacet->query();
     $search = $api->search();
+    $options = $query->getOptions();
 
     $result_set = $query->getResults();
     $result_set->setResultCount($search->getTotalResults());
@@ -324,87 +327,101 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $result_set->addResultItem($result_item);
     }
 
-    // @todo Implement FacetAPI from europa-search-client #OEL-148.
-    // $this->setFacets($query, $result_set);
+    $facets = isset($options['search_api_facets'])
+      ? array_column($options['search_api_facets'], 'field')
+      : [];
+
+    $es_options = [
+      'attributesToRetrieve' => [
+        'search_api_id',
+      ],
+      'facets' => $facets,
+      'analytics' => TRUE,
+    ];
+
+    if (!empty($options['limit'])) {
+      $es_options['length'] = $options['limit'];
+      $es_options['offset'] = $options['offset'];
+    }
+
+    $this->extractConditions($query->getConditionGroup(), $es_options, $facets);
+
+    if ($facet->getFacets() !== NULL) {
+      $result_set->setExtraData(
+        'search_api_facets',
+        $this->extractFacetsData($facets, $facet->getFacets())
+      );
+    }
+
     \Drupal::messenger()->addWarning($this->t('Search is not fully supported yet in %backend backends.', [
       '%backend' => $this->label(),
     ]));
   }
 
   /**
-   * Helper method for creating the facet field parameters.
+   * Extract facets data from response.
+   *
+   * @param array $facets
+   *   Facets to extract.
+   * @param array $data
+   *   Facets data from response.
+   *
+   * @return array
+   *   Facets data in format required by Drupal.
    */
-  protected function setFacets(QueryInterface $query, Query $result_set) {
-    // @todo Implement FacetAPI from europa-search-client #OEL-148.
-    static $index_fulltext_fields = [];
+  private function extractFacetsData(array $facets, array $data): array {
+    $facets_data = [];
 
-    $facets = $query->getOption('search_api_facets', []);
-    if (empty($facets)) {
-      return;
-    }
-
-    $index = $query->getIndex();
-    $index_id = $index->id();
-
-    $field_names = $this->getLanguageSpecificSolrFieldNames(LanguageInterface::LANGCODE_NOT_SPECIFIED, $index);
-
-    $facet_set = $result_set->getFacetSet();
-    $facet_set->setSort('count');
-    $facet_set->setLimit(10);
-    $facet_set->setMinCount(1);
-    $facet_set->setMissing(FALSE);
-
-    foreach ($facets as $info) {
-      if (empty($field_names[$info['field']])) {
+    foreach ($data as $facet_data) {
+      if (!in_array($facet_data->rawName, $facets)) {
         continue;
       }
-      $esc_field = $field_names[$info['field']];
-
-      // Backward compatibility for facets.
-      $info += ['query_type' => 'search_api_string'];
-
-      $this->setFacetField($esc_field, $index, $index_id, $info, $facet_set);
+      $facets_data[$facet_data->rawName][] = [
+        'count' => $facet_data->count,
+        'filter' => '"' . $facet_data->rawName . '"',
+      ];
     }
+
+    return $facets_data;
   }
 
   /**
-   * Helper method for set facet field.
+   * Extract conditions.
+   *
+   * @param \Drupal\search_api\Query\ConditionGroupInterface $condition_group
+   *   Condition group.
+   * @param array $options
+   *   Europa Search options.
+   * @param array $facets
+   *   Facets.
    */
-  protected function setFacetField($esc_field, $index, $index_id, $info, $facet_set, $facet_field = NULL) {
-    if (!isset($index_fulltext_fields[$index_id])) {
-      $index_fulltext_fields[$index_id] = $index->getFulltextFields();
-    }
+  private function extractConditions(ConditionGroupInterface $condition_group, array &$options, array $facets) {
+    foreach ($condition_group->getConditions() as $condition) {
+      if ($condition instanceof ConditionGroupInterface) {
+        $this->extractConditions($condition, $options, $facets);
+        continue;
+      }
 
-    if (in_array($info['field'], $index_fulltext_fields[$index_id])) {
-      \Drupal::messenger()->addWarning($this->t('Facetting on fulltext fields is not yet supported. Consider to add a string field to the index for that purpose.', [
-        '%backend' => $this->label(),
-      ]));
-    }
-    else {
-      // Create the Europa Search Client facet field object.
-      $facet_field = $facet_set->createFacetField($esc_field)->setField($esc_field);
-    }
+      $field = $condition->getField();
 
-    // Set limit, unless it's the default.
-    if ($info['limit'] != 10) {
-      $limit = $info['limit'] ? $info['limit'] : -1;
-      $facet_field->setLimit($limit);
-    }
-    // Set missing.
-    $facet_field->setMissing(isset($info['missing']));
+      /** @var \Drupal\search_api\Query\Condition $condition */
+      // We support limited operators for now.
+      if ($condition->getOperator() == '=') {
+        $query = $field . ':' . $condition->getValue();
 
-    // For "OR" facets, add the expected tag for exclusion.
-    if (isset($info['operator']) && strtolower($info['operator']) === 'or') {
-      // The tag "facet:field_name" is defined by the facets module. Therefore
-      // we have to use the Search API field name here to create the same tag.
-      // @see \Drupal\facets\QueryType\QueryTypeRangeBase::execute()
-      // @see https://cwiki.apache.org/confluence/display/solr/Faceting#Faceting-LocalParametersforFaceting
-      $facet_field->setExcludes(['facet:' . $info['field']]);
-    }
-
-    // Set mincount, unless it's the default.
-    if ($info['min_count'] != 1) {
-      $facet_field->setMinCount($info['min_count']);
+        if (in_array($field, $facets)) {
+          $options['facetFilters'][$field][] = $query;
+          $options['disjunctiveFacets'][$field] = $field;
+        }
+        else {
+          $options['filters'] = isset($options['filters'])
+            ? ' AND ' . $query
+            : $query;
+        }
+      }
+      elseif (in_array($condition->getOperator(), ['<', '>', '<=', '>='])) {
+        $options['numericFilters'][] = $field . ' ' . $condition->getOperator() . ' ' . $condition->getValue();
+      }
     }
   }
 
