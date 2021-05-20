@@ -5,15 +5,30 @@ plugin.plugin_configuration.search_api_backend.search_api_europa_search:
     api_key:
       type: string
       label: 'API key'
+    enable_ingestion:
+      type: boolean
+      label: 'Enable ingestion'
     database:
       type: string
       label: 'Database'
-    ingestion_api_endpoint:
+    text_ingestion_api_endpoint:
       type: string
-      label: 'Ingestion API endpoint URL'
-    search_api_endpoint:
+      label: 'Token API endpoint URL'
+    file_ingestion_api_endpoint:
       type: string
-      label: 'Search API endpoint URL'
+      label: 'Token API endpoint URL'
+    delete_api_endpoint:
+      type: string
+      label: 'Token API endpoint URL'
     token_api_endpoint:
       type: string
       label: 'Token API endpoint URL'
+    search_api_endpoint:
+      type: string
+      label: 'Search API endpoint URL'
+    facets_api_endpoint:
+      type: string
+      label: 'Token API endpoint URL'
+    info_api_endpoint:
+      type: string
+      label: 'Info API endpoint URL'

@@ -20,7 +20,6 @@ use Laminas\Diactoros\UriFactory;
 use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use Psr\Http\Client\ClientInterface as PsrClient;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -54,6 +53,25 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   const CONNECTION_SETTINGS = [
     'consumer_key',
     'consumer_secret',
+  ];
+
+  /**
+   * Europa Search Api configuration keys.
+   *
+   * @var string[]
+   */
+  const CLIENT_CONFIG_KEYS = [
+    'apiKey',
+    'database',
+    'searchApiEndpoint',
+    'infoApiEndpoint',
+    'facetsApiEndpoint',
+    'tokenApiEndpoint',
+    'textIngestionApiEndpoint',
+    'fileIngestionApiEndpoint',
+    'deleteApiEndpoint',
+    'consumerKey',
+    'consumerSecret',
   ];
 
   /**
@@ -127,14 +145,15 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   public function defaultConfiguration(): array {
     return [
       'api_key' => NULL,
+      'enable_ingestion' => TRUE,
       'database' => NULL,
-      'search_api_endpoint' => NULL,
-      'info_api_endpoint' => NULL,
-      'facets_api_endpoint' => NULL,
-      'token_api_endpoint' => NULL,
       'text_ingestion_api_endpoint' => NULL,
       'file_ingestion_api_endpoint' => NULL,
       'delete_api_endpoint'  => NULL,
+      'token_api_endpoint' => NULL,
+      'search_api_endpoint' => NULL,
+      'facets_api_endpoint' => NULL,
+      'info_api_endpoint' => NULL,
     ] + parent::defaultConfiguration();
   }
 
@@ -160,12 +179,21 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#default_value' => $configuration['api_key'],
     ];
 
+    $form['enable_ingestion'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable ingestion'),
+      '#description' => $this->t('All ingestion configuration will be required'),
+      '#default_value' => $configuration['enable_ingestion'],
+    ];
+
     $form['database'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Database'),
       '#description' => $this->t('The database element correspond to a dataSource that contains the documents.'),
-      '#required' => TRUE,
       '#default_value' => $configuration['database'],
+      '#states' => [
+        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
+      ],
     ];
 
     $form['text_ingestion_api_endpoint'] = [
@@ -174,11 +202,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#description' => $this->t('The URL of the endpoint where the Text Ingestion API is available.'),
       '#default_value' => $configuration['text_ingestion_api_endpoint'],
       '#states' => [
-        'required' => [
-          [':input[name="backend_config[file_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[delete_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[token_api_endpoint]"]' => ['filled' => TRUE]],
-        ],
+        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
       ],
     ];
 
@@ -188,11 +212,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#description' => $this->t('The URL of the endpoint where the File Ingestion API is available.'),
       '#default_value' => $configuration['file_ingestion_api_endpoint'],
       '#states' => [
-        'required' => [
-          [':input[name="backend_config[text_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[delete_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[token_api_endpoint]"]' => ['filled' => TRUE]],
-        ],
+        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
       ],
     ];
 
@@ -202,11 +222,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#description' => $this->t('The URL of the endpoint where the Delete API is available.'),
       '#default_value' => $configuration['delete_api_endpoint'],
       '#states' => [
-        'required' => [
-          [':input[name="backend_config[file_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[text_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[token_api_endpoint]"]' => ['filled' => TRUE]],
-        ],
+        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
       ],
     ];
 
@@ -216,11 +232,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#description' => $this->t('The URL of the endpoint where the Token API is available.'),
       '#default_value' => $configuration['token_api_endpoint'],
       '#states' => [
-        'required' => [
-          [':input[name="backend_config[file_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[delete_api_endpoint]"]' => ['filled' => TRUE]],
-          [':input[name="backend_config[text_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
-        ],
+        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
       ],
     ];
 
@@ -232,6 +244,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#default_value' => $configuration['search_api_endpoint'],
     ];
 
+    $form['facets_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Facets API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Facets API is available.'),
+      '#default_value' => $configuration['facets_api_endpoint'],
+    ];
+
     $form['info_api_endpoint'] = [
       '#type' => 'url',
       '#title' => $this->t('Info API endpoint'),
@@ -240,22 +259,14 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#default_value' => $configuration['info_api_endpoint'],
     ];
 
-    $form['facets_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Facets API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Facets API is available.'),
-      '#default_value' => $configuration['facets_api_endpoint'],
-    ];
-
     return $form;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // We assume all ingestion urls are empty if one is.
-    if (empty($form_state->getValue('text_ingestion_api_endpoint'))) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
+    if ($form_state->getValue('enable_ingestion') === FALSE) {
       return;
     }
 
@@ -353,13 +364,14 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $configuration = $this->getConfiguration() + $this->getConnectionSettings();
     // The client uses the snake case version of connection data identifiers.
     $snake_converter = new CamelCaseToSnakeCaseNameConverter();
-    $keys = array_map(function ($key) use ($snake_converter) {
-      $key = Container::camelize($key);
-      $key = $snake_converter->denormalize($key);
-      return $key;
+    $keys = array_map(function ($key) use ($snake_converter): string {
+      return $snake_converter->denormalize($key);
     }, array_keys($configuration));
+    $configuration = array_combine($keys, $configuration);
 
-    return array_combine($keys, $configuration);
+    return array_filter($configuration, function ($key): bool {
+      return in_array($key, static::CLIENT_CONFIG_KEYS);
+    }, ARRAY_FILTER_USE_KEY);
   }
 
   /**
