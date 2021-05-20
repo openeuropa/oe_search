@@ -13,12 +13,16 @@ use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
+use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use Laminas\Diactoros\RequestFactory;
 use Laminas\Diactoros\StreamFactory;
+use Laminas\Diactoros\UriFactory;
 use OpenEuropa\EuropaSearchClient\Client;
-use OpenEuropa\EuropaSearchClient\ClientInterface;
+use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
+use Psr\Http\Client\ClientInterface as PsrClient;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Europa Search backend for Search API.
@@ -76,7 +80,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   /**
    * The Europa Search client instance.
    *
-   * @var \OpenEuropa\EuropaSearchClient\ClientInterface
+   * @var \OpenEuropa\EuropaSearchClient\Contract\ClientInterface
    */
   protected $client;
 
@@ -124,9 +128,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     return [
       'api_key' => NULL,
       'database' => NULL,
-      'ingestion_api_endpoint' => NULL,
       'search_api_endpoint' => NULL,
+      'info_api_endpoint' => NULL,
+      'facets_api_endpoint' => NULL,
       'token_api_endpoint' => NULL,
+      'text_ingestion_api_endpoint' => NULL,
+      'file_ingestion_api_endpoint' => NULL,
+      'delete_api_endpoint'  => NULL,
     ] + parent::defaultConfiguration();
   }
 
@@ -143,8 +151,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
-    $this->checkMissingSettings();
-
     $configuration = $this->getConfiguration();
 
     $form['api_key'] = [
@@ -163,12 +169,28 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#default_value' => $configuration['database'],
     ];
 
-    $form['ingestion_api_endpoint'] = [
+    $form['text_ingestion_api_endpoint'] = [
       '#type' => 'url',
-      '#title' => $this->t('Ingestion API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Ingestion API is available.'),
+      '#title' => $this->t('Text Ingestion API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Text Ingestion API is available.'),
       '#required' => TRUE,
-      '#default_value' => $configuration['ingestion_api_endpoint'],
+      '#default_value' => $configuration['text_ingestion_api_endpoint'],
+    ];
+
+    $form['file_ingestion_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('File Ingestion API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the File Ingestion API is available.'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['file_ingestion_api_endpoint'],
+    ];
+
+    $form['delete_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Delete API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Delete API is available.'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['delete_api_endpoint'],
     ];
 
     $form['search_api_endpoint'] = [
@@ -177,6 +199,22 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#description' => $this->t('The URL of the endpoint where the Search API is available.'),
       '#required' => TRUE,
       '#default_value' => $configuration['search_api_endpoint'],
+    ];
+
+    $form['info_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Info API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Info API is available.'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['info_api_endpoint'],
+    ];
+
+    $form['facets_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Facets API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Facets API is available.'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['facets_api_endpoint'],
     ];
 
     $form['token_api_endpoint'] = [
@@ -188,6 +226,40 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $missing_settings = [];
+    $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '%s';";
+
+    foreach ($this->getConnectionSettings() as $setting => $value) {
+      if (!$value) {
+        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, $this->t('@name value...', [
+          '@name' => str_replace('_', ' ', $setting),
+        ]));
+      }
+    }
+
+    if (!$missing_settings) {
+      return;
+    }
+
+    $error = [
+      [
+        '#markup' => $this->t('Missing <code>settings.php</code> entries:'),
+      ],
+      [
+        '#type' => 'html_tag',
+        '#tag' => 'pre',
+        '#value' => implode("\n", $missing_settings),
+      ],
+    ];
+
+    $element = [];
+    $form_state->setError($element, $error);
   }
 
   /**
@@ -212,12 +284,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function search(QueryInterface $query): void {
+    $client = $this->getClient();
   }
 
   /**
    * Returns an Europa Search client instance.
    *
-   * @return \OpenEuropa\EuropaSearchClient\ClientInterface
+   * @return \OpenEuropa\EuropaSearchClient\Contract\ClientInterface
    *   The client.
    */
   protected function getClient(): ClientInterface {
@@ -225,10 +298,20 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       // Merge configuration and settings together.
       $configuration = $this->getConfiguration() + $this->getConnectionSettings();
       // The client uses the camelized version of connection data identifiers.
-      $configuration = array_map(Container::class . '::camelize', $configuration);
+      $snake_converter = new CamelCaseToSnakeCaseNameConverter();
+      $keys = array_map(function ($key) use ($snake_converter) {
+        $key = Container::camelize($key);
+        $key = $snake_converter->denormalize($key);
+        return $key;
+      }, array_keys($configuration));
+      $configuration = array_combine($keys, $configuration);
+      // The client uses PSR standards.
+      if (!$this->httpClient instanceof PsrClient) {
+        $this->httpClient = new GuzzleAdapter($this->httpClient);
+      }
       // @todo Refactor this instantiation to a new plugin type in OEL-152.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
-      $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), $configuration);
+      $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
     }
     return $this->client;
   }
@@ -246,37 +329,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     return array_map(function (string $setting): ?string {
       return $this->settings->get('oe_search')['backend'][$this->getServer()->id()][$setting] ?? NULL;
     }, array_combine(static::CONNECTION_SETTINGS, static::CONNECTION_SETTINGS));
-  }
-
-  /**
-   * Issues a warning messages if some settings are missing from settings.php.
-   */
-  protected function checkMissingSettings(): void {
-    $missing_settings = [];
-    $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '%s';";
-    foreach ($this->getConnectionSettings() as $setting => $value) {
-      if (!$value) {
-        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, $this->t('@name value...', [
-          '@name' => str_replace('_', ' ', $setting),
-        ]));
-      }
-    }
-
-    if (!$missing_settings) {
-      return;
-    }
-
-    $error = [
-      [
-        '#markup' => $this->t('Missing <code>settings.php</code> entries:'),
-      ],
-      [
-        '#type' => 'html_tag',
-        '#tag' => 'pre',
-        '#value' => implode("\n", $missing_settings),
-      ],
-    ];
-    $this->messenger()->addError($this->renderer->render($error));
   }
 
 }
