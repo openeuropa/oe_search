@@ -142,9 +142,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function isAvailable(): bool {
-    // Check that all settings from settings.php are set.
-    // @todo Perform also a ping as soon as the functionality is available.
-    return array_keys(array_filter($this->getConnectionSettings())) === static::CONNECTION_SETTINGS;
+    // @todo Perform a ping as soon as the functionality is available.
+    return TRUE;
   }
 
   /**
@@ -173,24 +172,56 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#type' => 'url',
       '#title' => $this->t('Text Ingestion API endpoint'),
       '#description' => $this->t('The URL of the endpoint where the Text Ingestion API is available.'),
-      '#required' => TRUE,
       '#default_value' => $configuration['text_ingestion_api_endpoint'],
+      '#states' => [
+        'required' => [
+          [':input[name="backend_config[file_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[delete_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[token_api_endpoint]"]' => ['filled' => TRUE]],
+        ],
+      ],
     ];
 
     $form['file_ingestion_api_endpoint'] = [
       '#type' => 'url',
       '#title' => $this->t('File Ingestion API endpoint'),
       '#description' => $this->t('The URL of the endpoint where the File Ingestion API is available.'),
-      '#required' => TRUE,
       '#default_value' => $configuration['file_ingestion_api_endpoint'],
+      '#states' => [
+        'required' => [
+          [':input[name="backend_config[text_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[delete_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[token_api_endpoint]"]' => ['filled' => TRUE]],
+        ],
+      ],
     ];
 
     $form['delete_api_endpoint'] = [
       '#type' => 'url',
       '#title' => $this->t('Delete API endpoint'),
       '#description' => $this->t('The URL of the endpoint where the Delete API is available.'),
-      '#required' => TRUE,
       '#default_value' => $configuration['delete_api_endpoint'],
+      '#states' => [
+        'required' => [
+          [':input[name="backend_config[file_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[text_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[token_api_endpoint]"]' => ['filled' => TRUE]],
+        ],
+      ],
+    ];
+
+    $form['token_api_endpoint'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Token API endpoint'),
+      '#description' => $this->t('The URL of the endpoint where the Token API is available.'),
+      '#default_value' => $configuration['token_api_endpoint'],
+      '#states' => [
+        'required' => [
+          [':input[name="backend_config[file_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[delete_api_endpoint]"]' => ['filled' => TRUE]],
+          [':input[name="backend_config[text_ingestion_api_endpoint]"]' => ['filled' => TRUE]],
+        ],
+      ],
     ];
 
     $form['search_api_endpoint'] = [
@@ -213,16 +244,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#type' => 'url',
       '#title' => $this->t('Facets API endpoint'),
       '#description' => $this->t('The URL of the endpoint where the Facets API is available.'),
-      '#required' => TRUE,
       '#default_value' => $configuration['facets_api_endpoint'],
-    ];
-
-    $form['token_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Token API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Token API is available.'),
-      '#required' => TRUE,
-      '#default_value' => $configuration['token_api_endpoint'],
     ];
 
     return $form;
@@ -232,6 +254,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    // We assume all ingestion urls are empty if one is.
+    if (empty($form_state->getValue('text_ingestion_api_endpoint'))) {
+      return;
+    }
+
     $missing_settings = [];
     $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '%s';";
 
@@ -259,32 +286,40 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     ];
 
     $element = [];
-    $form_state->setError($element, $error);
+    $form_state->setErrorByName($element, $error);
   }
 
   /**
    * {@inheritdoc}
    */
   public function indexItems(IndexInterface $index, array $items): array {
+    if (!$this->isIngestionAvailable()) {
+      return [];
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteItems(IndexInterface $index, array $item_ids): void {
+    if (!$this->isIngestionAvailable()) {
+      return;
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAllIndexItems(IndexInterface $index, $datasource_id = NULL): void {
+    if (!$this->isIngestionAvailable()) {
+      return;
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function search(QueryInterface $query): void {
-    $client = $this->getClient();
   }
 
   /**
@@ -295,16 +330,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function getClient(): ClientInterface {
     if (!isset($this->client)) {
-      // Merge configuration and settings together.
-      $configuration = $this->getConfiguration() + $this->getConnectionSettings();
-      // The client uses the camelized version of connection data identifiers.
-      $snake_converter = new CamelCaseToSnakeCaseNameConverter();
-      $keys = array_map(function ($key) use ($snake_converter) {
-        $key = Container::camelize($key);
-        $key = $snake_converter->denormalize($key);
-        return $key;
-      }, array_keys($configuration));
-      $configuration = array_combine($keys, $configuration);
+      $configuration = $this->getConfigurationForClient();
       // The client uses PSR standards.
       if (!$this->httpClient instanceof PsrClient) {
         $this->httpClient = new GuzzleAdapter($this->httpClient);
@@ -314,6 +340,26 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
     }
     return $this->client;
+  }
+
+  /**
+   * Get the configuration and prepare for client usage.
+   *
+   * @return array
+   *   The adapted configuration.
+   */
+  protected function getConfigurationForClient(): array {
+    // Merge configuration and settings together.
+    $configuration = $this->getConfiguration() + $this->getConnectionSettings();
+    // The client uses the snake case version of connection data identifiers.
+    $snake_converter = new CamelCaseToSnakeCaseNameConverter();
+    $keys = array_map(function ($key) use ($snake_converter) {
+      $key = Container::camelize($key);
+      $key = $snake_converter->denormalize($key);
+      return $key;
+    }, array_keys($configuration));
+
+    return array_combine($keys, $configuration);
   }
 
   /**
@@ -329,6 +375,40 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     return array_map(function (string $setting): ?string {
       return $this->settings->get('oe_search')['backend'][$this->getServer()->id()][$setting] ?? NULL;
     }, array_combine(static::CONNECTION_SETTINGS, static::CONNECTION_SETTINGS));
+  }
+
+  /**
+   * Checks if ingestion requirements are satisfied.
+   *
+   * @return bool
+   *   Check result.
+   */
+  protected function isIngestionAvailable(): bool {
+    $configuration = $this->getConfiguration() + $this->getConnectionSettings();
+
+    if (empty($configuration['api_key'])) {
+      return FALSE;
+    }
+    if (empty($configuration['database'])) {
+      return FALSE;
+    }
+    if (empty($configuration['text_ingestion_api_endpoint'])) {
+      return FALSE;
+    }
+    if (empty($configuration['file_ingestion_api_endpoint'])) {
+      return FALSE;
+    }
+    if (empty($configuration['delete_api_endpoint'])) {
+      return FALSE;
+    }
+    if (empty($configuration['token_api_endpoint'])) {
+      return FALSE;
+    }
+    if (!array_keys(array_filter($this->getConnectionSettings())) === static::CONNECTION_SETTINGS) {
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
 }
