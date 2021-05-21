@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
@@ -19,6 +19,7 @@ use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UriFactory;
 use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
+use OpenEuropa\EuropaSearchClient\Model\Document;
 use Psr\Http\Client\ClientInterface as PsrClient;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -89,18 +90,18 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $settings;
 
   /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * The Europa Search client instance.
    *
    * @var \OpenEuropa\EuropaSearchClient\Contract\ClientInterface
    */
   protected $client;
+
+  /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
 
   /**
    * Constructs a new plugin instance.
@@ -115,14 +116,14 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The HTTP client.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, RendererInterface $renderer) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, LanguageManagerInterface $language_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
-    $this->renderer = $renderer;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -135,7 +136,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $plugin_definition,
       $container->get('http_client'),
       $container->get('settings'),
-      $container->get('renderer')
+      $container->get('language_manager'),
     );
   }
 
@@ -307,6 +308,34 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     if (!$this->isIngestionAvailable()) {
       return [];
     }
+
+    $documents = $this->getDocuments($index, $items);
+    $client = $this->getClient();
+    $indexes = [];
+
+    /** @var \OpenEuropa\EuropaSearchClient\Model\Ingestion $result */
+    /** @var \OpenEuropa\EuropaSearchClient\Model\Document $document */
+    foreach ($documents as $item_id => $document) {
+      try {
+        $result = $client->ingestText(
+          $document->getUrl(),
+          $document->getContent(),
+          [$document->getLanguage()],
+          // @todo add metadata.
+          NULL,
+          $document->getReference()
+        );
+
+        if ($result->getReference()) {
+          $indexes[] = $item_id;
+        }
+      }
+      catch (\Exception $e) {
+        $this->getLogger()->warning($e->getMessage());
+      }
+    }
+
+    return $indexes;
   }
 
   /**
@@ -315,6 +344,23 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   public function deleteItems(IndexInterface $index, array $item_ids): void {
     if (!$this->isIngestionAvailable()) {
       return;
+    }
+
+    $client = $this->getClient();
+    $index_id = $index->id();
+    $references = [];
+
+    foreach ($item_ids as $id) {
+      $references[] = $this->createReference(NULL, $index_id, $id);
+    }
+
+    foreach ($references as $reference) {
+      try {
+        $client->deleteDocument($reference);
+      }
+      catch (\Exception $e) {
+        $this->getLogger()->warning($e->getMessage());
+      }
     }
   }
 
@@ -325,6 +371,16 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     if (!$this->isIngestionAvailable()) {
       return;
     }
+
+    $client = $this->getClient();
+    /** @var \OpenEuropa\EuropaSearchClient\Model\SearchResult $result */
+    $result = $client->search();
+
+    $item_ids = array_map(function (Document $document) {
+      return $document->getReference();
+    }, $result->getResults());
+
+    $this->deleteItems($index, $item_ids);
   }
 
   /**
@@ -421,6 +477,56 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     return TRUE;
+  }
+
+  /**
+   * Prepare documents from search api index items for ingestion.
+   *
+   * @param \Drupal\search_api\IndexInterface $index
+   *   The Search API index.
+   * @param \Drupal\search_api\Item\ItemInterface[] $items
+   *   An array of items to get documents for.
+   *
+   * @return array
+   *   An array of solr documents.
+   */
+  protected function getDocuments(IndexInterface $index, array $items): array {
+    $documents = [];
+    $index_id = $index->id();
+    $languages = $this->languageManager->getLanguages();
+
+    /** @var \Drupal\search_api\Item\ItemInterface[] $items */
+    foreach ($items as $id => $item) {
+      $document = new Document();
+      $language_id = $item->getLanguage();
+      $document->setUrl($item->getOriginalObject()->getValue()->toUrl()->setAbsolute()->toString());
+      $document->setContent($item->getOriginalObject()->getValue()->label());
+      $document->setLanguage($language_id);
+      $document->setReference($this->createReference(NULL, $index_id, $id));
+      $documents[$id] = $document;
+    }
+
+    return $documents;
+  }
+
+  /**
+   * Creates an ID used as the unique identifier at the Europa Search server.
+   *
+   * This has to consist of both index and item ID. Optionally, the site hash is
+   * also included.
+   *
+   * @param string $site_hash
+   *   The site hash.
+   * @param string $index_id
+   *   The index ID.
+   * @param string|int $item_id
+   *   The item ID.
+   *
+   * @return string
+   *   A unique identifier for the given item.
+   */
+  protected function createReference($site_hash, $index_id, $item_id) {
+    return "$site_hash-$index_id-$item_id";
   }
 
 }

@@ -19,10 +19,11 @@
         "drupal/facets": "^1.7",
         "drupal/http_request_mock": "^1.0",
         "drush/drush": "^10.4",
-        "openeuropa/behat-transformation-context" : "~0.1",
+        "openeuropa/behat-transformation-context": "~0.1",
         "openeuropa/code-review": "~1.0@beta",
         "openeuropa/drupal-core-require-dev": "^8 || ^9",
         "openeuropa/task-runner": "~1.0@beta",
+        "phpspec/prophecy-phpunit": "^2",
         "phpunit/phpunit": "^6 || ^7 || ^8 || ^9"
     },
     "scripts": {

@@ -13,13 +13,13 @@ plugin.plugin_configuration.search_api_backend.search_api_europa_search:
       label: 'Database'
     text_ingestion_api_endpoint:
       type: string
-      label: 'Token API endpoint URL'
+      label: 'Text ingestion API endpoint URL'
     file_ingestion_api_endpoint:
       type: string
-      label: 'Token API endpoint URL'
+      label: 'File ingestion API endpoint URL'
     delete_api_endpoint:
       type: string
-      label: 'Token API endpoint URL'
+      label: 'Delete API endpoint URL'
     token_api_endpoint:
       type: string
       label: 'Token API endpoint URL'
@@ -28,7 +28,7 @@ plugin.plugin_configuration.search_api_backend.search_api_europa_search:
       label: 'Search API endpoint URL'
     facets_api_endpoint:
       type: string
-      label: 'Token API endpoint URL'
+      label: 'Facets API endpoint URL'
     info_api_endpoint:
       type: string
       label: 'Info API endpoint URL'
