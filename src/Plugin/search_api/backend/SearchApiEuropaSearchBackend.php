@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\search_api\Backend\BackendPluginBase;
@@ -27,10 +26,13 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 /**
  * Europa Search backend for Search API.
  *
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ *
  * @SearchApiBackend(
  *   id = "search_api_europa_search",
  *   label = @Translation("Europa Search"),
- *   description = @Translation("Index items using Europa Search search server."),
+ *   description = @Translation("Index items using Europa Search search
+ *   server."),
  * )
  */
 class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFormInterface {
@@ -97,13 +99,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $client;
 
   /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
    * Constructs a new plugin instance.
    *
    * @param array $configuration
@@ -116,14 +111,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The HTTP client.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, LanguageManagerInterface $language_manager) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
-    $this->languageManager = $language_manager;
   }
 
   /**
@@ -136,7 +128,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $plugin_definition,
       $container->get('http_client'),
       $container->get('settings'),
-      $container->get('language_manager'),
     );
   }
 
@@ -321,8 +312,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
           $document->getUrl(),
           $document->getContent(),
           [$document->getLanguage()],
-          // @todo add metadata.
-          NULL,
+          $document->getMetadata(),
           $document->getReference()
         );
 
@@ -372,13 +362,17 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       return;
     }
 
-    $client = $this->getClient();
     /** @var \OpenEuropa\EuropaSearchClient\Model\SearchResult $result */
-    $result = $client->search();
+    $result = $this->getClient()->search();
 
-    $item_ids = array_map(function (Document $document) {
-      return $document->getReference();
+    $item_ids = array_map(function (Document $document) use ($index) {
+      [$site_hash, $index_id, $item_id] = $this->destructReference($document->getReference());
+      if ($index_id !== $index->id()) {
+        return FALSE;
+      }
+      return $item_id;
     }, $result->getResults());
+    $item_ids = array_filter($item_ids);
 
     $this->deleteItems($index, $item_ids);
   }
@@ -453,25 +447,21 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function isIngestionAvailable(): bool {
     $configuration = $this->getConfiguration() + $this->getConnectionSettings();
+    $ingestion_configuration = [
+      'api_key',
+      'database',
+      'text_ingestion_api_endpoint',
+      'file_ingestion_api_endpoint',
+      'delete_api_endpoint',
+      'token_api_endpoint',
+    ];
 
-    if (empty($configuration['api_key'])) {
-      return FALSE;
+    foreach ($ingestion_configuration as $key) {
+      if (empty($configuration[$key])) {
+        return FALSE;
+      }
     }
-    if (empty($configuration['database'])) {
-      return FALSE;
-    }
-    if (empty($configuration['text_ingestion_api_endpoint'])) {
-      return FALSE;
-    }
-    if (empty($configuration['file_ingestion_api_endpoint'])) {
-      return FALSE;
-    }
-    if (empty($configuration['delete_api_endpoint'])) {
-      return FALSE;
-    }
-    if (empty($configuration['token_api_endpoint'])) {
-      return FALSE;
-    }
+
     if (!array_keys(array_filter($this->getConnectionSettings())) === static::CONNECTION_SETTINGS) {
       return FALSE;
     }
@@ -488,12 +478,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   An array of items to get documents for.
    *
    * @return array
-   *   An array of solr documents.
+   *   An array of documents.
    */
   protected function getDocuments(IndexInterface $index, array $items): array {
     $documents = [];
     $index_id = $index->id();
-    $languages = $this->languageManager->getLanguages();
 
     /** @var \Drupal\search_api\Item\ItemInterface[] $items */
     foreach ($items as $id => $item) {
@@ -502,6 +491,15 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $document->setUrl($item->getOriginalObject()->getValue()->toUrl()->setAbsolute()->toString());
       $document->setContent($item->getOriginalObject()->getValue()->label());
       $document->setLanguage($language_id);
+      $item_fields = $item->getFields();
+      $metadata = [];
+
+      /** @var \Drupal\search_api\Item\FieldInterface $field */
+      foreach ($item_fields as $name => $field) {
+        $this->addIndexField($metadata, $name, $field->getValues(), $field->getType());
+      }
+
+      $document->setMetadata($metadata);
       $document->setReference($this->createReference(NULL, $index_id, $id));
       $documents[$id] = $document;
     }
@@ -525,8 +523,69 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @return string
    *   A unique identifier for the given item.
    */
-  protected function createReference($site_hash, $index_id, $item_id) {
+  protected function createReference($site_hash, $index_id, $item_id): string {
     return "$site_hash-$index_id-$item_id";
+  }
+
+  /**
+   * Extract the item id from the document reference.
+   *
+   * @param string $reference
+   *   The document reference.
+   *
+   * @return array
+   *   The deconstructed reference.
+   */
+  protected function destructReference(string $reference): array {
+    return explode('-', $reference);
+  }
+
+  /**
+   * Helper method for indexing.
+   *
+   * Adds $value with field name $key to the document $doc. The format of $value
+   * is the same as specified in
+   * \Drupal\search_api\Backend\BackendSpecificInterface::indexItems().
+   *
+   * @param array $metadata
+   *   Metadata for the document.
+   * @param string $key
+   *   The key to use for the field.
+   * @param array $values
+   *   The values for the field.
+   * @param string $type
+   *   The field type.
+   */
+  protected function addIndexField(array &$metadata, string $key, array $values, $type): void {
+    foreach ($values as $value) {
+      if (NULL !== $value) {
+        switch ($type) {
+          case 'boolean':
+            $value = (bool) $value;
+            break;
+
+          case 'integer':
+            $value = (int) $value;
+            break;
+
+          case 'decimal':
+            $value = (float) $value;
+            break;
+
+          case 'text':
+            /** @var \Drupal\search_api\Plugin\search_api\data_type\value\TextValueInterface $value */
+            $value = $value->getText();
+          case 'string':
+          default:
+            // Keep $value as it is.
+            if (!$value) {
+              continue 2;
+            }
+        }
+
+        $metadata[$key][] = $value;
+      }
+    }
   }
 
 }
