@@ -7,6 +7,7 @@ namespace Drupal\oe_search\Plugin\search_api\backend;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
@@ -25,8 +26,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 
 /**
  * Europa Search backend for Search API.
- *
- * @SuppressWarnings(PHPMD.NPathComplexity)
  *
  * @SearchApiBackend(
  *   id = "search_api_europa_search",
@@ -496,7 +495,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
       /** @var \Drupal\search_api\Item\FieldInterface $field */
       foreach ($item_fields as $name => $field) {
-        $this->addIndexField($metadata, $name, $field->getValues(), $field->getType());
+        $this->prepareField($metadata, $name, $field->getValues(), $field->getType());
       }
 
       $document->setMetadata($metadata);
@@ -543,7 +542,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   /**
    * Helper method for indexing.
    *
-   * Adds $value with field name $key to the document $doc. The format of $value
+   * Adds $value with field name $key to the document. The format of $value
    * is the same as specified in
    * \Drupal\search_api\Backend\BackendSpecificInterface::indexItems().
    *
@@ -556,10 +555,17 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @param string $type
    *   The field type.
    */
-  protected function addIndexField(array &$metadata, string $key, array $values, $type): void {
+  protected function prepareField(array &$metadata, string $key, array $values, $type): void {
     foreach ($values as $value) {
       if (NULL !== $value) {
         switch ($type) {
+          case 'date':
+            $value = $this->formatDate($value);
+            if ($value === FALSE) {
+              continue(2);
+            }
+            break;
+
           case 'boolean':
             $value = (bool) $value;
             break;
@@ -586,6 +592,56 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         $metadata[$key][] = $value;
       }
     }
+  }
+
+  /**
+   * Tries to format given date for ingestion.
+   *
+   * @param int|string $input
+   *   The date to format (timestamp or string).
+   *
+   * @return bool|string
+   *   The formatted date as string or FALSE in case of invalid input.
+   */
+  public function formatDate($input) {
+    try {
+      $input = is_numeric($input) ? (int) $input : new \DateTime($input, timezone_open(DateTimeItemInterface::STORAGE_TIMEZONE));
+    }
+    catch (\Exception $e) {
+      return FALSE;
+    }
+
+    switch (TRUE) {
+      case $input instanceof \DateTimeInterface:
+        $input = clone $input;
+        break;
+
+      case \is_string($input):
+      case is_numeric($input):
+        // If date/time string: convert to timestamp first.
+        if (\is_string($input)) {
+          $input = strtotime($input);
+        }
+        try {
+          $input = new \DateTime('@' . $input);
+        }
+        catch (\Exception $e) {
+          $input = FALSE;
+        }
+        break;
+
+      default:
+        $input = FALSE;
+        break;
+    }
+
+    if ($input) {
+      // When we get here the input is always a datetime object.
+      $input = $input->setTimezone(new \DateTimeZone('UTC'));
+      return $input->format(\DateTimeInterface::RFC3339_EXTENDED);
+    }
+
+    return FALSE;
   }
 
 }
