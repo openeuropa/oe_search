@@ -31,8 +31,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  * @SearchApiBackend(
  *   id = "search_api_europa_search",
  *   label = @Translation("Europa Search"),
- *   description = @Translation("Index items using Europa Search search
- *   server."),
+ *   description = @Translation("Europa Search server Search API backend."),
  * )
  */
 class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFormInterface {
