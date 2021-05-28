@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\State\StateInterface;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
@@ -81,6 +82,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $client;
 
   /**
+   * The state service.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
+
+  /**
    * Constructs a new plugin instance.
    *
    * @param array $configuration
@@ -95,12 +103,15 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The site settings.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
+   * @param \Drupal\Core\State\StateInterface $state
+   *   The state service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, RendererInterface $renderer) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, RendererInterface $renderer, StateInterface $state) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
     $this->renderer = $renderer;
+    $this->state = $state;
   }
 
   /**
@@ -113,7 +124,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $plugin_definition,
       $container->get('http_client'),
       $container->get('settings'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('state')
     );
   }
 
@@ -309,12 +321,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   A unique site hash, containing only alphanumeric characters.
    */
   protected function getSiteHash(): string {
-    // Copied from \Drupal\search_api_solr\Utility\Utility::getSiteHash().
-    $state = \Drupal::state();
-    if (!$hash = $state->get('oe_search.site_hash')) {
+    if (!$hash = $this->state->get('oe_search.site_hash')) {
       global $base_url;
       $hash = substr(base_convert(hash('sha256', uniqid($base_url, TRUE)), 16, 36), 0, 6);
-      $state->set('oe_search.site_hash', $hash);
+      $this->state->set('oe_search.site_hash', $hash);
     }
     return $hash;
   }
