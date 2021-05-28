@@ -412,7 +412,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * Get the configuration and prepare for client usage.
+   * Gets the configuration and prepare for client usage.
    *
    * @return array
    *   The adapted configuration.
@@ -477,7 +477,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * Prepare documents from search api index items for ingestion.
+   * Prepares documents from search API index items for ingestion.
    *
    * @param \Drupal\search_api\IndexInterface $index
    *   The Search API index.
@@ -535,7 +535,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * Extract the item id from the document reference.
+   * Extracts the item ID from the document reference.
    *
    * @param string $reference
    *   The document reference.
@@ -548,7 +548,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * Helper method for indexing.
+   * Provides a helper method for indexing.
    *
    * Adds $value with field name $key to the document. The format of $value
    * is the same as specified in
@@ -603,7 +603,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
-   * Tries to format given date for ingestion.
+   * Tries to format a given date for ingestion.
    *
    * @param int|string $input
    *   The date to format (timestamp or string).
