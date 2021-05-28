@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
@@ -57,22 +58,22 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   ];
 
   /**
-   * Europa Search API configuration keys.
+   * Europa Search API configuration keys and their Drupal correspondent.
    *
    * @var string[]
    */
   const CLIENT_CONFIG_KEYS = [
-    'api_key' => 'apiKey',
-    'database' => 'database',
-    'info_api_endpoint' => 'infoApiEndpoint',
-    'search_api_endpoint' => 'searchApiEndpoint',
-    'facets_api_endpoint' => 'facetsApiEndpoint',
-    'token_api_endpoint' => 'tokenApiEndpoint',
-    'consumer_key' => 'consumerKey',
-    'consumer_secret' => 'consumerSecret',
-    'text_ingestion_api_endpoint' => 'textIngestionApiEndpoint',
-    'file_ingestion_api_endpoint' => 'fileIngestionApiEndpoint',
-    'delete_api_endpoint' => 'deleteApiEndpoint',
+    'apiKey' => ['api_key'],
+    'database' => ['database'],
+    'infoApiEndpoint' => ['search', 'endpoint', 'info'],
+    'searchApiEndpoint' => ['search', 'endpoint', 'search'],
+    'facetApiEndpoint' => ['search', 'endpoint', 'facet'],
+    'tokenApiEndpoint' => ['ingestion', 'endpoint', 'token'],
+    'consumerKey' => ['consumer_key'],
+    'consumerSecret' => ['consumer_secret'],
+    'textIngestionApiEndpoint' => ['ingestion', 'endpoint', 'text'],
+    'fileIngestionApiEndpoint' => ['ingestion', 'endpoint', 'file'],
+    'deleteApiEndpoint' => ['ingestion', 'endpoint', 'delete'],
   ];
 
   /**
@@ -147,14 +148,22 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     return [
       'api_key' => NULL,
       'database' => NULL,
-      'info_api_endpoint' => NULL,
-      'search_api_endpoint' => NULL,
-      'facets_api_endpoint' => NULL,
-      'enable_ingestion' => TRUE,
-      'token_api_endpoint' => NULL,
-      'text_ingestion_api_endpoint' => NULL,
-      'file_ingestion_api_endpoint' => NULL,
-      'delete_api_endpoint' => NULL,
+      'search' => [
+        'endpoint' => [
+          'info' => NULL,
+          'search' => NULL,
+          'facet' => NULL,
+        ],
+      ],
+      'ingestion' => [
+        'enabled' => TRUE,
+        'endpoint' => [
+          'token' => NULL,
+          'text' => NULL,
+          'file' => NULL,
+          'delete' => NULL,
+        ],
+      ],
     ] + parent::defaultConfiguration();
   }
 
@@ -180,125 +189,106 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#default_value' => $configuration['api_key'],
     ];
 
-    $form['enable_ingestion'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enable ingestion'),
-      '#description' => $this->t('All ingestion configuration will be required'),
-      '#default_value' => $configuration['enable_ingestion'],
-    ];
-
     $form['database'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Database'),
       '#description' => $this->t('The database element correspond to a dataSource that contains the documents.'),
       '#default_value' => $configuration['database'],
-      '#states' => [
-        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
-      ],
     ];
 
-    $form['text_ingestion_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Text Ingestion API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Text Ingestion API is available.'),
-      '#default_value' => $configuration['text_ingestion_api_endpoint'],
-      '#states' => [
-        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
-      ],
+    $form['search'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Search & Info'),
+      '#open' => TRUE,
     ];
 
-    $form['file_ingestion_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('File Ingestion API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the File Ingestion API is available.'),
-      '#default_value' => $configuration['file_ingestion_api_endpoint'],
-      '#states' => [
-        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
-      ],
-    ];
-
-    $form['delete_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Delete API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Delete API is available.'),
-      '#default_value' => $configuration['delete_api_endpoint'],
-      '#states' => [
-        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
-      ],
-    ];
-
-    $form['token_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Token API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Token API is available.'),
-      '#default_value' => $configuration['token_api_endpoint'],
-      '#states' => [
-        'required' => [':input[name="backend_config[enable_ingestion]"]' => ['checked' => TRUE]],
-      ],
-    ];
-
-    $form['search_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Search API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Search API is available.'),
-      '#required' => TRUE,
-      '#default_value' => $configuration['search_api_endpoint'],
-    ];
-
-    $form['facets_api_endpoint'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Facets API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Facets API is available.'),
-      '#default_value' => $configuration['facets_api_endpoint'],
-    ];
-
-    $form['info_api_endpoint'] = [
+    $form['search']['endpoint']['info'] = [
       '#type' => 'url',
       '#title' => $this->t('Info API endpoint'),
-      '#description' => $this->t('The URL of the endpoint where the Info API is available.'),
       '#required' => TRUE,
-      '#default_value' => $configuration['info_api_endpoint'],
+      '#default_value' => $configuration['search']['endpoint']['info'],
+    ];
+
+    $form['search']['endpoint']['search'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Search API endpoint'),
+      '#required' => TRUE,
+      '#default_value' => $configuration['search']['endpoint']['search'],
+    ];
+
+    $form['search']['endpoint']['facet'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Facets API endpoint'),
+      '#default_value' => $configuration['search']['endpoint']['facet'],
+    ];
+
+    $form['ingestion'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Ingestion'),
+      '#open' => TRUE,
+    ];
+
+    $form['ingestion']['enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable ingestion'),
+      '#default_value' => $configuration['ingestion']['enabled'],
+    ];
+
+    $states = [
+      'required' => [':input[name="backend_config[ingestion][enabled]"]' => ['checked' => TRUE]],
+      'enabled' => [':input[name="backend_config[ingestion][enabled]"]' => ['checked' => TRUE]],
+    ];
+
+    if ($missing_settings = $this->getMissingSettings()) {
+      $form['ingestion']['settings'] = [
+        '#type' => 'container',
+        [
+          '#theme' => 'status_messages',
+          '#message_list' => [
+            'error' => [
+              [
+                '#theme' => 'item_list',
+                '#items' => $missing_settings,
+                '#title' => $this->t('Missing <code>settings.php</code> entries:'),
+              ],
+            ],
+          ],
+        ],
+        '#states' => [
+          'visible' => [':input[name="backend_config[ingestion][enabled]"]' => ['checked' => TRUE]],
+        ],
+      ];
+    }
+
+    $form['ingestion']['endpoint']['token'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Token API endpoint'),
+      '#default_value' => $configuration['ingestion']['endpoint']['token'],
+      '#states' => $states,
+    ];
+
+    $form['ingestion']['endpoint']['text'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Text ingestion API endpoint'),
+      '#default_value' => $configuration['ingestion']['endpoint']['text'],
+      '#states' => $states,
+    ];
+
+    $form['ingestion']['endpoint']['file'] = [
+      '#type' => 'url',
+      '#title' => $this->t('File ingestion API endpoint'),
+      '#default_value' => $configuration['ingestion']['endpoint']['file'],
+      '#states' => $states,
+    ];
+
+    $form['ingestion']['endpoint']['delete'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Delete API endpoint'),
+      '#default_value' => $configuration['ingestion']['endpoint']['delete'],
+      '#states' => $states,
     ];
 
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
-    if ($form_state->getValue('enable_ingestion') === FALSE) {
-      return;
-    }
-
-    $missing_settings = [];
-    $consumer_settings_template = "\$settings['oe_search']['backend']['%s']['%s'] = '%s';";
-
-    foreach ($this->getConnectionSettings() as $setting => $value) {
-      if (!$value) {
-        $missing_settings[] = sprintf($consumer_settings_template, $this->getServer()->id(), $setting, $this->t('@name value...', [
-          '@name' => str_replace('_', ' ', $setting),
-        ]));
-      }
-    }
-
-    if (!$missing_settings) {
-      return;
-    }
-
-    $error = [
-      [
-        '#markup' => $this->t('Missing <code>settings.php</code> entries:'),
-      ],
-      [
-        '#type' => 'html_tag',
-        '#tag' => 'pre',
-        '#value' => implode("\n", $missing_settings),
-      ],
-    ];
-
-    $element = [];
-    $form_state->setErrorByName($element, $error);
   }
 
   /**
@@ -392,6 +382,25 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   }
 
   /**
+   * Returns a list of missing settings already formatted for display.
+   *
+   * @return string[]
+   *   List of missing settings already formatted for display.
+   */
+  protected function getMissingSettings(): array {
+    $missing_settings = [];
+    $settings_template = "\$settings['oe_search']['server']['%s']['%s'] = '%s';";
+    foreach ($this->getConnectionSettings() as $setting => $value) {
+      if (!$value) {
+        $missing_settings[] = sprintf($settings_template, $this->getServer()->id(), $setting, $this->t('@name value...', [
+          '@name' => str_replace('_', ' ', $setting),
+        ]));
+      }
+    }
+    return $missing_settings;
+  }
+
+  /**
    * Returns an Europa Search client instance.
    *
    * @return \OpenEuropa\EuropaSearchClient\Contract\ClientInterface
@@ -420,14 +429,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected function getConfigurationForClient(): array {
     // Merge configuration and settings together.
     $configuration = $this->getConfiguration() + $this->getConnectionSettings();
-    $client_configuration_keys = static::CLIENT_CONFIG_KEYS;
     $client_configuration = [];
-    foreach ($configuration as $key => $value) {
-      if (isset($client_configuration_keys[$key])) {
-        $client_configuration[$client_configuration_keys[$key]] = $value;
+    foreach (static::CLIENT_CONFIG_KEYS as $key => $path) {
+      if ($value = NestedArray::getValue($configuration, $path)) {
+        $client_configuration[$key] = $value;
       }
     }
-
     return $client_configuration;
   }
 
@@ -442,7 +449,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function getConnectionSettings(): array {
     return array_map(function (string $setting): ?string {
-      return $this->settings->get('oe_search')['backend'][$this->getServer()->id()][$setting] ?? NULL;
+      return $this->settings->get('oe_search')['server'][$this->getServer()->id()][$setting] ?? NULL;
     }, array_combine(static::CONNECTION_SETTINGS, static::CONNECTION_SETTINGS));
   }
 
@@ -453,23 +460,22 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   Check result.
    */
   protected function isIngestionAvailable(): bool {
-    $configuration = $this->getConfiguration() + $this->getConnectionSettings();
-    $ingestion_configuration = [
-      'api_key',
-      'database',
-      'text_ingestion_api_endpoint',
-      'file_ingestion_api_endpoint',
-      'delete_api_endpoint',
-      'token_api_endpoint',
-    ];
+    $ingestion_configuration = $this->getConfiguration()['ingestion'];
 
-    foreach ($ingestion_configuration as $key) {
-      if (empty($configuration[$key])) {
+    // Ingestion has been explicitly disabled.
+    if (!$ingestion_configuration['enabled']) {
+      return FALSE;
+    }
+
+    // At least one ingestion endpoint is missing.
+    foreach ($ingestion_configuration['endpoint'] as $url) {
+      if (empty($url)) {
         return FALSE;
       }
     }
 
-    if (!array_keys(array_filter($this->getConnectionSettings())) === static::CONNECTION_SETTINGS) {
+    // At least one of settings is missing.
+    if (array_keys(array_filter($this->getConnectionSettings())) !== static::CONNECTION_SETTINGS) {
       return FALSE;
     }
 
