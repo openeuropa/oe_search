@@ -58,7 +58,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   ];
 
   /**
-   * Europa Search Api configuration keys.
+   * Europa Search API configuration keys.
    *
    * @var string[]
    */
