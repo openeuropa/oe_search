@@ -372,7 +372,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       return;
     }
 
-    /** @var \OpenEuropa\EuropaSearchClient\Model\SearchResult $result */
     $result = $this->getClient()->search();
 
     $item_ids = array_map(function (Document $document) use ($index) {
