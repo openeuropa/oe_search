@@ -5,7 +5,7 @@ namespace Drupal\oe_search\Plugin\search_api\processor;
 use Drupal\search_api\Processor\FieldsProcessorPluginBase;
 
 /**
- * Strips HTML tags from fulltext fields and decodes HTML entities.
+ * Converts field names to their uppercase version.
  *
  * @SearchApiProcessor(
  *   id = "search_api_europa_search_processor_upper_keys",
