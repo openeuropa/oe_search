@@ -436,8 +436,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   /**
    * Returns the values of connection settings.
    *
-   * These connection data is considered sensitive and depending on the
-   * environment, thus is stored in `settings.php`, rather than config store.
+   * These connection info are considered sensitive and are depending on the
+   * environment, so they are stored in `settings.php`, rather than config.
    *
    * @return array
    *   The values of connection settings.
