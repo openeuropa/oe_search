@@ -491,7 +491,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $documents = [];
     $index_id = $index->id();
 
-    /** @var \Drupal\search_api\Item\ItemInterface[] $items */
     foreach ($items as $id => $item) {
       $document = new Document();
       $language_id = $item->getLanguage();
@@ -501,7 +500,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $item_fields = $item->getFields();
       $metadata = [];
 
-      /** @var \Drupal\search_api\Item\FieldInterface $field */
       foreach ($item_fields as $name => $field) {
         $this->prepareField($metadata, $name, $field->getValues(), $field->getType());
       }
