@@ -22,7 +22,7 @@ class UpperCaseFieldNamesProcessor extends FieldsProcessorPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocessIndexItems(array $items) {
+  public function preprocessIndexItems(array $items): void {
     /** @var \Drupal\search_api\Item\ItemInterface $item */
     foreach ($items as $item) {
       $fields = $item->getFields();
