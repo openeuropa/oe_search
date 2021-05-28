@@ -23,7 +23,6 @@ use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
 use Psr\Http\Client\ClientInterface as PsrClient;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Europa Search backend for Search API.
@@ -63,17 +62,17 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @var string[]
    */
   const CLIENT_CONFIG_KEYS = [
-    'apiKey',
-    'database',
-    'searchApiEndpoint',
-    'infoApiEndpoint',
-    'facetsApiEndpoint',
-    'tokenApiEndpoint',
-    'textIngestionApiEndpoint',
-    'fileIngestionApiEndpoint',
-    'deleteApiEndpoint',
-    'consumerKey',
-    'consumerSecret',
+    'api_key' => 'apiKey',
+    'database' => 'database',
+    'info_api_endpoint' => 'infoApiEndpoint',
+    'search_api_endpoint' => 'searchApiEndpoint',
+    'facets_api_endpoint' => 'facetsApiEndpoint',
+    'token_api_endpoint' => 'tokenApiEndpoint',
+    'consumer_key' => 'consumerKey',
+    'consumer_secret' => 'consumerSecret',
+    'text_ingestion_api_endpoint' => 'textIngestionApiEndpoint',
+    'file_ingestion_api_endpoint' => 'fileIngestionApiEndpoint',
+    'delete_api_endpoint' => 'deleteApiEndpoint',
   ];
 
   /**
@@ -147,15 +146,15 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   public function defaultConfiguration(): array {
     return [
       'api_key' => NULL,
-      'enable_ingestion' => TRUE,
       'database' => NULL,
-      'text_ingestion_api_endpoint' => NULL,
-      'file_ingestion_api_endpoint' => NULL,
-      'delete_api_endpoint'  => NULL,
-      'token_api_endpoint' => NULL,
+      'info_api_endpoint' => NULL,
       'search_api_endpoint' => NULL,
       'facets_api_endpoint' => NULL,
-      'info_api_endpoint' => NULL,
+      'enable_ingestion' => TRUE,
+      'token_api_endpoint' => NULL,
+      'text_ingestion_api_endpoint' => NULL,
+      'file_ingestion_api_endpoint' => NULL,
+      'delete_api_endpoint' => NULL,
     ] + parent::defaultConfiguration();
   }
 
@@ -421,16 +420,15 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected function getConfigurationForClient(): array {
     // Merge configuration and settings together.
     $configuration = $this->getConfiguration() + $this->getConnectionSettings();
-    // The client uses the snake case version of connection data identifiers.
-    $snake_converter = new CamelCaseToSnakeCaseNameConverter();
-    $keys = array_map(function ($key) use ($snake_converter): string {
-      return $snake_converter->denormalize($key);
-    }, array_keys($configuration));
-    $configuration = array_combine($keys, $configuration);
+    $client_configuration_keys = static::CLIENT_CONFIG_KEYS;
+    $client_configuration = [];
+    foreach ($configuration as $key => $value) {
+      if (isset($client_configuration_keys[$key])) {
+        $client_configuration[$client_configuration_keys[$key]] = $value;
+      }
+    }
 
-    return array_filter($configuration, function ($key): bool {
-      return in_array($key, static::CLIENT_CONFIG_KEYS);
-    }, ARRAY_FILTER_USE_KEY);
+    return $client_configuration;
   }
 
   /**
