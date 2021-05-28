@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\State\StateInterface;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
@@ -81,6 +82,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $client;
 
   /**
+   * The state service.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
+
+  /**
    * Constructs a new plugin instance.
    *
    * @param array $configuration
@@ -95,12 +103,15 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The site settings.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
+   * @param \Drupal\Core\State\StateInterface $state
+   *   The state service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, RendererInterface $renderer) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, RendererInterface $renderer, StateInterface $state) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
     $this->renderer = $renderer;
+    $this->state = $state;
   }
 
   /**
@@ -113,7 +124,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $plugin_definition,
       $container->get('http_client'),
       $container->get('settings'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('state')
     );
   }
 
@@ -277,6 +289,44 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       ],
     ];
     $this->messenger()->addError($this->renderer->render($error));
+  }
+
+  /**
+   * Creates an ID used as the unique identifier at the Europa Search server.
+   *
+   * This method should be used everywhere we need to get the Europa Search
+   * reference for a given Search API item ID. The way it's constructed
+   * guarantees that we can ingest content from different sites and indexes in
+   * the same Europa Search database.
+   *
+   * @param string $index_id
+   *   The index ID.
+   * @param string $item_id
+   *   The item ID.
+   *
+   * @return string
+   *   A unique Europa Search reference for the given item.
+   */
+  protected function createReference(string $index_id, string $item_id): string {
+    return "{$this->getSiteHash()}-{$index_id}-{$item_id}";
+  }
+
+  /**
+   * Returns a unique hash for the current site.
+   *
+   * This is used to identify the Europa Search documents from different sites
+   * within a single Europa Search database.
+   *
+   * @return string
+   *   A unique site hash, containing only alphanumeric characters.
+   */
+  protected function getSiteHash(): string {
+    if (!$hash = $this->state->get('oe_search.site_hash')) {
+      global $base_url;
+      $hash = substr(base_convert(hash('sha256', uniqid($base_url, TRUE)), 16, 36), 0, 6);
+      $this->state->set('oe_search.site_hash', $hash);
+    }
+    return $hash;
   }
 
 }
