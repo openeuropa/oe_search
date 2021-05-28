@@ -8,16 +8,16 @@ use Drupal\search_api\Processor\FieldsProcessorPluginBase;
  * Converts field names to their uppercase version.
  *
  * @SearchApiProcessor(
- *   id = "search_api_europa_search_processor_upper_keys",
- *   label = @Translation("Upper Case Field Keys"),
- *   description = @Translation("Upper case the field keys."),
+ *   id = "search_api_europa_search_uppercase_field_names",
+ *   label = @Translation("Upper case field names"),
+ *   description = @Translation("Convert the field names to their upercase version."),
  *   stages = {
  *     "pre_index_save" = 0,
  *     "preprocess_index" = 0,
  *   }
  * )
  */
-class SearchApiEuropaSearchUpperProcessorUpperKeys extends FieldsProcessorPluginBase {
+class UpperCaseFieldNamesProcessor extends FieldsProcessorPluginBase {
 
   /**
    * {@inheritdoc}
