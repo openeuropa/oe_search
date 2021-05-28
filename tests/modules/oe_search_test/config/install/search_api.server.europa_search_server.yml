@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - oe_search
+id: europa_search_server
+name: 'Europa search server'
+description: 'Test server.'
+backend: search_api_europa_search
+backend_config:
+  api_key: api-key
+  enable_ingestion: true
+  database: db
+  text_ingestion_api_endpoint: 'http://example.com/ingest/text'
+  file_ingestion_api_endpoint: 'http://example.com/ingest'
+  delete_api_endpoint: 'http://example.com/document'
+  token_api_endpoint: 'http://example.com/token'
+  search_api_endpoint: 'http://example.com/search'
+  facets_api_endpoint: 'http://example.com/search/facets'
+  info_api_endpoint: 'http://example.com/search/info'
