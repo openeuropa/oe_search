@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
+use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\oe_search\Event\DocumentCreationEvent;
+use Drupal\oe_search\IngestionDocument;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
@@ -105,6 +107,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $state;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
+   */
+  protected $eventService;
+
+  /**
    * Constructs a new plugin instance.
    *
    * @param array $configuration
@@ -119,12 +128,15 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The site settings.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
+   * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_service
+   *   The event service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, StateInterface $state) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, StateInterface $state, ContainerAwareEventDispatcher $event_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
     $this->state = $state;
+    $this->eventService = $event_service;
   }
 
   /**
@@ -137,7 +149,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $plugin_definition,
       $container->get('http_client'),
       $container->get('settings'),
-      $container->get('state')
+      $container->get('state'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -304,13 +317,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $indexes = [];
 
     /** @var \OpenEuropa\EuropaSearchClient\Model\Ingestion $result */
-    /** @var \OpenEuropa\EuropaSearchClient\Model\Document $document */
     foreach ($documents as $item_id => $document) {
       try {
         $result = $client->ingestText(
           $document->getUrl(),
           $document->getContent(),
-          [$document->getLanguage()],
+          $document->getLanguages(),
           $document->getMetadata(),
           $document->getReference()
         );
@@ -389,6 +401,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function getMissingSettings(): array {
     $missing_settings = [];
+
     $settings_template = "\$settings['oe_search']['server']['%s']['%s'] = '%s';";
     foreach ($this->getConnectionSettings() as $setting => $value) {
       if (!$value) {
@@ -490,28 +503,45 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @param \Drupal\search_api\Item\ItemInterface[] $items
    *   An array of items to get documents for.
    *
-   * @return array
+   * @return \Drupal\oe_search\IngestionDocument[]
    *   An array of documents.
    */
   protected function getDocuments(IndexInterface $index, array $items): array {
     $documents = [];
     $index_id = $index->id();
+    $site_hash = $this->getSiteHash();
 
     foreach ($items as $id => $item) {
-      $document = new Document();
-      $language_id = $item->getLanguage();
-      $document->setUrl($item->getOriginalObject()->getValue()->toUrl()->setAbsolute()->toString());
-      $document->setContent($item->getOriginalObject()->getValue()->label());
-      $document->setLanguage($language_id);
-      $item_fields = $item->getFields();
-      $metadata = [];
-
-      foreach ($item_fields as $name => $field) {
-        $this->prepareField($metadata, $name, $field->getValues(), $field->getType());
+      if ($item->getOriginalObject() === NULL || $item->getOriginalObject()->getValue() === NULL) {
+        continue;
       }
 
-      $document->setMetadata($metadata);
-      $document->setReference($this->createReference($index_id, $id));
+      $original_object = $item->getOriginalObject()->getValue();
+      $document = (new IngestionDocument())
+        ->setUrl($original_object->toUrl()->setAbsolute()->toString())
+        ->setContent($original_object->label())
+        ->setLanguage($item->getLanguage())
+        ->setReference($this->createReference($index_id, $id))
+        ->setMetadata('hash', [$site_hash], 'string')
+        ->setMetadata('index_id', [$index_id], 'string')
+        ->setStatus(TRUE);
+      $item_fields = $item->getFields();
+      $item_fields += $this->getSpecialFields($index, $item);
+
+      foreach ($item_fields as $name => $field) {
+        $document->setMetadata($name, $field->getValues(), $field->getType());
+      }
+
+      $event = (new DocumentCreationEvent())
+        ->setDocument($document)
+        ->setEntity($original_object->getValue());
+      // @TODO: test in 8.9.
+      $this->eventService->dispatch($event, DocumentCreationEvent::class);
+
+      if ($document->hasStatus(FALSE)) {
+        continue;
+      }
+
       $documents[$id] = $document;
     }
 
@@ -549,111 +579,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function destructReference(string $reference): array {
     return explode('-', $reference);
-  }
-
-  /**
-   * Provides a helper method for indexing.
-   *
-   * Adds $value with field name $key to the document. The format of $value
-   * is the same as specified in
-   * \Drupal\search_api\Backend\BackendSpecificInterface::indexItems().
-   *
-   * @param array $metadata
-   *   Metadata for the document.
-   * @param string $key
-   *   The key to use for the field.
-   * @param array $values
-   *   The values for the field.
-   * @param string $type
-   *   The field type.
-   */
-  protected function prepareField(array &$metadata, string $key, array $values, $type): void {
-    foreach ($values as $value) {
-      if (NULL !== $value) {
-        switch ($type) {
-          case 'date':
-            $value = $this->formatDate($value);
-            if ($value === FALSE) {
-              continue(2);
-            }
-            break;
-
-          case 'boolean':
-            $value = (bool) $value;
-            break;
-
-          case 'integer':
-            $value = (int) $value;
-            break;
-
-          case 'decimal':
-            $value = (float) $value;
-            break;
-
-          case 'text':
-            /** @var \Drupal\search_api\Plugin\search_api\data_type\value\TextValueInterface $value */
-            $value = $value->getText();
-          case 'string':
-          default:
-            // Keep $value as it is.
-            if (!$value) {
-              continue 2;
-            }
-        }
-
-        $metadata[$key][] = $value;
-      }
-    }
-  }
-
-  /**
-   * Tries to format a given date for ingestion.
-   *
-   * @param int|string $input
-   *   The date to format (timestamp or string).
-   *
-   * @return bool|string
-   *   The formatted date as string or FALSE in case of invalid input.
-   */
-  public function formatDate($input) {
-    try {
-      $input = is_numeric($input) ? (int) $input : new \DateTime($input, timezone_open(DateTimeItemInterface::STORAGE_TIMEZONE));
-    }
-    catch (\Exception $e) {
-      return FALSE;
-    }
-
-    switch (TRUE) {
-      case $input instanceof \DateTimeInterface:
-        $input = clone $input;
-        break;
-
-      case \is_string($input):
-      case is_numeric($input):
-        // If date/time string: convert to timestamp first.
-        if (\is_string($input)) {
-          $input = strtotime($input);
-        }
-        try {
-          $input = new \DateTime('@' . $input);
-        }
-        catch (\Exception $e) {
-          $input = FALSE;
-        }
-        break;
-
-      default:
-        $input = FALSE;
-        break;
-    }
-
-    if ($input) {
-      // When we get here the input is always a datetime object.
-      $input = $input->setTimezone(new \DateTimeZone('UTC'));
-      return $input->format(\DateTimeInterface::RFC3339_EXTENDED);
-    }
-
-    return FALSE;
   }
 
   /**
