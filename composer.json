@@ -10,7 +10,7 @@
         "drupal/core-composer-scaffold": "^8.9 || ^9",
         "drupal/core-recommended": "^8.9 || ^9",
         "drupal/search_api": "^1.19",
-        "openeuropa/europa-search-client": "dev-EPIC-EuropaSearch",
+        "openeuropa/europa-search-client": "dev-OEL-155",
         "php-http/guzzle6-adapter": "^2.0"
     },
     "require-dev": {

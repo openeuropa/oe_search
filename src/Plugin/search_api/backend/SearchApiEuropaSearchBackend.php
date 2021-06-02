@@ -322,7 +322,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         $result = $client->ingestText(
           $document->getUrl(),
           $document->getContent(),
-          $document->getLanguages(),
+          [$document->getLanguage()],
           $document->getMetadata(),
           $document->getReference()
         );
@@ -522,19 +522,19 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         ->setContent($original_object->label())
         ->setLanguage($item->getLanguage())
         ->setReference($this->createReference($index_id, $id))
-        ->setMetadata('hash', [$site_hash], 'string')
-        ->setMetadata('index_id', [$index_id], 'string')
+        ->addMetadata('hash', [$site_hash], 'string')
+        ->addMetadata('index_id', [$index_id], 'string')
         ->setStatus(TRUE);
       $item_fields = $item->getFields();
       $item_fields += $this->getSpecialFields($index, $item);
 
       foreach ($item_fields as $name => $field) {
-        $document->setMetadata($name, $field->getValues(), $field->getType());
+        $document->addMetadata($name, $field->getValues(), $field->getType());
       }
 
       $event = (new DocumentCreationEvent())
         ->setDocument($document)
-        ->setEntity($original_object->getValue());
+        ->setEntity($original_object);
       // @TODO: test in 8.9.
       $this->eventService->dispatch($event, DocumentCreationEvent::class);
 
