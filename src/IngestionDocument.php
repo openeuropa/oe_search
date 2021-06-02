@@ -13,7 +13,7 @@ use OpenEuropa\EuropaSearchClient\Model\DocumentBase;
 class IngestionDocument extends DocumentBase {
 
   /**
-   * Whether this document eligible for ingestion.
+   * Whether this document is eligible for ingestion.
    *
    * @var bool
    */
