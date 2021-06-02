@@ -6,6 +6,7 @@ namespace Drupal\oe_search\Plugin\search_api\backend;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
@@ -14,6 +15,7 @@ use Drupal\oe_search\Event\DocumentCreationEvent;
 use Drupal\oe_search\IngestionDocument;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
+use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
@@ -514,13 +516,19 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         continue;
       }
 
-      $original_object = $item->getOriginalObject()->getValue();
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      $entity = $item->getOriginalObject()->getValue();
+
+      // Non-publishable entities still can be indexed by explicitly subscribing
+      // to DocumentCreationEvent and setting the Document's status to TRUE.
+      $can_be_ingested = $entity instanceof EntityPublishedInterface ? $entity->isPublished() : FALSE;
+
       $document = (new IngestionDocument())
-        ->setUrl($original_object->toUrl()->setAbsolute()->toString())
-        ->setContent($original_object->label())
+        ->setUrl($entity->toUrl()->setAbsolute()->toString())
+        ->setContent($entity->label())
         ->setLanguage($item->getLanguage())
         ->setReference($this->createReference($index->id(), $id))
-        ->setStatus(TRUE);
+        ->setCanBeIngested($can_be_ingested);
 
       $item_fields = $this->getSpecialFields($index, $item) + $item->getFields();
       foreach ($item_fields as $name => $field) {
@@ -529,15 +537,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
       $event = (new DocumentCreationEvent())
         ->setDocument($document)
-        ->setEntity($original_object);
-      // @TODO: test in 8.9.
-      $this->eventService->dispatch($event, DocumentCreationEvent::class);
+        ->setEntity($entity);
+      // @todo Remove 1st argument when dropping support for Drupal 8.9.
+      $this->eventService->dispatch(DocumentCreationEvent::class, $event);
 
-      if ($document->hasStatus(FALSE)) {
-        continue;
+      if ($document->canBeIngested()) {
+        $documents[$id] = $document;
       }
-
-      $documents[$id] = $document;
     }
 
     return $documents;

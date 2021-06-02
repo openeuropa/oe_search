@@ -13,11 +13,11 @@ use OpenEuropa\EuropaSearchClient\Model\DocumentBase;
 class IngestionDocument extends DocumentBase {
 
   /**
-   * Is the document eligible.
+   * Whether this document eligible for ingestion.
    *
    * @var bool
    */
-  protected $status;
+  protected $canBeIngested = FALSE;
 
   /**
    * Adds $value with field name $key to the document.
@@ -48,28 +48,25 @@ class IngestionDocument extends DocumentBase {
   }
 
   /**
-   * Checks the document status.
-   *
-   * @param bool $status
-   *   Desired status to compare.
+   * Checks whether this ingestion document is allowed for ingestion.
    *
    * @return bool
-   *   The status check result.
+   *   Whether this ingestion document is allowed for ingestion.
    */
-  public function hasStatus(bool $status): bool {
-    return $this->status === $status;
+  public function canBeIngested(): bool {
+    return $this->canBeIngested;
   }
 
   /**
-   * Sets the document status.
+   * Sets whether this document can be ingested.
    *
-   * @param bool $status
-   *   The document status.
+   * @param bool $can_be_ingested
+   *   Whether this document can be ingested.
    *
    * @return $this
    */
-  public function setStatus(bool $status): self {
-    $this->status = $status;
+  public function setCanBeIngested(bool $can_be_ingested): self {
+    $this->canBeIngested = $can_be_ingested;
     return $this;
   }
 

@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search\EventSubscriber;
 
-use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -29,13 +28,7 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
    *   The event object.
    */
   public function setDocumentValues(DocumentCreationEvent $event): void {
-    $entity = $event->getEntity();
-    $document = $event->getDocument();
-
-    // @todo: media & files will override the document url, content.
-    if ($entity instanceof EntityPublishedInterface) {
-      $document->setStatus($entity->isPublished());
-    }
+    // @todo: Handle exceptions from Drupal core (media URL, etc).
   }
 
 }
