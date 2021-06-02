@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search\Event;
 
-use Drupal\Component\EventDispatcher\Event;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\oe_search\IngestionDocument;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Event for managing document values.
