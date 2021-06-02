@@ -209,6 +209,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#title' => $this->t('Database'),
       '#description' => $this->t('The database element correspond to a dataSource that contains the documents.'),
       '#default_value' => $configuration['database'],
+      '#states' => [
+        'required' => [':input[name="backend_config[ingestion][enabled]"]' => ['checked' => TRUE]],
+      ],
     ];
 
     $form['search'] = [
@@ -401,11 +404,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function getMissingSettings(): array {
     $missing_settings = [];
-
+    $server_id = $this->getServer()->id() ?? 'your_server_machine_name';
     $settings_template = "\$settings['oe_search']['server']['%s']['%s'] = '%s';";
     foreach ($this->getConnectionSettings() as $setting => $value) {
       if (!$value) {
-        $missing_settings[] = sprintf($settings_template, $this->getServer()->id(), $setting, $this->t('@name value...', [
+        $missing_settings[] = sprintf($settings_template, $server_id, $setting, $this->t('@name value...', [
           '@name' => str_replace('_', ' ', $setting),
         ]));
       }
