@@ -508,8 +508,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   protected function getDocuments(IndexInterface $index, array $items): array {
     $documents = [];
-    $index_id = $index->id();
-    $site_hash = $this->getSiteHash();
 
     foreach ($items as $id => $item) {
       if ($item->getOriginalObject() === NULL || $item->getOriginalObject()->getValue() === NULL) {
@@ -521,13 +519,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         ->setUrl($original_object->toUrl()->setAbsolute()->toString())
         ->setContent($original_object->label())
         ->setLanguage($item->getLanguage())
-        ->setReference($this->createReference($index_id, $id))
-        ->addMetadata('hash', [$site_hash], 'string')
-        ->addMetadata('index_id', [$index_id], 'string')
+        ->setReference($this->createReference($index->id(), $id))
         ->setStatus(TRUE);
-      $item_fields = $item->getFields();
-      $item_fields += $this->getSpecialFields($index, $item);
 
+      $item_fields = $this->getSpecialFields($index, $item) + $item->getFields();
       foreach ($item_fields as $name => $field) {
         $document->addMetadata($name, $field->getValues(), $field->getType());
       }
@@ -546,6 +541,27 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     return $documents;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getSpecialFields(IndexInterface $index, ItemInterface $item = NULL): array {
+    $fields = parent::getSpecialFields($index, $item);
+
+    $field_info = [
+      'type' => 'string',
+      'original type' => 'string',
+    ];
+
+    $fields['search_api_site_hash'] = $this->getFieldsHelper()
+      ->createField($index, 'search_api_site_hash', $field_info)
+      ->setValues([$this->getSiteHash()]);
+    $fields['search_api_index_id'] = $this->getFieldsHelper()
+      ->createField($index, 'search_api_index_id', $field_info)
+      ->setValues([$index->id()]);
+
+    return $fields;
   }
 
   /**
