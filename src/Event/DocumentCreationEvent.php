@@ -14,21 +14,21 @@ use Drupal\oe_search\IngestionDocument;
 class DocumentCreationEvent extends Event {
 
   /**
-   * The object.
+   * The entity being ingested.
    *
    * @var \Drupal\Core\Entity\ContentEntityInterface
    */
   protected $entity;
 
   /**
-   * The document.
+   * The ingestion document.
    *
    * @var \Drupal\oe_search\IngestionDocument
    */
   protected $document;
 
   /**
-   * Get the entity.
+   * Returns the entity being ingested.
    *
    * @return \Drupal\Core\Entity\ContentEntityInterface
    *   The source entity.
@@ -38,7 +38,7 @@ class DocumentCreationEvent extends Event {
   }
 
   /**
-   * Set the entity.
+   * Sets the entity being ingested.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The source entity.
@@ -51,7 +51,7 @@ class DocumentCreationEvent extends Event {
   }
 
   /**
-   * Get the document.
+   * Returns the ingestion document.
    *
    * @return \Drupal\oe_search\IngestionDocument
    *   The document to be ingested.
@@ -61,7 +61,7 @@ class DocumentCreationEvent extends Event {
   }
 
   /**
-   * Set the document.
+   * Sets the ingestion document.
    *
    * @param \Drupal\oe_search\IngestionDocument $document
    *   The document to be ingested.
