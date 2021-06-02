@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Drupal\oe_search\Event;
 
+use Drupal\Component\EventDispatcher\Event;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\oe_search\IngestionDocument;
-use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Event for managing document values.
