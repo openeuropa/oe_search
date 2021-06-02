@@ -186,8 +186,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function isAvailable(): bool {
-    // @todo Perform a ping as soon as the functionality is available.
-    return TRUE;
+    $info = $this->getClient()->getInfo();
+    return !empty($info);
   }
 
   /**
