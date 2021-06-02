@@ -16,7 +16,7 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       DocumentCreationEvent::class => 'setDocumentValues',
     ];
@@ -28,7 +28,7 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
    * @param \Drupal\oe_search\Event\DocumentCreationEvent $event
    *   The event object.
    */
-  public function setDocumentValues(DocumentCreationEvent $event) {
+  public function setDocumentValues(DocumentCreationEvent $event): void {
     $entity = $event->getEntity();
     $document = $event->getDocument();
 
