@@ -23,7 +23,7 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Subscribe to the document creation event dispatched.
+   * Subscribes to the document creation event.
    *
    * @param \Drupal\oe_search\Event\DocumentCreationEvent $event
    *   The event object.
