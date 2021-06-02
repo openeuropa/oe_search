@@ -20,7 +20,7 @@
         "drush/drush": "^10.4",
         "openeuropa/behat-transformation-context": "~0.1",
         "openeuropa/code-review": "2.x-dev",
-        "openeuropa/drupal-core-require-dev": "^8 || ^9",
+        "openeuropa/drupal-core-require-dev": "^8.9 || ^9",
         "openeuropa/task-runner": "~1.0@beta",
         "phpspec/prophecy-phpunit": "^2",
         "phpunit/phpunit": "^6.5 || ^7 || ^8 || ^9"
