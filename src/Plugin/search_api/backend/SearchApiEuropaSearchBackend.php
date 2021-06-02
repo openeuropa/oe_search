@@ -314,7 +314,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       return [];
     }
 
-    $indexes = [];
+    $indexed = [];
 
     /** @var \OpenEuropa\EuropaSearchClient\Model\Ingestion $result */
     foreach ($this->getDocuments($index, $items) as $item_id => $document) {
@@ -328,7 +328,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         );
 
         if ($result->getReference()) {
-          $indexes[] = $item_id;
+          $indexed[] = $item_id;
         }
       }
       catch (\Exception $e) {
@@ -336,7 +336,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       }
     }
 
-    return $indexes;
+    return $indexed;
   }
 
   /**
