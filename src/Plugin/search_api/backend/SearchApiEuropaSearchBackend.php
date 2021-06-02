@@ -533,6 +533,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         $document->addMetadata($name, $field->getValues(), $field->getType());
       }
 
+      // Allow third-party to alter the document being ingested.
       $event = (new DocumentCreationEvent())
         ->setDocument($document)
         ->setEntity($entity);
