@@ -520,7 +520,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $entity = $item->getOriginalObject()->getValue();
 
       // Non-publishable entities still can be indexed by explicitly subscribing
-      // to DocumentCreationEvent and setting the Document's status to TRUE.
+      // to DocumentCreationEvent and use IngestionDocument::setCanBeIngested().
       $can_be_ingested = $entity instanceof EntityPublishedInterface ? $entity->isPublished() : FALSE;
 
       $document = (new IngestionDocument())
