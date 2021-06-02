@@ -314,14 +314,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       return [];
     }
 
-    $documents = $this->getDocuments($index, $items);
-    $client = $this->getClient();
     $indexes = [];
 
     /** @var \OpenEuropa\EuropaSearchClient\Model\Ingestion $result */
-    foreach ($documents as $item_id => $document) {
+    foreach ($this->getDocuments($index, $items) as $item_id => $document) {
       try {
-        $result = $client->ingestText(
+        $result = $this->getClient()->ingestText(
           $document->getUrl(),
           $document->getContent(),
           [$document->getLanguage()],
