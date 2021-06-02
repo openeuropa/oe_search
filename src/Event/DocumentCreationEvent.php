@@ -10,6 +10,12 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Event for managing document values.
+ *
+ * Subscribers to this event are able to change the IngestionDocument data just
+ * before it gets ingested.
+ *
+ * @todo Extend \Drupal\Component\EventDispatcher\Event when dropping support
+ *   for Drupal 8.9.
  */
 class DocumentCreationEvent extends Event {
 
