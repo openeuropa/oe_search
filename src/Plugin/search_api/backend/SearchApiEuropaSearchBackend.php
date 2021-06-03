@@ -13,6 +13,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Drupal\oe_search\IngestionDocument;
+use Drupal\oe_search\Psr17\Factory;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Item\ItemInterface;
@@ -20,9 +21,6 @@ use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
-use Laminas\Diactoros\RequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use Laminas\Diactoros\UriFactory;
 use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
@@ -429,9 +427,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       if (!$this->httpClient instanceof PsrClient) {
         $this->httpClient = new GuzzleAdapter($this->httpClient);
       }
+      // @todo Remove Drupal\oe_search\Psr17\Factory once support for drupal 8.9
+      // is dropped, use laminas-diactoros instead.
+      $psr17Factory = new Factory();
       // @todo Refactor this instantiation to a new plugin type in OEL-152.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
-      $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
+      $this->client = new Client($this->httpClient, $psr17Factory, $psr17Factory, $psr17Factory, $configuration);
     }
     return $this->client;
   }
