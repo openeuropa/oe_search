@@ -322,7 +322,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     /** @var \OpenEuropa\EuropaSearchClient\Model\Ingestion $result */
     foreach ($this->getDocuments($index, $items) as $item_id => $document) {
       try {
-        $result = $this->getClient()->ingestText(
+        $method = $document->isFile() ? 'ingestFile' : 'ingestText';
+        $result = $this->getClient()->{$method}(
           $document->getUrl(),
           $document->getContent(),
           [$document->getLanguage()],
@@ -528,7 +529,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $can_be_ingested = $entity instanceof EntityPublishedInterface ? $entity->isPublished() : FALSE;
 
       $document = (new IngestionDocument())
-        ->setUrl($entity->toUrl()->setAbsolute()->toString())
         ->setContent($entity->label())
         ->setLanguage($item->getLanguage())
         ->setReference($this->createReference($index->id(), $id))

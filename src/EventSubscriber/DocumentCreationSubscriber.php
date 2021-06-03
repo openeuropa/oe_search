@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search\EventSubscriber;
 
+use Drupal\file\Entity\File;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -28,7 +29,40 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
    *   The event object.
    */
   public function setDocumentValues(DocumentCreationEvent $event): void {
-    // @todo: Handle exceptions from Drupal core (media URL, etc).
+    $entity = $event->getEntity();
+
+    switch (TRUE) {
+      case $entity instanceof File:
+        $this->setFileFields($entity, $event);
+        break;
+
+      case $entity instanceof Media:
+        $fid = $entity->getSource()->getSourceFieldValue($entity);
+        $file = File::load($fid);
+        $this->setFileFields($file, $event);
+        break;
+
+      default:
+        $event->getDocument()->setUrl($entity->toUrl()->setAbsolute()->toString());
+        break;
+    }
+  }
+
+  /**
+   * Set document fields required for file ingestion.
+   *
+   * @param \Drupal\oe_search\EventSubscriber\File $file
+   *   The file entity.
+   * @param \Drupal\oe_search\Event\DocumentCreationEvent $event
+   *   The event object.
+   */
+  protected function setFileFields(File $file, DocumentCreationEvent $event): void {
+    $document = $event->getDocument();
+    $uri = $file->getFileUri();
+    $document->setUrl(file_create_url($uri));
+    $document->setContent(file_get_contents($uri));
+    $document->setIsFile(TRUE);
+    $document->setCanBeIngested(TRUE);
   }
 
 }

@@ -44,6 +44,11 @@ function oe_search_form_search_api_index_edit_form_validate(array $form, FormSta
 
   /** @var \Drupal\search_api\Plugin\search_api\datasource\ContentEntity $datasource */
   foreach ($form_state->getValue('datasources') as $datasource_id) {
+    // We consider files as exception.
+    if ($datasource_id === 'entity:file') {
+      continue;
+    }
+
     $datasource = $plugin_manager->createInstance($datasource_id, [
       '#index' => $form_object->getEntity(),
     ]);

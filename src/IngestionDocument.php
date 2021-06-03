@@ -12,6 +12,13 @@ use OpenEuropa\EuropaSearchClient\Model\DocumentBase;
 class IngestionDocument extends DocumentBase {
 
   /**
+   * Whether this document is a file for ingestion.
+   *
+   * @var bool
+   */
+  protected $isFile = FALSE;
+
+  /**
    * Whether this document is eligible for ingestion.
    *
    * @var bool
@@ -44,6 +51,29 @@ class IngestionDocument extends DocumentBase {
       }
     }
     return $this;
+  }
+
+  /**
+   * Sets whether this document is a file.
+   *
+   * @param bool $is_file
+   *   Whether this document is a file.
+   *
+   * @return $this
+   */
+  public function setIsFile(bool $is_file): self {
+    $this->isFile = $is_file;
+    return $this;
+  }
+
+  /**
+   * Checks whether this ingestion document is a file for ingestion.
+   *
+   * @return bool
+   *   The check result.
+   */
+  public function isFile(): bool {
+    return $this->isFile;
   }
 
   /**
