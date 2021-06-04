@@ -10,7 +10,7 @@
         "drupal/core": "^8.9 || ^9.1",
         "drupal/core-composer-scaffold": "^8.9 || ^9.1",
         "drupal/search_api": "^1.19",
-        "nyholm/psr7": "^1.4",
+        "http-interop/http-factory-guzzle": "^1.0",
         "openeuropa/europa-search-client": "dev-OEL-155",
         "php-http/guzzle6-adapter": "^2.0"
     },

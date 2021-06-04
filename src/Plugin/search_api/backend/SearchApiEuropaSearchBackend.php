@@ -20,7 +20,9 @@ use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
-use Nyholm\Psr7\Factory\Psr17Factory;
+use Http\Factory\Guzzle\RequestFactory;
+use Http\Factory\Guzzle\StreamFactory;
+use Http\Factory\Guzzle\UriFactory;
 use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
@@ -427,11 +429,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       if (!$this->httpClient instanceof PsrClient) {
         $this->httpClient = new GuzzleAdapter($this->httpClient);
       }
-      // @todo Rmove Psr17Factory once laminas-diactoros ^2 is available.
-      $psr17Factory = new Psr17Factory();
       // @todo Refactor this instantiation to a new plugin type in OEL-152.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
-      $this->client = new Client($this->httpClient, $psr17Factory, $psr17Factory, $psr17Factory, $configuration);
+      // @todo Remove \Http\Factory\Guzzle once laminas-diactoros ^2 is available.
+      $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
     }
     return $this->client;
   }
