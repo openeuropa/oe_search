@@ -20,9 +20,9 @@ use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
-use Laminas\Diactoros\RequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use Laminas\Diactoros\UriFactory;
+use Http\Factory\Guzzle\RequestFactory;
+use Http\Factory\Guzzle\StreamFactory;
+use Http\Factory\Guzzle\UriFactory;
 use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
@@ -431,6 +431,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       }
       // @todo Refactor this instantiation to a new plugin type in OEL-152.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
+      // @todo Replace \Http\Factory\Guzzle with factories provided by
+      //   laminas/laminas-diactoros:^2 once support for Drupal 8.9 is dropped.
+      // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-194
       $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
     }
     return $this->client;
