@@ -431,7 +431,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       }
       // @todo Refactor this instantiation to a new plugin type in OEL-152.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
-      // @todo Replace Psr17Factory with factories provided by
+      // @todo Replace \Http\Factory\Guzzle with factories provided by
       //   laminas/laminas-diactoros:^2 once support for Drupal 8.9 is dropped.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-194
       $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
