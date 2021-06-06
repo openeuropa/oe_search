@@ -4,7 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search\EventSubscriber;
 
-use Drupal\file\Entity\File;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\file\FileInterface;
+use Drupal\media\MediaInterface;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -12,6 +14,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Event subscriber to add additional parsing to documents.
  */
 class DocumentCreationSubscriber implements EventSubscriberInterface {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * NotificationsController constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
+   */
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+    $this->entityTypeManager = $entityTypeManager;
+  }
 
   /**
    * {@inheritdoc}
@@ -32,17 +51,25 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
     $entity = $event->getEntity();
 
     switch (TRUE) {
-      case $entity instanceof File:
+      case $entity instanceof FileInterface:
+        // @todo decide if files are supported.
         $this->setFileFields($entity, $event);
         break;
 
-      case $entity instanceof Media:
+      case $entity instanceof MediaInterface:
         $fid = $entity->getSource()->getSourceFieldValue($entity);
-        $file = File::load($fid);
+        $file = $this->entityTypeManager->getStorage('file')->load($fid);
+
+        // @todo decide what action to take for remote files.
+        if ($file === NULL) {
+          continue;
+        }
+        // @todo decide if standalone URL should be used if enabled.
         $this->setFileFields($file, $event);
         break;
 
       default:
+        // @todo if files are removed then move this back into the backend.
         $event->getDocument()->setUrl($entity->toUrl()->setAbsolute()->toString());
         break;
     }

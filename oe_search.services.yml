@@ -1,5 +1,6 @@
 services:
   oe_search_document_creation_event:
     class: '\Drupal\oe_search\EventSubscriber\DocumentCreationSubscriber'
+    arguments: ['@entity_type.manager']
     tags:
       - { name: 'event_subscriber' }

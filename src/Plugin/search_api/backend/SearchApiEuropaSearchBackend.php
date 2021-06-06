@@ -529,6 +529,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $can_be_ingested = $entity instanceof EntityPublishedInterface ? $entity->isPublished() : FALSE;
 
       $document = (new IngestionDocument())
+        // @todo if we wont support files add setUrl() here.
         ->setContent($entity->label())
         ->setLanguage($item->getLanguage())
         ->setReference($this->createReference($index->id(), $id))
