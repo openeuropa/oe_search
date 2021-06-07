@@ -26,7 +26,6 @@ class EuropaSearchServerResponse extends PluginBase implements ServiceMockPlugin
    */
   public function applies(RequestInterface $request, array $options): bool {
     $this->collectCalledMethods($request->getUri()->getPath(), __FUNCTION__);
-    // @todo implement collectRequests().
     return $request->getUri()->getHost() === 'example.com';
   }
 
@@ -36,6 +35,7 @@ class EuropaSearchServerResponse extends PluginBase implements ServiceMockPlugin
   public function getResponse(RequestInterface $request, array $options): ResponseInterface {
     $path = $request->getUri()->getPath();
     $this->collectCalledMethods($path, __FUNCTION__);
+    $this->collectRequests($path, $request);
 
     switch ($path) {
       case '/token':
@@ -75,6 +75,21 @@ class EuropaSearchServerResponse extends PluginBase implements ServiceMockPlugin
 
     $calls[$path][$method]++;
     $state->set('oe_search_test.service_mock_calls', $calls);
+  }
+
+  /**
+   * Collects the requests received.
+   *
+   * @param string $path
+   *   The request path.
+   * @param \Psr\Http\Message\RequestInterface $request
+   *   The received request.
+   */
+  protected function collectRequests(string $path, RequestInterface $request): void {
+    $state = \Drupal::state();
+    $requests = $state->get('oe_search_test.service_mock_requests', []);
+    $requests[$path][] = $request;
+    $state->set('oe_search_test.service_mock_requests', $requests);
   }
 
   /**

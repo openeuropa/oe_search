@@ -5,12 +5,15 @@ declare(strict_types = 1);
 namespace Drupal\oe_search\Tests;
 
 use Drupal\Core\Site\Settings;
-use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\search_api\Functional\ExampleContentTrait;
+use Drupal\entity_test\Entity\EntityTestMulRevChanged;
+use Drupal\oe_search\Utility;
+use Drupal\search_api\Utility\Utility as SearchApiUtility;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
-use Drupal\search_api\Utility\Utility;
-use Drupal\Tests\search_api\Functional\ExampleContentTrait;
+use OpenEuropa\Tests\EuropaSearchClient\Traits\InspectTestRequestTrait;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Tests Europa Search Drupal Search API integration.
@@ -20,6 +23,7 @@ use Drupal\Tests\search_api\Functional\ExampleContentTrait;
 class BackendTest extends KernelTestBase {
 
   use ExampleContentTrait;
+  use InspectTestRequestTrait;
 
   /**
    * A Search API server ID.
@@ -68,7 +72,7 @@ class BackendTest extends KernelTestBase {
     // Do not use a batch for tracking the initial items after creating an
     // index when running the tests via the GUI. Otherwise, it seems Drupal's
     // Batch API gets confused and the test fails.
-    if (!Utility::isRunningInCli()) {
+    if (!SearchApiUtility::isRunningInCli()) {
       \Drupal::state()->set('search_api_use_tracking_batch', FALSE);
     }
 
@@ -76,15 +80,15 @@ class BackendTest extends KernelTestBase {
     $this->insertExampleContent();
 
     $settings = [
-      'oe_search' => [
-        'server' => [
-          'europa_search_server' => [
-            'consumer_key' => 'foo',
-            'consumer_secret' => 'bar',
+        'oe_search' => [
+          'server' => [
+            'europa_search_server' => [
+              'consumer_key' => 'foo',
+              'consumer_secret' => 'bar',
+            ],
           ],
         ],
-      ],
-    ] + Settings::getAll();
+      ] + Settings::getAll();
     new Settings($settings);
   }
 
@@ -103,7 +107,7 @@ class BackendTest extends KernelTestBase {
     $datasource->setIndex($index);
 
     $item_ids = array_map(function (EntityTestMulRevChanged $entity) use ($datasource): string {
-      return Utility::createCombinedId($datasource->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
+      return SearchApiUtility::createCombinedId($datasource->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
     }, $this->entities);
 
     /** @var \Drupal\search_api\Item\ItemInterface[] $items */
@@ -124,7 +128,52 @@ class BackendTest extends KernelTestBase {
     $this->container->get('state')->set('oe_search_test.enable_document_alter', TRUE);
     $backend->indexItems($index, $items);
     $this->assertServiceMockCalls('/ingest/text', 5, 5);
-    // @todo fetch collected requests and compare to $items.
+
+    // Compare set data with received data.
+    $requests = $this->getServiceMockRequests('/ingest/text');
+    $this->assertIngestedItem($requests[0], $items, $item_ids[1], 1);
+    $this->assertIngestedItem($requests[1], $items, $item_ids[2], 2);
+    $this->assertIngestedItem($requests[2], $items, $item_ids[3], 3);
+    $this->assertIngestedItem($requests[3], $items, $item_ids[4], 4);
+    // @todo check that items where added to search_api_items table.
+  }
+
+  /**
+   * Assert data for one ingested item.
+   *
+   * @param \Psr\Http\Message\RequestInterface $request
+   *   The request.
+   * @param array $items
+   *   The items sent to ingestion.
+   * @param string $item_id
+   *   The search_api_id of the current item.
+   * @param int $id
+   *   The id of the current item.
+   */
+  protected function assertIngestedItem(RequestInterface $request, array $items, string $item_id, int $id): void {
+    $item = $items[$item_id];
+    $entity = $item->getOriginalObject()->getValue();
+    // Assert query parameters.
+    parse_str($request->getUri()->getQuery(), $parameters);
+    $this->assertSame($entity->toUrl()->setAbsolute()->toString(), $parameters['uri']);
+    $this->assertSame(Utility::getSiteHash() . '-europa_search_index-' . $item_id, $parameters['reference']);
+    $this->assertSame('["en"]', $parameters['language']);
+    // Assert request body.
+    $this->inspectBoundary($request);
+    $parts = $this->getMultiParts($request);
+    $expected_meta = json_encode([
+      'search_api_id' => [$item_id],
+      'search_api_datasource' => ['entity:entity_test_mulrev_changed'],
+      'search_api_language' => ['en'],
+      'search_api_site_hash' => [Utility::getSiteHash()],
+      'search_api_index_id' => ['europa_search_index'],
+      'id' => [$id],
+      'name' => [$entity->label()],
+      'created' => [$item->getField('created')->getValues()['0'] * 1000],
+    ]);
+
+    $this->inspectPart($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
+    $this->inspectPart($parts[1], 'text/plain', 'text', strlen($entity->label()), $entity->label());
   }
 
   /**
@@ -155,6 +204,22 @@ class BackendTest extends KernelTestBase {
 
     // Leave the place clean for future assertions.
     $state->delete('oe_search_test.service_mock_calls');
+  }
+
+  /**
+   * Gets the received request by the mock server.
+   *
+   * @param string $path
+   *   Path to filter list by.
+   *
+   * @return array
+   *   List or requests.
+   */
+  protected function getServiceMockRequests(string $path): array {
+    $state = $this->container->get('state');
+    $requests = $state->get('oe_search_test.service_mock_requests', []);
+
+    return $requests[$path];
   }
 
 }
