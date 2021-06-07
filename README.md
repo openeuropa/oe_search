@@ -2,13 +2,19 @@
 
 [![Build Status](https://drone.fpfis.eu/api/badges/openeuropa/oe_search/status.svg?branch=master)](https://drone.fpfis.eu/openeuropa/oe_search)
 
-The OpenEuropa Search provides a simple block that allows to execute a search against the Europa Search portal.
+The OpenEuropa Search module integrates [Europa Search Client](https://github.com/openeuropa/europa-search-client) with [Search API](https://www.drupal.org/project/search_api).
 
 Europa Search is the corporate search engine for the European Commission.
 
 ### Future developments planned
 
-- A backend for Search API which uses the "Europa Search" search engine for storing and searching data.
+- File ingestion
+- Search: simple, advanced, faceted
+- Integration with translation
+
+## Requirements
+
+
 
 ## Development setup
 
@@ -92,12 +98,6 @@ To run the phpunit tests:
 
 ```bash
 docker-compose exec web ./vendor/bin/phpunit
-```
-
-To run the behat tests:
-
-```bash
-docker-compose exec web ./vendor/bin/behat
 ```
 
 #### Step debugging
