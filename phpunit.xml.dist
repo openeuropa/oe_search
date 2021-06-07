@@ -9,7 +9,7 @@
   </php>
   <testsuites>
     <testsuite name="OpenEuropa Search">
-      <directory>./tests/</directory>
+      <directory>./build/modules/custom/oe_search/tests/src/</directory>
     </testsuite>
   </testsuites>
 </phpunit>

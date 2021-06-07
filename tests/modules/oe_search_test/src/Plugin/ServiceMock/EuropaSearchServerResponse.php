@@ -16,7 +16,7 @@ use Psr\Http\Message\ResponseInterface;
  * @ServiceMock(
  *   id = "europa_search_server_response",
  *   label = @Translation("Europa Search mocked server responses for tesing."),
- *   weight = 0,
+ *   weight = -1,
  * )
  */
 class EuropaSearchServerResponse extends PluginBase implements ServiceMockPluginInterface {
@@ -25,6 +25,7 @@ class EuropaSearchServerResponse extends PluginBase implements ServiceMockPlugin
    * {@inheritdoc}
    */
   public function applies(RequestInterface $request, array $options): bool {
+    $this->collectCalledMethods(__FUNCTION__);
     return $request->getUri()->getHost() === 'example.com';
   }
 
@@ -32,7 +33,24 @@ class EuropaSearchServerResponse extends PluginBase implements ServiceMockPlugin
    * {@inheritdoc}
    */
   public function getResponse(RequestInterface $request, array $options): ResponseInterface {
+    $this->collectCalledMethods(__FUNCTION__);
     return new Response(200, [], 'Mocking example.com response');
+  }
+
+  /**
+   * Counts how many times each method of this class were called.
+   *
+   * @param string $method
+   *   The method being called.
+   */
+  protected function collectCalledMethods(string $method): void {
+    $state = \Drupal::state();
+    $calls = $state->get('oe_search_test.service_mock_calls', [
+      'applies' => 0,
+      'getResponse' => 0,
+    ]);
+    $calls[$method]++;
+    $state->set('oe_search_test.service_mock_calls', $calls);
   }
 
 }
