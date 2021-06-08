@@ -123,9 +123,12 @@ class BackendTest extends KernelTestBase {
     $backend->indexItems($index, $items);
     $this->assertServiceMockCalls(1, 1);
 
-//    print_r($items['entity:entity_test_mulrev_changed/1:en']->getOriginalObject()->toArray());
+    // print_r($items['entity:entity_test_mulrev_changed/1:en']->getOriginalObject()->toArray());
   }
 
+  /**
+   * Asserts that the service mock methods are called.
+   */
   protected function assertServiceMockCalls(int $applies_calls, int $get_response_calls): void {
     $state = $this->container->get('state');
     $calls = $state->get('oe_search_test.service_mock_calls', [
