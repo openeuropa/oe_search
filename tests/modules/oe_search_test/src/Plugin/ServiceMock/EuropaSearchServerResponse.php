@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\http_request_mock\Plugin\ServiceMock;
+namespace Drupal\oe_search_test\Plugin\ServiceMock;
 
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\http_request_mock\ServiceMockPluginInterface;

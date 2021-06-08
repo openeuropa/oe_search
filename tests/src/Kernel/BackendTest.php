@@ -41,6 +41,7 @@ class BackendTest extends KernelTestBase {
   protected static $modules = [
     'entity_test',
     'field',
+    'http_request_mock',
     'oe_search',
     'oe_search_test',
     'search_api',
