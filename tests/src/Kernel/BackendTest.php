@@ -94,6 +94,7 @@ class BackendTest extends KernelTestBase {
   public function testIndexItems(): void {
     $field_helper = $this->container->get('search_api.fields_helper');
     $datasource_manager = $this->container->get('plugin.manager.search_api.datasource');
+    /** @var \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend $backend */
     $backend = Server::load($this->serverId)->getBackend();
     $index = Index::load($this->indexId);
 
@@ -116,29 +117,41 @@ class BackendTest extends KernelTestBase {
     // indexed by default.
     // @see \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::getDocuments()
     $backend->indexItems($index, $items);
-    $this->assertServiceMockCalls(0, 0);
+    $this->assertServiceMockCalls('/ingest/text', 0, 0);
 
     // Enable ingestion of 'entity_test_mulrev_changed' entities.
     // @see \Drupal\oe_search_test\EventSubscriber\OeSearchTestSubscriber::indexEntityTestMulRevChanged()
     $this->container->get('state')->set('oe_search_test.enable_document_alter', TRUE);
     $backend->indexItems($index, $items);
-    $this->assertServiceMockCalls(1, 1);
-
-    // print_r($items['entity:entity_test_mulrev_changed/1:en']->getOriginalObject()->toArray());
+    $this->assertServiceMockCalls('/ingest/text', 5, 5);
+    // @todo fetch collected requests and compare to $items.
   }
 
   /**
    * Asserts that the service mock methods are called.
+   *
+   * @param string $path
+   *   The request path.
+   * @param int $applies_calls
+   *   Received requests count.
+   * @param int $get_response_calls
+   *   Count of replies from mocked server.
+   *
+   * @throws \Exception
    */
-  protected function assertServiceMockCalls(int $applies_calls, int $get_response_calls): void {
+  protected function assertServiceMockCalls(string $path, int $applies_calls, int $get_response_calls): void {
     $state = $this->container->get('state');
-    $calls = $state->get('oe_search_test.service_mock_calls', [
-      'applies' => 0,
-      'getResponse' => 0,
-    ]);
+    $calls = $state->get('oe_search_test.service_mock_calls', []);
 
-    $this->assertSame($applies_calls, $calls['applies']);
-    $this->assertSame($get_response_calls, $calls['getResponse']);
+    if (!isset($calls[$path])) {
+      $calls[$path] = [
+        'applies' => 0,
+        'getResponse' => 0,
+      ];
+    }
+
+    $this->assertSame($applies_calls, $calls[$path]['applies']);
+    $this->assertSame($get_response_calls, $calls[$path]['getResponse']);
 
     // Leave the place clean for future assertions.
     $state->delete('oe_search_test.service_mock_calls');
