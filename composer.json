@@ -15,6 +15,7 @@
         "php-http/guzzle6-adapter": "^2.0"
     },
     "require-dev": {
+        "ext-json": "*",
         "composer/installers": "^1.11",
         "drupal/drupal-extension": "~4.0",
         "drupal/facets": "^1.7",
