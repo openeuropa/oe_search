@@ -80,15 +80,15 @@ class BackendTest extends KernelTestBase {
     $this->insertExampleContent();
 
     $settings = [
-        'oe_search' => [
-          'server' => [
-            'europa_search_server' => [
-              'consumer_key' => 'foo',
-              'consumer_secret' => 'bar',
-            ],
+      'oe_search' => [
+        'server' => [
+          'europa_search_server' => [
+            'consumer_key' => 'foo',
+            'consumer_secret' => 'bar',
           ],
         ],
-      ] + Settings::getAll();
+      ],
+    ] + Settings::getAll();
     new Settings($settings);
   }
 
