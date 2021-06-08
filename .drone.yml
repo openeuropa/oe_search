@@ -70,6 +70,12 @@ pipeline:
     commands:
       - ./vendor/bin/grumphp run
 
+  phpunit:
+    group: test
+    image: registry.fpfis.eu/fpfis/httpd-php:${PHP_VERSION}-ci
+    commands:
+      - ./vendor/bin/phpunit
+
 matrix:
   COMPOSER_BOUNDARY:
     - lowest
