@@ -6,6 +6,7 @@ namespace Drupal\oe_search\Plugin\search_api\backend;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -37,6 +38,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   label = @Translation("Europa Search"),
  *   description = @Translation("Europa Search server Search API backend."),
  * )
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFormInterface {
 
@@ -499,28 +502,35 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *
    * @return \Drupal\oe_search\IngestionDocument[]
    *   An array of documents.
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    */
   protected function getDocuments(IndexInterface $index, array $items): array {
     $documents = [];
 
     foreach ($items as $id => $item) {
-      if ($item->getOriginalObject() === NULL || $item->getOriginalObject()->getValue() === NULL) {
+      if (!$entity = $this->getEntity($item)) {
         continue;
       }
 
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-      $entity = $item->getOriginalObject()->getValue();
-
       // Non-publishable entities still can be indexed by explicitly subscribing
       // to DocumentCreationEvent and use IngestionDocument::setCanBeIngested().
+      // @todo Reevaluate this logic in OEL-218.
+      // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-218
       $can_be_ingested = $entity instanceof EntityPublishedInterface ? $entity->isPublished() : FALSE;
 
       $document = (new IngestionDocument())
-        ->setUrl($entity->toUrl()->setAbsolute()->toString())
         ->setContent($entity->label())
         ->setLanguage($item->getLanguage())
         ->setReference(Utility::createReference($index->id(), $id))
         ->setCanBeIngested($can_be_ingested);
+
+      // Entities without a canonical URL are able to set an arbitrary one by
+      // subscribing to DocumentCreationEvent.
+      if ($entity->getEntityType()->hasLinkTemplate('canonical')) {
+        // Default to entity's canonical URL.
+        $document->setUrl($entity->toUrl()->setAbsolute()->toString());
+      }
 
       $item_fields = $this->getSpecialFields($index, $item) + $item->getFields();
       foreach ($item_fields as $name => $field) {
@@ -533,6 +543,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         ->setEntity($entity);
       // @todo Remove 1st argument when dropping support for Drupal 8.9.
       $this->eventService->dispatch(DocumentCreationEvent::class, $event);
+
+      if (!$document->getUrl()) {
+        $document->setCanBeIngested(FALSE);
+      }
 
       if ($document->canBeIngested()) {
         $documents[$id] = $document;
@@ -561,6 +575,29 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       ->setValues([$index->id()]);
 
     return $fields;
+  }
+
+  /**
+   * Extracts the content entity out of a give Search API item.
+   *
+   * @param \Drupal\search_api\Item\ItemInterface $item
+   *   The Search API item.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   *   The content entity or NULL if none.
+   */
+  protected function getEntity(ItemInterface $item): ?ContentEntityInterface {
+    if ($item->getOriginalObject() === NULL) {
+      return NULL;
+    }
+
+    $entity = $item->getOriginalObject()->getValue();
+    // Module limitation: Only supports content entity datasources.
+    if ($entity === NULL || !$entity instanceof ContentEntityInterface) {
+      return NULL;
+    }
+
+    return $entity;
   }
 
 }

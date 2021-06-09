@@ -52,18 +52,6 @@ function oe_search_form_search_api_index_edit_form_validate(array $form, FormSta
       $form_state->setErrorByName('datasources', t('Datasource "@datasource" must be a Content Entity.', [
         '@datasource' => Utility::escapeHtml($datasource->label()),
       ]));
-      continue;
-    }
-
-    $entity_type_id = $datasource->getEntityTypeId();
-    /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $definition */
-    $definition = Drupal::entityTypeManager()->getDefinition($entity_type_id);
-
-    if (!$definition->hasLinkTemplate('canonical')) {
-      $form_state->setErrorByName('datasources', t('Datasource "@datasource" must have a canonical link.', [
-        '@datasource' => Utility::escapeHtml($datasource->label()),
-      ]));
-      continue;
     }
   }
 }

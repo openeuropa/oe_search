@@ -12,6 +12,11 @@ Europa Search is the corporate search engine for the European Commission.
 - Search: simple, advanced, faceted
 - Integration with translation
 
+## Limitations
+
+- Only content entities can be ingested.
+- Ingested entities should expose a canonical URL. Alternatively, third-party code may alter the document being ingested and provide an arbitrary URL. See the **API** section below.
+
 ## Requirements
 
 * PHP 7.3 or newer.
@@ -161,12 +166,8 @@ class AlterIndexedDocSubscriber implements EventSubscriberInterface {
 
   public function setReleased(DocumentCreationEvent $event): void {
     $entity = $event->getEntity();
-    if (
-      $entity->getEntityTypeId() === 'node'
-      && $entity->bundle() === 'press_release'
-      && !$entity->get('released_date')->isEmpty()
-     ) {
-      $event->getDocument()->addMetadata('released', [TRUE], 'boolean');
+    if ($entity->getEntityTypeId() === 'foo') {
+      $event->getDocument()->setUrl("http://example.com/{$entity->uuid()}");
     }
   }
 
