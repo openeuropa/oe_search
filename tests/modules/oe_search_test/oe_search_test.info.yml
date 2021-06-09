@@ -1,0 +1,9 @@
+name: 'OpenEuropa Search Test'
+description: 'Test module for the OpenEuropa Search.'
+package: Testing
+
+type: module
+core_version_requirement: ^8.9 || ^9.1
+
+dependencies:
+  - oe_search:oe_search

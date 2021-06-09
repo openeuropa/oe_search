@@ -1,0 +1,5 @@
+services:
+  oe_search_test.document_subscriber:
+    class: Drupal\oe_search_test\EventSubscriber\OeSearchTestSubscriber
+    tags:
+      - { name: event_subscriber }

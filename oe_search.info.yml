@@ -1,10 +1,9 @@
+type: module
 name: OpenEuropa Search
 description: Search features for the OpenEuropa project.
+core_version_requirement: ^8 || ^9
 package: OpenEuropa
-
-type: module
-core: 8.x
-
-'interface translation project': oe_search
-# The path to the actual translations is defined in
-# oe_search_locale_translation_projects_alter().
+dependencies:
+  - search_api:search_api
+test_dependencies:
+  - http_request_mock:http_request_mock

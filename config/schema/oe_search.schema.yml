@@ -1,0 +1,50 @@
+plugin.plugin_configuration.search_api_backend.search_api_europa_search:
+  type: plugin.plugin_configuration.search_api_backend.*
+  label: 'EC Europa Search settings'
+  mapping:
+    api_key:
+      type: string
+      label: 'API key'
+    database:
+      type: string
+      label: 'Database'
+    search:
+      type: mapping
+      label: 'Search & Info'
+      mapping:
+        endpoint:
+          type: mapping
+          label: 'Endpoints'
+          mapping:
+            info:
+              type: uri
+              label: 'Info API endpoint'
+            search:
+              type: uri
+              label: 'Search API endpoint'
+            facet:
+              type: uri
+              label: 'Facet API endpoint'
+    ingestion:
+      type: mapping
+      label: 'Ingestion'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Enabled'
+        endpoint:
+          type: mapping
+          label: Endpoints
+          mapping:
+            token:
+              type: uri
+              label: 'Token API endpoint'
+            text:
+              type: uri
+              label: 'Text API endpoint'
+            file:
+              type: uri
+              label: 'File API endpoint'
+            delete:
+              type: uri
+              label: 'Delete API endpoint'
