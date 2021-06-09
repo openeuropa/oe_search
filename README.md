@@ -1,6 +1,6 @@
 # OpenEuropa Search
 
-[![Build Status](https://drone.fpfis.eu/api/badges/openeuropa/oe_search/status.svg?branch=master)](https://drone.fpfis.eu/openeuropa/oe_search)
+[![Build Status](https://drone.fpfis.eu/api/badges/openeuropa/oe_search/status.svg?branch=2.x)](https://drone.fpfis.eu/openeuropa/oe_search)
 
 The OpenEuropa Search module integrates [Europa Search Client](https://github.com/openeuropa/europa-search-client) with [Search API](https://www.drupal.org/project/search_api).
 
@@ -14,7 +14,12 @@ Europa Search is the corporate search engine for the European Commission.
 
 ## Requirements
 
+* PHP 7.3 or newer.
+* Drupal 8.9 or >= 9.1
+* [Search API](https://www.drupal.org/project/search_api) Drupal module 1.19 ot newer.
+* [Europa Search Client](https://github.com/openeuropa/europa-search-client) library.
 
+For a full list of dependencies, please check the [composer.json](composer.json) file.
 
 ## Development setup
 
@@ -123,3 +128,47 @@ Please read [the full documentation](https://github.com/openeuropa/openeuropa) f
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the available versions, see the [tags on this repository](https://github.com/openeuropa/oe_search/tags).
+
+## API
+
+### Alter a document being ingested (indexed)
+
+Third party modules are able to intercept and alter the indexed document subscribing to `Drupal\oe_search\Event\DocumentCreationEvent` event:
+
+**mymodule.service.yml**:
+```yaml
+services:
+  mymodule.alter_indexed_doc:
+    class: Drupal\mymodule\EventSubscriber\AlterIndexedDocSubscriber
+    tags:
+      - { name: 'event_subscriber' }
+```
+
+**src/EventSubscriber/AlterIndexedDocSubscriber.php**:
+```php
+<?php
+
+namespace Drupal\mymodule\EventSubscriber;
+
+use Drupal\oe_search\Event\DocumentCreationEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class AlterIndexedDocSubscriber implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [DocumentCreationEvent::class => 'setReleased'];
+  }
+
+  public function setReleased(DocumentCreationEvent $event): void {
+    $entity = $event->getEntity();
+    if (
+      $entity->getEntityTypeId() === 'node'
+      && $entity->bundle() === 'press_release'
+      && !$entity->get('released_date')->isEmpty()
+     ) {
+      $event->getDocument()->addMetadata('released', [TRUE], 'boolean');
+    }
+  }
+
+}
+```
