@@ -366,10 +366,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     $result = $this->getClient()->search();
-
     $item_ids = array_map(function (Document $document) use ($index) {
-      [, $index_id, $item_id] = Utility::destructReference($document->getReference());
-      if ($index_id !== $index->id()) {
+      [$site_hash, $index_id, $item_id] = Utility::destructReference($document->getReference());
+      if ($site_hash !== Utility::getSiteHash() || $index_id !== $index->id()) {
         return FALSE;
       }
       return $item_id;
