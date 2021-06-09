@@ -1,5 +1,5 @@
 services:
   oe_search_document_creation_event:
-    class: '\Drupal\oe_search\EventSubscriber\DocumentCreationSubscriber'
+    class: Drupal\oe_search\EventSubscriber\DocumentCreationSubscriber
     tags:
       - { name: 'event_subscriber' }
