@@ -10,9 +10,9 @@ use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\State\StateInterface;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Drupal\oe_search\IngestionDocument;
+use Drupal\oe_search\Utility;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Item\ItemInterface;
@@ -102,13 +102,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $client;
 
   /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * The event dispatcher.
    *
    * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
@@ -128,16 +121,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The HTTP client.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
    * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_service
    *   The event service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, StateInterface $state, ContainerAwareEventDispatcher $event_service) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, ContainerAwareEventDispatcher $event_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
-    $this->state = $state;
     $this->eventService = $event_service;
   }
 
@@ -151,7 +141,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $plugin_definition,
       $container->get('http_client'),
       $container->get('settings'),
-      $container->get('state'),
       $container->get('event_dispatcher')
     );
   }
@@ -355,7 +344,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $references = [];
 
     foreach ($item_ids as $id) {
-      $references[] = $this->createReference($index_id, $id);
+      $references[] = Utility::createReference($index_id, $id);
     }
 
     foreach ($references as $reference) {
@@ -379,7 +368,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $result = $this->getClient()->search();
 
     $item_ids = array_map(function (Document $document) use ($index) {
-      [, $index_id, $item_id] = $this->destructReference($document->getReference());
+      [, $index_id, $item_id] = Utility::destructReference($document->getReference());
       if ($index_id !== $index->id()) {
         return FALSE;
       }
@@ -531,7 +520,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         ->setUrl($entity->toUrl()->setAbsolute()->toString())
         ->setContent($entity->label())
         ->setLanguage($item->getLanguage())
-        ->setReference($this->createReference($index->id(), $id))
+        ->setReference(Utility::createReference($index->id(), $id))
         ->setCanBeIngested($can_be_ingested);
 
       $item_fields = $this->getSpecialFields($index, $item) + $item->getFields();
@@ -567,63 +556,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
     $fields['search_api_site_hash'] = $this->getFieldsHelper()
       ->createField($index, 'search_api_site_hash', $field_info)
-      ->setValues([$this->getSiteHash()]);
+      ->setValues([Utility::getSiteHash()]);
     $fields['search_api_index_id'] = $this->getFieldsHelper()
       ->createField($index, 'search_api_index_id', $field_info)
       ->setValues([$index->id()]);
 
     return $fields;
-  }
-
-  /**
-   * Creates an ID used as the unique identifier at the Europa Search server.
-   *
-   * This method should be used everywhere we need to get the Europa Search
-   * reference for a given Search API item ID. The way it's constructed
-   * guarantees that we can ingest content from different sites and indexes in
-   * the same Europa Search database.
-   *
-   * @param string $index_id
-   *   The index ID.
-   * @param string $item_id
-   *   The item ID.
-   *
-   * @return string
-   *   A unique Europa Search reference for the given item.
-   */
-  protected function createReference(string $index_id, string $item_id): string {
-    return "{$this->getSiteHash()}-{$index_id}-{$item_id}";
-  }
-
-  /**
-   * Extracts the item ID from the document reference.
-   *
-   * @param string $reference
-   *   The document reference.
-   *
-   * @return array
-   *   The deconstructed reference.
-   */
-  protected function destructReference(string $reference): array {
-    return explode('-', $reference);
-  }
-
-  /**
-   * Returns a unique hash for the current site.
-   *
-   * This is used to identify the Europa Search documents from different sites
-   * within a single Europa Search database.
-   *
-   * @return string
-   *   A unique site hash, containing only alphanumeric characters.
-   */
-  protected function getSiteHash(): string {
-    if (!$hash = $this->state->get('oe_search.site_hash')) {
-      global $base_url;
-      $hash = substr(base_convert(hash('sha256', uniqid($base_url, TRUE)), 16, 36), 0, 6);
-      $this->state->set('oe_search.site_hash', $hash);
-    }
-    return $hash;
   }
 
 }
