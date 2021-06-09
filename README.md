@@ -16,7 +16,7 @@ Europa Search is the corporate search engine for the European Commission.
 
 * PHP 7.3 or newer.
 * Drupal 8.9 or >= 9.1
-* [Search API](https://www.drupal.org/project/search_api) Drupal module 1.19 ot newer.
+* [Search API](https://www.drupal.org/project/search_api) Drupal module 1.19 or newer.
 * [Europa Search Client](https://github.com/openeuropa/europa-search-client) library.
 
 For a full list of dependencies, please check the [composer.json](composer.json) file.
