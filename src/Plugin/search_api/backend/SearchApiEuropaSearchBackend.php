@@ -581,7 +581,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * Extracts the content entity out of a give Search API item.
    *
    * @param \Drupal\search_api\Item\ItemInterface $item
-   *   The Search API ite.
+   *   The Search API item.
    *
    * @return \Drupal\Core\Entity\ContentEntityInterface|null
    *   The content entity or NULL if none.
