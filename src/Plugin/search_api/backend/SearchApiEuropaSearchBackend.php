@@ -344,7 +344,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $references = [];
 
     foreach ($item_ids as $id) {
-      $references[] = $this->createReference($index_id, $id);
+      $references[] = Utility::createReference($index_id, $id);
     }
 
     foreach ($references as $reference) {
@@ -368,7 +368,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     $result = $this->getClient()->search();
 
     $item_ids = array_map(function (Document $document) use ($index) {
-      [, $index_id, $item_id] = $this->destructReference($document->getReference());
+      [, $index_id, $item_id] = Utility::destructReference($document->getReference());
       if ($index_id !== $index->id()) {
         return FALSE;
       }
@@ -520,7 +520,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         ->setUrl($entity->toUrl()->setAbsolute()->toString())
         ->setContent($entity->label())
         ->setLanguage($item->getLanguage())
-        ->setReference($this->createReference($index->id(), $id))
+        ->setReference(Utility::createReference($index->id(), $id))
         ->setCanBeIngested($can_be_ingested);
 
       $item_fields = $this->getSpecialFields($index, $item) + $item->getFields();
@@ -562,39 +562,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       ->setValues([$index->id()]);
 
     return $fields;
-  }
-
-  /**
-   * Creates an ID used as the unique identifier at the Europa Search server.
-   *
-   * This method should be used everywhere we need to get the Europa Search
-   * reference for a given Search API item ID. The way it's constructed
-   * guarantees that we can ingest content from different sites and indexes in
-   * the same Europa Search database.
-   *
-   * @param string $index_id
-   *   The index ID.
-   * @param string $item_id
-   *   The item ID.
-   *
-   * @return string
-   *   A unique Europa Search reference for the given item.
-   */
-  protected function createReference(string $index_id, string $item_id): string {
-    return Utility::getSiteHash() . "-{$index_id}-{$item_id}";
-  }
-
-  /**
-   * Extracts the item ID from the document reference.
-   *
-   * @param string $reference
-   *   The document reference.
-   *
-   * @return array
-   *   The deconstructed reference.
-   */
-  protected function destructReference(string $reference): array {
-    return explode('-', $reference);
   }
 
 }

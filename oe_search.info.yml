@@ -7,4 +7,3 @@ dependencies:
   - search_api:search_api
 test_dependencies:
   - http_request_mock:http_request_mock
-  - facets:facets

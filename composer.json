@@ -18,7 +18,6 @@
         "ext-json": "*",
         "composer/installers": "^1.11",
         "drupal/drupal-extension": "~4.0",
-        "drupal/facets": "^1.7",
         "drupal/http_request_mock": "^1.0",
         "drush/drush": "^10.4",
         "openeuropa/behat-transformation-context": "~0.1",

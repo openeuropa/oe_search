@@ -18,6 +18,7 @@ use Psr\Http\Message\RequestInterface;
 /**
  * Tests Europa Search Drupal Search API integration.
  *
+ * @coversDefaultClass \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend
  * @group oe_search
  */
 class BackendTest extends KernelTestBase {
@@ -26,18 +27,39 @@ class BackendTest extends KernelTestBase {
   use InspectTestRequestTrait;
 
   /**
-   * A Search API server ID.
-   *
-   * @var string
-   */
-  protected $serverId = 'europa_search_server';
-
-  /**
    * A Search API index ID.
    *
    * @var string
    */
   protected $indexId = 'europa_search_index';
+
+  /**
+   * The Search API Europa Search backend.
+   *
+   * @var \Drupal\search_api\Backend\BackendInterface
+   */
+  protected $backend;
+
+  /**
+   * The datasource attached to the index.
+   *
+   * @var \Drupal\search_api\Datasource\DatasourceInterface
+   */
+  protected $datasource;
+
+  /**
+   * A Search API index.
+   *
+   * @var \Drupal\search_api\IndexInterface
+   */
+  protected $index;
+
+  /**
+   * A list of item IDs.
+   *
+   * @var array
+   */
+  protected $itemIds = [];
 
   /**
    * {@inheritdoc}
@@ -90,52 +112,87 @@ class BackendTest extends KernelTestBase {
       ],
     ] + Settings::getAll();
     new Settings($settings);
+
+    $datasource_manager = $this->container->get('plugin.manager.search_api.datasource');
+    $this->backend = Server::load('europa_search_server')->getBackend();
+    $this->index = Index::load($this->indexId);
+    $this->datasource = $datasource_manager->createInstance('entity:entity_test_mulrev_changed');
+    $this->datasource->setIndex($this->index);
+
+    $this->itemIds = array_map(function (EntityTestMulRevChanged $entity): string {
+      return SearchApiUtility::createCombinedId($this->datasource->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
+    }, $this->entities);
   }
 
   /**
    * Test Ingestion.
+   *
+   * @covers ::indexItems
    */
   public function testIndexItems(): void {
     $field_helper = $this->container->get('search_api.fields_helper');
-    $datasource_manager = $this->container->get('plugin.manager.search_api.datasource');
-    /** @var \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend $backend */
-    $backend = Server::load($this->serverId)->getBackend();
-    $index = Index::load($this->indexId);
-
-    /** @var \Drupal\search_api\Datasource\DatasourceInterface $datasource */
-    $datasource = $datasource_manager->createInstance('entity:entity_test_mulrev_changed');
-    $datasource->setIndex($index);
-
-    $item_ids = array_map(function (EntityTestMulRevChanged $entity) use ($datasource): string {
-      return SearchApiUtility::createCombinedId($datasource->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
-    }, $this->entities);
 
     /** @var \Drupal\search_api\Item\ItemInterface[] $items */
     $items = [];
-    foreach ($item_ids as $item_id) {
-      $items[$item_id] = $field_helper->createItem($index, $item_id, $datasource);
+    foreach ($this->itemIds as $item_id) {
+      $items[$item_id] = $field_helper->createItem($this->index, $item_id, $this->datasource);
     }
 
     // The 'entity_test_mulrev_changed' entity type is not implementing the
     // \Drupal\Core\Entity\EntityPublishedInterface interface, thus it cannot be
     // indexed by default.
     // @see \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::getDocuments()
-    $backend->indexItems($index, $items);
+    $this->backend->indexItems($this->index, $items);
     $this->assertServiceMockCalls('/ingest/text', 0, 0);
 
     // Enable ingestion of 'entity_test_mulrev_changed' entities.
     // @see \Drupal\oe_search_test\EventSubscriber\OeSearchTestSubscriber::indexEntityTestMulRevChanged()
     $this->container->get('state')->set('oe_search_test.enable_document_alter', TRUE);
-    $backend->indexItems($index, $items);
+    $this->backend->indexItems($this->index, $items);
     $this->assertServiceMockCalls('/ingest/text', 5, 5);
 
-    // Compare set data with received data.
+    // Compare sent data with received data.
     $requests = $this->getServiceMockRequests('/ingest/text');
-    $this->assertIngestedItem($requests[0], $items, $item_ids[1], 1);
-    $this->assertIngestedItem($requests[1], $items, $item_ids[2], 2);
-    $this->assertIngestedItem($requests[2], $items, $item_ids[3], 3);
-    $this->assertIngestedItem($requests[3], $items, $item_ids[4], 4);
-    // @todo check that items where added to search_api_items table.
+    $this->assertCount(5, $requests);
+    $this->assertIngestedItem($requests[0], $items, 1);
+    $this->assertIngestedItem($requests[1], $items, 2);
+    $this->assertIngestedItem($requests[2], $items, 3);
+    $this->assertIngestedItem($requests[3], $items, 4);
+    $this->assertIngestedItem($requests[4], $items, 5);
+  }
+
+  /**
+   * @covers ::deleteItems
+   */
+  public function testDeleteItems(): void {
+    $this->assertServiceMockCalls('/ingest/delete', 0, 0);
+    $this->backend->deleteItems($this->index, $this->itemIds);
+    $this->assertServiceMockCalls('/ingest/delete', 5, 5);
+    // Compare sent data with received data.
+    $requests = $this->getServiceMockRequests('/ingest/delete');
+    $this->assertCount(5, $requests);
+    $this->assertDeletedItem($requests[0], 1);
+    $this->assertDeletedItem($requests[1], 2);
+    $this->assertDeletedItem($requests[2], 3);
+    $this->assertDeletedItem($requests[3], 4);
+    $this->assertDeletedItem($requests[4], 5);
+  }
+
+  /**
+   * @covers ::deleteAllIndexItems
+   */
+  public function testDeleteAllIndexItems(): void {
+    $this->assertServiceMockCalls('/ingest/delete', 0, 0);
+    $this->backend->deleteAllIndexItems($this->index);
+    $this->assertServiceMockCalls('/ingest/delete', 5, 5);
+    // Compare sent data with received data.
+    $requests = $this->getServiceMockRequests('/ingest/delete');
+    $this->assertCount(5, $requests);
+    $this->assertDeletedItem($requests[0], 1);
+    $this->assertDeletedItem($requests[1], 2);
+    $this->assertDeletedItem($requests[2], 3);
+    $this->assertDeletedItem($requests[3], 4);
+    $this->assertDeletedItem($requests[4], 5);
   }
 
   /**
@@ -145,18 +202,17 @@ class BackendTest extends KernelTestBase {
    *   The request.
    * @param array $items
    *   The items sent to ingestion.
-   * @param string $item_id
-   *   The search_api_id of the current item.
    * @param int $id
    *   The id of the current item.
    */
-  protected function assertIngestedItem(RequestInterface $request, array $items, string $item_id, int $id): void {
+  protected function assertIngestedItem(RequestInterface $request, array $items, int $id): void {
+    $item_id = $this->itemIds[$id];
     $item = $items[$item_id];
-    $entity = $item->getOriginalObject()->getValue();
+    $entity = $this->entities[$id];
     // Assert query parameters.
     parse_str($request->getUri()->getQuery(), $parameters);
     $this->assertSame($entity->toUrl()->setAbsolute()->toString(), $parameters['uri']);
-    $this->assertSame(Utility::getSiteHash() . '-europa_search_index-' . $item_id, $parameters['reference']);
+    $this->assertSame(Utility::getSiteHash() . '-' . $this->indexId . '-' . $item_id, $parameters['reference']);
     $this->assertSame('["en"]', $parameters['language']);
     // Assert request body.
     $this->inspectBoundary($request);
@@ -166,7 +222,7 @@ class BackendTest extends KernelTestBase {
       'search_api_datasource' => ['entity:entity_test_mulrev_changed'],
       'search_api_language' => ['en'],
       'search_api_site_hash' => [Utility::getSiteHash()],
-      'search_api_index_id' => ['europa_search_index'],
+      'search_api_index_id' => [$this->indexId],
       'id' => [$id],
       'name' => [$entity->label()],
       'created' => [$item->getField('created')->getValues()['0'] * 1000],
@@ -174,6 +230,20 @@ class BackendTest extends KernelTestBase {
 
     $this->inspectPart($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
     $this->inspectPart($parts[1], 'text/plain', 'text', strlen($entity->label()), $entity->label());
+  }
+
+  /**
+   * Assert data for one deleted item.
+   *
+   * @param \Psr\Http\Message\RequestInterface $request
+   *   The request.
+   * @param int $id
+   *   The id of the current item.
+   */
+  protected function assertDeletedItem(RequestInterface $request, int $id): void {
+    $item_id = $this->itemIds[$id];
+    parse_str($request->getUri()->getQuery(), $parameters);
+    $this->assertSame(Utility::createReference($this->indexId, $item_id), $parameters['reference']);
   }
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\oe_search_test\Plugin\ServiceMock;
 
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\http_request_mock\ServiceMockPluginInterface;
+use Drupal\oe_search\Utility;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -44,6 +45,14 @@ class EuropaSearchServerResponse extends PluginBase implements ServiceMockPlugin
 
       case '/ingest/text':
         $response = $this->getIngestTextResponse();
+        break;
+
+      case '/ingest/delete':
+        $response = $this->getDeleteResponse();
+        break;
+
+      case '/search/search':
+        $response = $this->getSearchResponse();
         break;
 
       default:
@@ -118,6 +127,140 @@ class EuropaSearchServerResponse extends PluginBase implements ServiceMockPlugin
       'apiVersion' => '2.67',
       'reference' => 'foo',
       'trackingId' => 'bar',
+    ]));
+  }
+
+  /**
+   * Get mocked delete response.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The mocked response.
+   */
+  protected function getDeleteResponse(): ResponseInterface {
+    return new Response(200, [], json_encode([
+      'apiVersion' => '2.67',
+      'reference' => 'foo',
+      'trackingId' => 'bar',
+    ]));
+  }
+
+  /**
+   * Get mocked search response.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The mocked response.
+   */
+  protected function getSearchResponse(): ResponseInterface {
+    $index_id = 'europa_search_index';
+
+    return new Response(200, [], json_encode([
+      'apiVersion' => '2.69',
+      'terms' => '',
+      'responseTime' => 44,
+      'totalResults' => 5,
+      'pageNumber' => 1,
+      'pageSize' => 10,
+      'sort' => 'title:ASC',
+      'groupByField' => NULL,
+      'queryLanguage' => [
+        'language' => 'en',
+        'probability' => 0.0,
+      ],
+      'spellingSuggestion' => '',
+      'bestBets' => [],
+      'results' => [
+        [
+          'apiVersion' => '2.69',
+          'reference' => Utility::createReference($index_id, 'entity:entity_test_mulrev_changed/1:en'),
+          'url' => 'http://example.com/ref1',
+          'title' => NULL,
+          'contentType' => 'text/plain',
+          'language' => 'en',
+          'databaseLabel' => 'ACME',
+          'database' => 'ACME',
+          'summary' => NULL,
+          'weight' => 9.849739,
+          'groupById' => '3',
+          'content' => 'A coordination platform',
+          'accessRestriction' => FALSE,
+          'pages' => NULL,
+          'metadata' => [],
+          'children' => [],
+        ],
+        [
+          'apiVersion' => '2.69',
+          'reference' => Utility::createReference($index_id, 'entity:entity_test_mulrev_changed/2:en'),
+          'url' => 'http://example.com/ref2',
+          'title' => NULL,
+          'contentType' => 'text/plain',
+          'language' => 'en',
+          'databaseLabel' => 'ACME',
+          'database' => 'ACME',
+          'summary' => NULL,
+          'weight' => 9.849739,
+          'groupById' => '3',
+          'content' => 'A coordination platform',
+          'accessRestriction' => FALSE,
+          'pages' => NULL,
+          'metadata' => [],
+          'children' => [],
+        ],
+        [
+          'apiVersion' => '2.69',
+          'reference' => Utility::createReference($index_id, 'entity:entity_test_mulrev_changed/3:en'),
+          'url' => 'http://example.com/ref3',
+          'title' => NULL,
+          'contentType' => 'text/plain',
+          'language' => 'en',
+          'databaseLabel' => 'ACME',
+          'database' => 'ACME',
+          'summary' => NULL,
+          'weight' => 9.849739,
+          'groupById' => '3',
+          'content' => 'A coordination platform',
+          'accessRestriction' => FALSE,
+          'pages' => NULL,
+          'metadata' => [],
+          'children' => [],
+        ],
+        [
+          'apiVersion' => '2.69',
+          'reference' => Utility::createReference($index_id, 'entity:entity_test_mulrev_changed/4:en'),
+          'url' => 'http://example.com/ref4',
+          'title' => NULL,
+          'contentType' => 'text/plain',
+          'language' => 'en',
+          'databaseLabel' => 'ACME',
+          'database' => 'ACME',
+          'summary' => NULL,
+          'weight' => 9.849739,
+          'groupById' => '3',
+          'content' => 'A coordination platform',
+          'accessRestriction' => FALSE,
+          'pages' => NULL,
+          'metadata' => [],
+          'children' => [],
+        ],
+        [
+          'apiVersion' => '2.69',
+          'reference' => Utility::createReference($index_id, 'entity:entity_test_mulrev_changed/5:en'),
+          'url' => 'http://example.com/ref5',
+          'title' => NULL,
+          'contentType' => 'text/plain',
+          'language' => 'en',
+          'databaseLabel' => 'ACME',
+          'database' => 'ACME',
+          'summary' => NULL,
+          'weight' => 9.849739,
+          'groupById' => '3',
+          'content' => 'A coordination platform',
+          'accessRestriction' => FALSE,
+          'pages' => NULL,
+          'metadata' => [],
+          'children' => [],
+        ],
+      ],
+      'warnings' => [],
     ]));
   }
 
