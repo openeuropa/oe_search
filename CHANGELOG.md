@@ -1,10 +1,33 @@
 # Change Log
 
+## [1.6.0](https://github.com/openeuropa/oe_search/tree/1.6.0) (2021-08-12)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.5.0...1.6.0)
+
+**Merged pull requests:**
+
+- EWPP-1289: Add missing interface translations. [\#44](https://github.com/openeuropa/oe_search/pull/44) ([yenyasinn](https://github.com/yenyasinn))
+- OEL-219: Allow arbitrary URLs for entities w/o canonical URL [\#42](https://github.com/openeuropa/oe_search/pull/42) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-217: Filter items by site hash. [\#41](https://github.com/openeuropa/oe_search/pull/41) ([drishu](https://github.com/drishu))
+- OEL-204: README improvements [\#40](https://github.com/openeuropa/oe_search/pull/40) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-167: Add test for backend config form. [\#39](https://github.com/openeuropa/oe_search/pull/39) ([drishu](https://github.com/drishu))
+- OEL-193: Use epic branch for europa search client. [\#38](https://github.com/openeuropa/oe_search/pull/38) ([drishu](https://github.com/drishu))
+- OEL-193: Add http-factory-guzzle usage. [\#36](https://github.com/openeuropa/oe_search/pull/36) ([drishu](https://github.com/drishu))
+- OEL-167: Add plugin tests [\#35](https://github.com/openeuropa/oe_search/pull/35) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-149: Support multi-site & multi-index [\#34](https://github.com/openeuropa/oe_search/pull/34) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-155: Implement Text Ingestion. [\#33](https://github.com/openeuropa/oe_search/pull/33) ([drishu](https://github.com/drishu))
+- OEL-151: Create the plugin skeleton [\#31](https://github.com/openeuropa/oe_search/pull/31) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-102: Structure and Service [\#29](https://github.com/openeuropa/oe_search/pull/29) ([saidatom](https://github.com/saidatom))
+- OEL-117: Update PHP \>= 7.3 [\#28](https://github.com/openeuropa/oe_search/pull/28) ([saidatom](https://github.com/saidatom))
+- EWPP-721: Update xdebug configuration. [\#27](https://github.com/openeuropa/oe_search/pull/27) ([22Alexandra](https://github.com/22Alexandra))
+- EWPP-529: Replace scaffold library. [\#25](https://github.com/openeuropa/oe_search/pull/25) ([sergepavle](https://github.com/sergepavle))
+- EWPP-516: Update docker images. [\#24](https://github.com/openeuropa/oe_search/pull/24) ([22Alexandra](https://github.com/22Alexandra))
+
 ## [1.5.0](https://github.com/openeuropa/oe_search/tree/1.5.0) (2020-06-19)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.4.0...1.5.0)
 
 **Merged pull requests:**
 
+- Update CHANGELOG.md for release 1.5.0. [\#23](https://github.com/openeuropa/oe_search/pull/23) ([brummbar](https://github.com/brummbar))
 - OPENEUROPA-3286: Translation of word Search in Lithuanian and Latvian are swapped [\#22](https://github.com/openeuropa/oe_search/pull/22) ([brummbar](https://github.com/brummbar))
 
 ## [1.4.0](https://github.com/openeuropa/oe_search/tree/1.4.0) (2020-04-08)
