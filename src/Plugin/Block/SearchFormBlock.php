@@ -30,7 +30,7 @@ class SearchFormBlock extends BlockBase implements ContainerFactoryPluginInterfa
   protected $formBuilder;
 
   /**
-   * Constructs an Search block object.
+   * Constructs a Search block object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
