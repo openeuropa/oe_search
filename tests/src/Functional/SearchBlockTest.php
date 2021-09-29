@@ -37,6 +37,10 @@ class SearchBlockTest extends BrowserTestBase {
     ]);
 
     ConfigurableLanguage::createFromLangcode('fr')->save();
+    // Rebuild container to make sure that the language path processor is
+    // picked up.
+    // @see \Drupal\language\LanguageServiceProvider::register()
+    $this->rebuildContainer();
   }
 
   /**
@@ -52,6 +56,7 @@ class SearchBlockTest extends BrowserTestBase {
     $assert_session->elementNotExists('css', '#block-oe-search');
 
     $this->drupalLogin($this->createUser(['access content']));
+    $this->drupalGet('<front>');
     $block = $assert_session->elementExists('css', '#block-oe-search');
 
     // Disable redirects to avoid loading web pages outside the test
@@ -69,7 +74,9 @@ class SearchBlockTest extends BrowserTestBase {
 
     // Test that the correct language is passed to the search redirect url.
     $this->getSession()->getDriver()->getClient()->followRedirects(TRUE);
-    $this->drupalGet('/fr');
+    $this->drupalGet('<front>', [
+      'language' => \Drupal::languageManager()->getLanguage('fr'),
+    ]);
     $block = $assert_session->elementExists('css', '#block-oe-search');
     $block->fillField('Search', 'European Commission');
     $this->getSession()->getDriver()->getClient()->followRedirects(FALSE);
