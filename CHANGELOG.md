@@ -1,11 +1,21 @@
 # Changelog
 
+## [1.8.0](https://github.com/openeuropa/oe_search/tree/1.8.0) (2021-11-08)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.7.0...1.8.0)
+
+**Merged pull requests:**
+
+- EWPP-1706: Fixing test page navigation in other languages. [\#52](https://github.com/openeuropa/oe_search/pull/52) ([upchuk](https://github.com/upchuk))
+- EWPP-1577: Update to D9 and convert behat tests to phpunit [\#51](https://github.com/openeuropa/oe_search/pull/51) ([brummbar](https://github.com/brummbar))
+
 ## [1.7.0](https://github.com/openeuropa/oe_search/tree/1.7.0) (2021-09-27)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.6.0...1.7.0)
 
 **Merged pull requests:**
 
+- Prepare release 1.7.0. [\#50](https://github.com/openeuropa/oe_search/pull/50) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-1465: Enable non-eu languages: is, nb. [\#49](https://github.com/openeuropa/oe_search/pull/49) ([yenyasinn](https://github.com/yenyasinn))
 - EWPP-1478: Add interface translations in non-eu languages. [\#48](https://github.com/openeuropa/oe_search/pull/48) ([yenyasinn](https://github.com/yenyasinn))
 - Fix release branch for 1.6.0 changelog generation. [\#47](https://github.com/openeuropa/oe_search/pull/47) ([brummbar](https://github.com/brummbar))
