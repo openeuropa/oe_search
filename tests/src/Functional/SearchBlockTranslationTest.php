@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\oe_search\Functional;
 
+use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -29,7 +30,7 @@ class SearchBlockTranslationTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->drupalPlaceBlock('oe_search', [
@@ -55,18 +56,14 @@ class SearchBlockTranslationTest extends BrowserTestBase {
     $assert_session = $this->assertSession();
 
     $this->drupalLogin($this->createUser(['access content']));
-    $this->drupalGet('<front>');
+    $this->drupalGet(Url::fromUserInput('/en/node'));
     $block = $assert_session->elementExists('css', '#block-oe-search');
     $assert_session->buttonExists('Search', $block);
     // Check that the block button is translated in French.
-    $this->drupalGet('<front>', [
-      'language' => \Drupal::languageManager()->getLanguage('fr'),
-    ]);
+    $this->drupalGet(Url::fromUserInput('/fr/node'));
     $assert_session->buttonExists('Rechercher', $block);
     // And in Italian.
-    $this->drupalGet('<front>', [
-      'language' => \Drupal::languageManager()->getLanguage('it'),
-    ]);
+    $this->drupalGet(Url::fromUserInput('/it/node'));
     $assert_session->buttonExists('Cerca', $block);
   }
 
