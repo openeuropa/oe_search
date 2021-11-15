@@ -255,8 +255,6 @@ class BackendTest extends KernelTestBase {
    *   Received requests count.
    * @param int $get_response_calls
    *   Count of replies from mocked server.
-   *
-   * @throws \Exception
    */
   protected function assertServiceMockCalls(string $path, int $applies_calls, int $get_response_calls): void {
     $state = $this->container->get('state');

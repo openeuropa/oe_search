@@ -27,9 +27,6 @@ function oe_search_form_search_api_index_edit_form_alter(&$form, FormStateInterf
  *   The form definition.
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The form state object.
- *
- * @throws \Drupal\Component\Plugin\Exception\PluginException
- * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
  */
 function oe_search_form_search_api_index_edit_form_validate(array $form, FormStateInterface $form_state): void {
   $server = Server::load($form_state->getValue('server'));

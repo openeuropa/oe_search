@@ -83,7 +83,7 @@ class IngestionDocument extends DocumentBase {
   protected function formatValue($value, string $type) {
     switch ($type) {
       case 'date':
-        // This will always be a timestamp, we just transform to millis.
+        // This will always be a timestamp, we just transform to milliseconds.
         // @see \Drupal\search_api\Plugin\search_api\data_type\DateDataType::getValue()
         $value = $value * 1000;
         break;
