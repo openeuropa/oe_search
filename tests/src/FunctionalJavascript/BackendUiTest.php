@@ -29,7 +29,10 @@ class BackendUiTest extends WebDriverTestBase {
    * @covers \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::buildConfigurationForm()
    */
   public function testBackendUi(): void {
-    $admin_user = $this->drupalCreateUser(['administer search_api', 'access content']);
+    $admin_user = $this->drupalCreateUser([
+      'administer search_api',
+      'access content',
+    ]);
     $this->drupalLogin($admin_user);
 
     $this->drupalGet('admin/config/search/search-api/add-server');

@@ -12,7 +12,7 @@ use Drupal\oe_search\Utility;
 use Drupal\search_api\Utility\Utility as SearchApiUtility;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
-use OpenEuropa\Tests\EuropaSearchClient\Traits\InspectTestRequestTrait;
+use OpenEuropa\Tests\EuropaSearchClient\Traits\AssertTestRequestTrait;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -24,7 +24,7 @@ use Psr\Http\Message\RequestInterface;
 class BackendTest extends KernelTestBase {
 
   use ExampleContentTrait;
-  use InspectTestRequestTrait;
+  use AssertTestRequestTrait;
 
   /**
    * A Search API index ID.
@@ -215,8 +215,9 @@ class BackendTest extends KernelTestBase {
     $this->assertSame(Utility::getSiteHash() . '-' . $this->indexId . '-' . $item_id, $parameters['reference']);
     $this->assertSame('["en"]', $parameters['language']);
     // Assert request body.
-    $this->inspectBoundary($request);
-    $parts = $this->getMultiParts($request);
+    $boundary = $this->getRequestBoundary($request);
+    $this->assertBoundary($request, $boundary);
+    $parts = $this->getRequestMultipartStreamResources($request, $boundary);
     $expected_meta = json_encode([
       'search_api_id' => [$item_id],
       'search_api_datasource' => ['entity:entity_test_mulrev_changed'],
@@ -228,8 +229,8 @@ class BackendTest extends KernelTestBase {
       'created' => [$item->getField('created')->getValues()['0'] * 1000],
     ]);
 
-    $this->inspectPart($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
-    $this->inspectPart($parts[1], 'text/plain', 'text', strlen($entity->label()), $entity->label());
+    $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
+    $this->assertMultipartStreamResource($parts[1], 'text/plain', 'text', strlen($entity->label()), $entity->label());
   }
 
   /**
@@ -255,8 +256,6 @@ class BackendTest extends KernelTestBase {
    *   Received requests count.
    * @param int $get_response_calls
    *   Count of replies from mocked server.
-   *
-   * @throws \Exception
    */
   protected function assertServiceMockCalls(string $path, int $applies_calls, int $get_response_calls): void {
     $state = $this->container->get('state');

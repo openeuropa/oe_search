@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\oe_search;
 
 /**
- * Utility methods.
+ * Specific utility methods.
  */
 class Utility {
 

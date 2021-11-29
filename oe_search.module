@@ -14,6 +14,13 @@ use Drupal\search_api\Entity\Server;
 use Drupal\search_api\Utility\Utility;
 
 /**
+ * Implements hook_locale_translation_projects_alter().
+ */
+function oe_search_locale_translation_projects_alter(&$projects) {
+  $projects['oe_search']['info']['interface translation server pattern'] = drupal_get_path('module', 'oe_search') . '/translations/%project-%language.po';
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  */
 function oe_search_form_search_api_index_edit_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
@@ -27,9 +34,6 @@ function oe_search_form_search_api_index_edit_form_alter(&$form, FormStateInterf
  *   The form definition.
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The form state object.
- *
- * @throws \Drupal\Component\Plugin\Exception\PluginException
- * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
  */
 function oe_search_form_search_api_index_edit_form_validate(array $form, FormStateInterface $form_state): void {
   $server = Server::load($form_state->getValue('server'));

@@ -28,7 +28,7 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
    *   The event object.
    */
   public function setDocumentValues(DocumentCreationEvent $event): void {
-    // @todo: Handle exceptions from Drupal core (media URL, etc).
+    // @todo Handle exceptions from Drupal core (media URL, etc).
   }
 
 }

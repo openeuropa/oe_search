@@ -16,7 +16,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * @ServiceMock(
  *   id = "europa_search_server_response",
- *   label = @Translation("Europa Search mocked server responses for tesing."),
+ *   label = @Translation("Europa Search mocked server responses for testing."),
  *   weight = -1,
  * )
  */

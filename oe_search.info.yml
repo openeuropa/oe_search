@@ -7,3 +7,8 @@ dependencies:
   - search_api:search_api
 test_dependencies:
   - http_request_mock:http_request_mock
+
+
+'interface translation project': oe_search
+# The path to the actual translations is defined in
+# oe_search_locale_translation_projects_alter().
