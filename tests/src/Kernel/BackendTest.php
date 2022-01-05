@@ -5,14 +5,19 @@ declare(strict_types = 1);
 namespace Drupal\oe_search\Tests;
 
 use Drupal\Core\Site\Settings;
+use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
+use Drupal\media\Entity\Media;
+use Drupal\media\MediaInterface;
+use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\search_api\Functional\ExampleContentTrait;
 use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\oe_search\Utility;
 use Drupal\search_api\Utility\Utility as SearchApiUtility;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
+use Drupal\Tests\TestFileCreationTrait;
 use OpenEuropa\Tests\EuropaSearchClient\Traits\AssertTestRequestTrait;
 use Psr\Http\Message\RequestInterface;
 
@@ -26,6 +31,8 @@ class BackendTest extends KernelTestBase {
 
   use ExampleContentTrait;
   use AssertTestRequestTrait;
+  use MediaTypeCreationTrait;
+  use TestFileCreationTrait;
 
   /**
    * A Search API index ID.
@@ -75,7 +82,24 @@ class BackendTest extends KernelTestBase {
     'search_api',
     'system',
     'user',
+    'media',
+    'image',
+    'file',
   ];
+
+  /**
+   * Media entities.
+   *
+   * @var array
+   */
+  protected $mediaEntities = [];
+
+  /**
+   * Media item IDs.
+   *
+   * @var string[]
+   */
+  protected $mediaItemIds;
 
   /**
    * {@inheritdoc}
@@ -85,9 +109,15 @@ class BackendTest extends KernelTestBase {
 
     $this->installSchema('search_api', ['search_api_item']);
     $this->installSchema('user', ['users_data']);
+    $this->installSchema('file', ['file_usage']);
     $this->installEntitySchema('entity_test_mulrev_changed');
+    $this->installEntitySchema('file');
+    $this->installEntitySchema('media');
+    $this->installEntitySchema('user');
     $this->installEntitySchema('search_api_task');
     $this->installConfig([
+      'media',
+      'image',
       'search_api',
       'oe_search',
       'oe_search_test',
@@ -124,6 +154,31 @@ class BackendTest extends KernelTestBase {
     $this->itemIds = array_map(function (EntityTestMulRevChanged $entity): string {
       return SearchApiUtility::createCombinedId($this->datasource->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
     }, $this->entities);
+
+    // Create test medias.
+    $media_type = $this->createMediaType('file');
+    for ($i = 1; $i <= 5; $i++) {
+      $file = File::create([
+        'uri' => $this->getTestFiles('image')[0]->uri,
+      ]);
+      $file->setPermanent();
+      $file->save();
+
+      $media = Media::create([
+        'name' => 'Test file media ' . $i,
+        'bundle' => $media_type->id(),
+        'field_media_file' => $file->id(),
+      ]);
+      $media->save();
+      $this->mediaEntities[$media->id()] = $media;
+    }
+
+    $this->datasource_media = $datasource_manager->createInstance('entity:media');
+    $this->datasource_media->setIndex($this->index);
+
+    $this->mediaItemIds = array_map(function (MediaInterface $entity): string {
+      return SearchApiUtility::createCombinedId($this->datasource_media->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
+    }, $this->mediaEntities);
   }
 
   /**
@@ -161,6 +216,33 @@ class BackendTest extends KernelTestBase {
     $this->assertIngestedItem($requests[2], $items, 3);
     $this->assertIngestedItem($requests[3], $items, 4);
     $this->assertIngestedItem($requests[4], $items, 5);
+  }
+
+  /**
+   * Test Ingestion.
+   *
+   * @covers ::indexItems
+   */
+  public function testMediaIndexItems(): void {
+    $field_helper = $this->container->get('search_api.fields_helper');
+
+    /** @var \Drupal\search_api\Item\ItemInterface[] $items */
+    $items = [];
+    foreach ($this->mediaItemIds as $item_id) {
+      $items[$item_id] = $field_helper->createItem($this->index, $item_id, $this->datasource_media);
+    }
+
+    $this->backend->indexItems($this->index, $items);
+    $this->assertServiceMockCalls('/ingest/file', 5, 5);
+
+    // Compare sent data with received data.
+    $requests = $this->getServiceMockRequests('/ingest/file');
+    $this->assertCount(5, $requests);
+    $this->assertIngestedFileItem($requests[0], $items, 1);
+    $this->assertIngestedFileItem($requests[1], $items, 2);
+    $this->assertIngestedFileItem($requests[2], $items, 3);
+    $this->assertIngestedFileItem($requests[3], $items, 4);
+    $this->assertIngestedFileItem($requests[4], $items, 5);
   }
 
   /**
@@ -233,6 +315,43 @@ class BackendTest extends KernelTestBase {
 
     $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
     $this->assertMultipartStreamResource($parts[1], 'text/plain', 'text', strlen($entity->label()), $entity->label());
+  }
+
+  /**
+   * Assert data for one ingested file item.
+   *
+   * @param \Psr\Http\Message\RequestInterface $request
+   *   The request.
+   * @param array $items
+   *   The items sent to ingestion.
+   * @param int $id
+   *   The id of the current item.
+   */
+  protected function assertIngestedFileItem(RequestInterface $request, array $items, int $id): void {
+    $item_id = $this->mediaItemIds[$id];
+    $item = $items[$item_id];
+    $entity = $this->mediaEntities[$id];
+    // Assert query parameters.
+    parse_str($request->getUri()->getQuery(), $parameters);
+    $fid = $entity->getSource()->getSourceFieldValue($entity);
+    $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+    $this->assertSame($file->createFileUrl(), $parameters['uri']);
+    $this->assertSame(Utility::getSiteHash() . '-' . $this->indexId . '-' . $item_id, $parameters['reference']);
+    $this->assertSame('["en"]', $parameters['language']);
+    // Assert request body.
+    $boundary = $this->getRequestBoundary($request);
+    $this->assertBoundary($request, $boundary);
+    $parts = $this->getRequestMultipartStreamResources($request, $boundary);
+    $expected_meta = json_encode([
+      'search_api_id' => [$item_id],
+      'search_api_datasource' => ['entity:media'],
+      'search_api_language' => ['en'],
+      'search_api_site_hash' => [Utility::getSiteHash()],
+      'search_api_index_id' => [$this->indexId],
+    ]);
+
+    $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
+    $this->assertMultipartStreamResource($parts[1], 'text/plain', 'file', strlen($entity->label()), $entity->label());
   }
 
   /**
