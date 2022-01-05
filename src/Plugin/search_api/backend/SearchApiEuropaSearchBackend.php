@@ -314,13 +314,29 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     /** @var \OpenEuropa\EuropaSearchClient\Model\Ingestion $result */
     foreach ($this->getDocuments($index, $items) as $item_id => $document) {
       try {
-        $result = $this->getClient()->ingestText(
-          $document->getUrl(),
-          $document->getContent(),
-          [$document->getLanguage()],
-          $document->getMetadata(),
-          $document->getReference()
-        );
+        switch (1) {
+          case $document->isTextIngestion():
+            $result = $this->getClient()->ingestText(
+              $document->getUrl(),
+              $document->getContent(),
+              [$document->getLanguage()],
+              $document->getMetadata(),
+              $document->getReference()
+            );
+
+            break;
+
+          case $document->isFileIngestion():
+            $result = $this->getClient()->ingestFile(
+              $document->getUrl(),
+              $document->getContent(),
+              [$document->getLanguage()],
+              $document->getMetadata(),
+              $document->getReference()
+            );
+
+            break;
+        }
 
         if ($result->getReference()) {
           $indexed[] = $item_id;
@@ -600,7 +616,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
     $entity = $item->getOriginalObject()->getValue();
     // Module limitation: Only supports content entity datasources.
-    if ($entity === NULL || !$entity instanceof ContentEntityInterface) {
+    if (!$entity instanceof ContentEntityInterface) {
       return NULL;
     }
 

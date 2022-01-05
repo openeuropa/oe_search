@@ -12,11 +12,63 @@ use OpenEuropa\EuropaSearchClient\Model\DocumentBase;
 class IngestionDocument extends DocumentBase {
 
   /**
+   * Text ingestion.
+   */
+  const TEXT_INGESTION = 1;
+
+  /**
+   * File ingestion.
+  */
+  const FILE_INGESTION = 2;
+
+  /**
    * Whether this document is eligible for ingestion.
    *
    * @var bool
    */
   protected $canBeIngested = FALSE;
+
+  /**
+   * Ingestion type (text or file).
+   *
+   * @var int
+   */
+  protected $ingestionType = self::TEXT_INGESTION;
+
+  /**
+   * Whether this document can be ingested as text.
+   *
+   * @return bool
+   *   Returns TRUE if document for text ingestion.
+   */
+  public function isTextIngestion(): bool {
+    return $this->ingestionType === self::TEXT_INGESTION;
+  }
+
+  /**
+   * Whether this document can be ingested as file.
+   *
+   * @return bool
+   *   Returns TRUE if document for file ingestion.
+   */
+  public function isFileIngestion(): bool {
+    return $this->ingestionType === self::FILE_INGESTION;
+  }
+
+  /**
+   * Set document's ingestion type.
+   *
+   * @param int $ingestion_type
+   *   Ingestion type.
+   */
+  public function setIngestionType(int $ingestion_type): void {
+    if (in_array($ingestion_type, [
+      self::TEXT_INGESTION,
+      self::FILE_INGESTION,
+    ], TRUE)) {
+      $this->ingestionType = $ingestion_type;
+    }
+  }
 
   /**
    * Adds $value with field name $key to the document.
