@@ -3,3 +3,7 @@ services:
     class: Drupal\oe_search_test\EventSubscriber\OeSearchTestSubscriber
     tags:
       - { name: event_subscriber }
+  oe_search_test.es_mock_event_subscriber:
+    class: Drupal\oe_search_test\EventSubscriber\EuropaSearchMockEventSubscriber
+    tags:
+      - { name: event_subscriber }
