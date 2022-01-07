@@ -1,0 +1,9 @@
+name: 'EWCMS Search mock'
+description: 'Module for the mock EWCMS Europa Search.'
+package: EWCMS
+type: module
+core_version_requirement: ^8.9 || ^9.2
+
+dependencies:
+  - http_request_mock:http_request_mock
+  - ewcms:ewcms_search

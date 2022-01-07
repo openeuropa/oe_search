@@ -1,0 +1,9 @@
+services:
+  oe_search_mock.config_overrider:
+    class: Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider
+    tags:
+      - {name: config.factory.override}
+  oe_search_mock.es_mock_event_subscriber:
+    class: Drupal\oe_search_mock\EventSubscriber\EuropaSearchMockEventSubscriber
+    tags:
+      - { name: event_subscriber }
