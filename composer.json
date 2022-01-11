@@ -54,8 +54,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "OpenEuropa\\Tests\\EuropaSearchClient\\Traits\\": "./vendor/openeuropa/europa-search-client/tests/src/Traits",
-            "Drupal\\Tests\\oe_search\\": "./tests/src/"
+            "Drupal\\Tests\\oe_search\\": "./tests/src",
+            "OpenEuropa\\Tests\\EuropaSearchClient\\Traits\\": "./vendor/openeuropa/europa-search-client/tests/src/Traits"
         }
     },
     "extra": {

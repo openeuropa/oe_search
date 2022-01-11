@@ -57,13 +57,15 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
     $document = $event->getDocument();
     $document->setCanBeIngested(TRUE);
     $document->setIngestionType(IngestionDocument::FILE_INGESTION);
-    $file = $entity;
     // Extract file entity from media if applicable.
     if ($entity instanceof MediaInterface) {
       $fid = $entity->getSource()->getSourceFieldValue($entity);
-      $file = $this->entityTypeManager->getStorage('file')->load($fid) ?? $file;
+      $entity = $this->entityTypeManager->getStorage('file')->load($fid);
     }
-    $document->setUrl($file->createFileUrl());
+
+    if ($entity instanceof FileInterface) {
+      $document->setUrl($entity->createFileUrl());
+    }
   }
 
 }

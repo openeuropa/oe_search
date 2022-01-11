@@ -310,35 +310,31 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     $indexed = [];
+    $result = NULL;
 
     /** @var \OpenEuropa\EuropaSearchClient\Model\Ingestion $result */
     foreach ($this->getDocuments($index, $items) as $item_id => $document) {
       try {
-        switch (1) {
-          case $document->isTextIngestion():
-            $result = $this->getClient()->ingestText(
-              $document->getUrl(),
-              $document->getContent(),
-              [$document->getLanguage()],
-              $document->getMetadata(),
-              $document->getReference()
-            );
-
-            break;
-
-          case $document->isFileIngestion():
-            $result = $this->getClient()->ingestFile(
-              $document->getUrl(),
-              $document->getContent(),
-              [$document->getLanguage()],
-              $document->getMetadata(),
-              $document->getReference()
-            );
-
-            break;
+        if ($document->isTextIngestion()) {
+          $result = $this->getClient()->ingestText(
+            $document->getUrl(),
+            $document->getContent(),
+            [$document->getLanguage()],
+            $document->getMetadata(),
+            $document->getReference()
+          );
+        }
+        elseif ($document->isFileIngestion()) {
+          $result = $this->getClient()->ingestFile(
+            $document->getUrl(),
+            $document->getContent(),
+            [$document->getLanguage()],
+            $document->getMetadata(),
+            $document->getReference()
+          );
         }
 
-        if ($result->getReference()) {
+        if ($result && $result->getReference()) {
           $indexed[] = $item_id;
         }
       }

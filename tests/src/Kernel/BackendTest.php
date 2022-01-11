@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\oe_search\Tests;
+namespace Drupal\Tests\oe_search\Kernel;
 
 use Drupal\Core\Site\Settings;
 use Drupal\file\Entity\File;
@@ -233,10 +233,10 @@ class BackendTest extends KernelTestBase {
     }
 
     $this->backend->indexItems($this->index, $items);
-    $this->assertServiceMockCalls('/ingest/file', 5, 5);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE, 5, 5);
 
     // Compare sent data with received data.
-    $requests = $this->getServiceMockRequests('/ingest/file');
+    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE);
     $this->assertCount(5, $requests);
     $this->assertIngestedFileItem($requests[0], $items, 1);
     $this->assertIngestedFileItem($requests[1], $items, 2);
