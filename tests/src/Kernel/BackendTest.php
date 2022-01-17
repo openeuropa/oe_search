@@ -335,7 +335,7 @@ class BackendTest extends KernelTestBase {
     parse_str($request->getUri()->getQuery(), $parameters);
     $fid = $entity->getSource()->getSourceFieldValue($entity);
     $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
-    $this->assertSame($file->createFileUrl(), $parameters['uri']);
+    $this->assertStringContainsString($file->createFileUrl(), $parameters['uri']);
     $this->assertSame(Utility::getSiteHash() . '-' . $this->indexId . '-' . $item_id, $parameters['reference']);
     $this->assertSame('["en"]', $parameters['language']);
     // Assert request body.

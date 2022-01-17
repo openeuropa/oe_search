@@ -64,7 +64,7 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
     }
 
     if ($entity instanceof FileInterface) {
-      $document->setUrl($entity->createFileUrl());
+      $document->setUrl($entity->createFileUrl(FALSE));
     }
   }
 
