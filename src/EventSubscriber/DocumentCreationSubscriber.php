@@ -60,7 +60,7 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
     // Extract file entity from media if applicable.
     if ($entity instanceof MediaInterface) {
       $fid = $entity->getSource()->getSourceFieldValue($entity);
-      $entity = $this->entityTypeManager->getStorage('file')->load($fid);
+      $entity = $fid ? $this->entityTypeManager->getStorage('file')->load($fid) : NULL;
     }
 
     if ($entity instanceof FileInterface) {
