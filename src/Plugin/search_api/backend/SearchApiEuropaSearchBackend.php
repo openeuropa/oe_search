@@ -532,7 +532,14 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         $document->setUrl($entity->toUrl()->setAbsolute()->toString());
       }
 
-      $item_fields = $this->getSpecialFields($index, $item) + $item->getFields();
+      // Guarantee special fields are ingested uppercase.
+      $special_fields_uppercase = [];
+      $special_fields = $this->getSpecialFields($index, $item);
+      foreach ($special_fields as $name => $field) {
+        $special_fields_uppercase[strtoupper($name)] = $field;
+      }
+
+      $item_fields = $special_fields_uppercase + $item->getFields();
       foreach ($item_fields as $name => $field) {
         $document->addMetadata($name, $field->getValues(), $field->getType());
       }
