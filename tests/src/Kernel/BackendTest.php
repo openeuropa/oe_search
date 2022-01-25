@@ -219,7 +219,7 @@ class BackendTest extends KernelTestBase {
   }
 
   /**
-   * Test Ingestion.
+   * File ingestion.
    *
    * @covers ::indexItems
    */
@@ -235,7 +235,7 @@ class BackendTest extends KernelTestBase {
     $this->backend->indexItems($this->index, $items);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE, 5, 5);
 
-    // Compare sent data with received data.
+    // Compare the sent files with received data.
     $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE);
     $this->assertCount(5, $requests);
     $this->assertIngestedFileItem($requests[0], $items, 1);
@@ -280,7 +280,7 @@ class BackendTest extends KernelTestBase {
   }
 
   /**
-   * Assert data for one ingested item.
+   * Assert data for an ingested file item.
    *
    * @param \Psr\Http\Message\RequestInterface $request
    *   The request.
@@ -329,7 +329,6 @@ class BackendTest extends KernelTestBase {
    */
   protected function assertIngestedFileItem(RequestInterface $request, array $items, int $id): void {
     $item_id = $this->mediaItemIds[$id];
-    $item = $items[$item_id];
     $entity = $this->mediaEntities[$id];
     // Assert query parameters.
     parse_str($request->getUri()->getQuery(), $parameters);
@@ -343,11 +342,11 @@ class BackendTest extends KernelTestBase {
     $this->assertBoundary($request, $boundary);
     $parts = $this->getRequestMultipartStreamResources($request, $boundary);
     $expected_meta = json_encode([
-      'search_api_id' => [$item_id],
-      'search_api_datasource' => ['entity:media'],
-      'search_api_language' => ['en'],
-      'search_api_site_hash' => [Utility::getSiteHash()],
-      'search_api_index_id' => [$this->indexId],
+      'SEARCH_API_ID' => [$item_id],
+      'SEARCH_API_DATASOURCE' => ['entity:media'],
+      'SEARCH_API_LANGUAGE' => ['en'],
+      'SEARCH_API_SITE_HASH' => [Utility::getSiteHash()],
+      'SEARCH_API_INDEX_ID' => [$this->indexId],
     ]);
 
     $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
