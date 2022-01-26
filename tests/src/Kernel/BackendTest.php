@@ -219,11 +219,11 @@ class BackendTest extends KernelTestBase {
     $this->assertBoundary($request, $boundary);
     $parts = $this->getRequestMultipartStreamResources($request, $boundary);
     $expected_meta = json_encode([
-      'search_api_id' => [$item_id],
-      'search_api_datasource' => ['entity:entity_test_mulrev_changed'],
-      'search_api_language' => ['en'],
-      'search_api_site_hash' => [Utility::getSiteHash()],
-      'search_api_index_id' => [$this->indexId],
+      'SEARCH_API_ID' => [$item_id],
+      'SEARCH_API_DATASOURCE' => ['entity:entity_test_mulrev_changed'],
+      'SEARCH_API_LANGUAGE' => ['en'],
+      'SEARCH_API_SITE_HASH' => [Utility::getSiteHash()],
+      'SEARCH_API_INDEX_ID' => [$this->indexId],
       'id' => [$id],
       'name' => [$entity->label()],
       'created' => [$item->getField('created')->getValues()['0'] * 1000],
