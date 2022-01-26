@@ -19,7 +19,7 @@
         "drupal/token": "^1.10",
         "egulias/email-validator": "^2.1.22 || ^3.0",
         "openeuropa/oe_multilingual": "^1.10",
-        "openeuropa/code-review": "^1.6 || ^2.0",
+        "openeuropa/code-review": "^2.0",
         "openeuropa/task-runner-drupal-project-symlink": "^1.0.0-beta5",
         "phpspec/prophecy-phpunit": "^1 || ^2"
     },
