@@ -57,7 +57,7 @@ class SearchBlockTranslationTest extends BrowserTestBase {
 
     $this->drupalLogin($this->createUser(['access content']));
     $this->drupalGet(Url::fromUserInput('/en/node'));
-    $block = $assert_session->elementExists('css', '#block-oe-search');
+    $block = $assert_session->elementExists('css', 'div[id^="block-oe-search"]');
     $assert_session->buttonExists('Search', $block);
     // Check that the block button is translated in French.
     $this->drupalGet(Url::fromUserInput('/fr/node'));

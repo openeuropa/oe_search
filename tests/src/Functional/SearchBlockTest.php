@@ -53,11 +53,11 @@ class SearchBlockTest extends BrowserTestBase {
     // block.
     $this->drupalLogin($this->createUser());
     $this->drupalGet('<front>');
-    $assert_session->elementNotExists('css', '#block-oe-search');
+    $assert_session->elementNotExists('css', 'div[id^="block-oe-search"]');
 
     $this->drupalLogin($this->createUser(['access content']));
     $this->drupalGet('<front>');
-    $block = $assert_session->elementExists('css', '#block-oe-search');
+    $block = $assert_session->elementExists('css', 'div[id^="block-oe-search"]');
 
     // Disable redirects to avoid loading web pages outside the test
     // environment.
@@ -77,7 +77,7 @@ class SearchBlockTest extends BrowserTestBase {
     $this->drupalGet('<front>', [
       'language' => \Drupal::languageManager()->getLanguage('fr'),
     ]);
-    $block = $assert_session->elementExists('css', '#block-oe-search');
+    $block = $assert_session->elementExists('css', 'div[id^="block-oe-search"]');
     $block->fillField('Search', 'European Commission');
     $this->getSession()->getDriver()->getClient()->followRedirects(FALSE);
     $block->pressButton('Search');
