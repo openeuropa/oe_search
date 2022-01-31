@@ -9,8 +9,8 @@
     <env name="MINK_DRIVER_ARGS_WEBDRIVER" value='["${selenium.browser}", null, "${selenium.host}:${selenium.port}/wd/hub"]'/>
   </php>
   <testsuites>
-    <testsuite name="OpenEuropa Search">
-      <directory>./build/modules/custom/oe_search/tests/src/</directory>
+    <testsuite name="OpenEuropa Search tests">
+      <directory>./tests/src/</directory>
     </testsuite>
   </testsuites>
 </phpunit>

@@ -3,4 +3,4 @@ msgid ""
 msgstr ""
 
 msgid "Search"
-msgstr "Buscar"
+msgstr "Búsqueda"
