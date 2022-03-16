@@ -6,6 +6,7 @@ namespace Drupal\oe_search\Tests;
 
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Drupal\Tests\search_api\Functional\ExampleContentTrait;
 use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\oe_search\Utility;
@@ -70,6 +71,7 @@ class BackendTest extends KernelTestBase {
     'http_request_mock',
     'oe_search',
     'oe_search_test',
+    'oe_search_mock',
     'search_api',
     'system',
     'user',
@@ -143,16 +145,16 @@ class BackendTest extends KernelTestBase {
     // indexed by default.
     // @see \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::getDocuments()
     $this->backend->indexItems($this->index, $items);
-    $this->assertServiceMockCalls('/ingest/text', 0, 0);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT, 0, 0);
 
     // Enable ingestion of 'entity_test_mulrev_changed' entities.
-    // @see \Drupal\oe_search_test\EventSubscriber\OeSearchTestSubscriber::indexEntityTestMulRevChanged()
+    // @see \Drupal\oe_search_mock\EventSubscriber\OeSearchTestSubscriber::indexEntityTestMulRevChanged()
     $this->container->get('state')->set('oe_search_test.enable_document_alter', TRUE);
     $this->backend->indexItems($this->index, $items);
-    $this->assertServiceMockCalls('/ingest/text', 5, 5);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT, 5, 5);
 
     // Compare sent data with received data.
-    $requests = $this->getServiceMockRequests('/ingest/text');
+    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT);
     $this->assertCount(5, $requests);
     $this->assertIngestedItem($requests[0], $items, 1);
     $this->assertIngestedItem($requests[1], $items, 2);
@@ -165,11 +167,11 @@ class BackendTest extends KernelTestBase {
    * @covers ::deleteItems
    */
   public function testDeleteItems(): void {
-    $this->assertServiceMockCalls('/ingest/delete', 0, 0);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
     $this->backend->deleteItems($this->index, $this->itemIds);
-    $this->assertServiceMockCalls('/ingest/delete', 5, 5);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 5, 5);
     // Compare sent data with received data.
-    $requests = $this->getServiceMockRequests('/ingest/delete');
+    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
     $this->assertCount(5, $requests);
     $this->assertDeletedItem($requests[0], 1);
     $this->assertDeletedItem($requests[1], 2);
@@ -182,11 +184,11 @@ class BackendTest extends KernelTestBase {
    * @covers ::deleteAllIndexItems
    */
   public function testDeleteAllIndexItems(): void {
-    $this->assertServiceMockCalls('/ingest/delete', 0, 0);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
     $this->backend->deleteAllIndexItems($this->index);
-    $this->assertServiceMockCalls('/ingest/delete', 5, 5);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 5, 5);
     // Compare sent data with received data.
-    $requests = $this->getServiceMockRequests('/ingest/delete');
+    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
     $this->assertCount(5, $requests);
     $this->assertDeletedItem($requests[0], 1);
     $this->assertDeletedItem($requests[1], 2);
@@ -259,7 +261,7 @@ class BackendTest extends KernelTestBase {
    */
   protected function assertServiceMockCalls(string $path, int $applies_calls, int $get_response_calls): void {
     $state = $this->container->get('state');
-    $calls = $state->get('oe_search_test.service_mock_calls', []);
+    $calls = $state->get('oe_search_mock.service_mock_calls', []);
 
     if (!isset($calls[$path])) {
       $calls[$path] = [
@@ -272,7 +274,7 @@ class BackendTest extends KernelTestBase {
     $this->assertSame($get_response_calls, $calls[$path]['getResponse']);
 
     // Leave the place clean for future assertions.
-    $state->delete('oe_search_test.service_mock_calls');
+    $state->delete('oe_search_mock.service_mock_calls');
   }
 
   /**
@@ -286,7 +288,7 @@ class BackendTest extends KernelTestBase {
    */
   protected function getServiceMockRequests(string $path): array {
     $state = $this->container->get('state');
-    $requests = $state->get('oe_search_test.service_mock_requests', []);
+    $requests = $state->get('oe_search_mock.service_mock_requests', []);
 
     return $requests[$path];
   }
