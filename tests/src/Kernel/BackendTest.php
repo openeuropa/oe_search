@@ -208,7 +208,7 @@ class BackendTest extends KernelTestBase {
     $this->backend->indexItems($this->index, $items);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT, 5, 5);
 
-    // Compare sent data with received data.
+    // Check that the data sent is correct.
     $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT);
     $this->assertCount(5, $requests);
     $this->assertIngestedItem($requests[0], $items, 1);
@@ -318,7 +318,7 @@ class BackendTest extends KernelTestBase {
   }
 
   /**
-   * Assert data for one ingested file item.
+   * Assert data for the ingested file item.
    *
    * @param \Psr\Http\Message\RequestInterface $request
    *   The request.
