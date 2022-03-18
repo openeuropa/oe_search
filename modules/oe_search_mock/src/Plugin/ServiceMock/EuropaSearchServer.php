@@ -103,6 +103,10 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         $response = $this->getIngestTextResponse();
         break;
 
+      case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE:
+        $response = $this->getIngestTextResponse();
+        break;
+
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE:
         $response = $this->getDeleteResponse();
         break;

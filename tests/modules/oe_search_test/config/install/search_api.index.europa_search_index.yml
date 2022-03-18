@@ -34,6 +34,7 @@ field_settings:
     property_path: body
 datasource_settings:
   'entity:entity_test_mulrev_changed': {  }
+  'entity:media': { }
 processor_settings:
   add_url: {  }
   aggregated_field: {  }

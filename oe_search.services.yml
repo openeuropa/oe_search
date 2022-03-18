@@ -1,5 +1,6 @@
 services:
   oe_search.document_creation_event_subscriber:
     class: Drupal\oe_search\EventSubscriber\DocumentCreationSubscriber
+    arguments: [ '@entity_type.manager' ]
     tags:
       - { name: 'event_subscriber' }
