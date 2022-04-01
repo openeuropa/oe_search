@@ -559,6 +559,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       // Allow third-party to alter the document being ingested.
       $event = (new DocumentCreationEvent())
         ->setDocument($document)
+        ->setItem($item)
         ->setEntity($entity);
       // @todo Remove 1st argument when dropping support for Drupal 8.9.
       $this->eventService->dispatch(DocumentCreationEvent::class, $event);

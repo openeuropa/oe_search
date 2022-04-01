@@ -6,6 +6,7 @@ namespace Drupal\oe_search\Event;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\oe_search\IngestionDocument;
+use Drupal\search_api\Item\ItemInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -32,6 +33,13 @@ class DocumentCreationEvent extends Event {
    * @var \Drupal\oe_search\IngestionDocument
    */
   protected $document;
+
+  /**
+   * The search api item.
+   *
+   * @var \Drupal\search_api\Item\ItemInterface
+   */
+  protected $item;
 
   /**
    * Returns the entity being ingested.
@@ -76,6 +84,27 @@ class DocumentCreationEvent extends Event {
    */
   public function setDocument(IngestionDocument $document): self {
     $this->document = $document;
+    return $this;
+  }
+
+  /**
+   * Returns the item.
+   *
+   * @return \Drupal\search_api\Item\ItemInterface
+   *   The search api item.
+   */
+  public function getItem(): ItemInterface {
+    return $this->item;
+  }
+
+  /**
+   * Sets the item.
+   *
+   * @param \Drupal\search_api\Item\ItemInterface $item
+   *   The search api item.
+   */
+  public function setItem(ItemInterface $item): self {
+    $this->item = $item;
     return $this;
   }
 
