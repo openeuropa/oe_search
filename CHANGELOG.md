@@ -1,5 +1,41 @@
 # Changelog
 
+## [2.0.0-alpha1](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha1) (2022-04-11)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.9.0...2.0.0-alpha1)
+
+**Merged pull requests:**
+
+- EWPP-2125: Add translation for ru language. [\#67](https://github.com/openeuropa/oe_search/pull/67) ([sergepavle](https://github.com/sergepavle))
+- EWPP-2101: Add translation for chinese and ukrainian languages. [\#66](https://github.com/openeuropa/oe_search/pull/66) ([sergepavle](https://github.com/sergepavle))
+- EWPP-2100: Allow to add search api item. [\#65](https://github.com/openeuropa/oe_search/pull/65) ([hernani](https://github.com/hernani))
+- EWPP-1683: Create index to ingest nodes. [\#57](https://github.com/openeuropa/oe_search/pull/57) ([sergepavle](https://github.com/sergepavle))
+- EWPP-1687: Allow to ingest files. [\#56](https://github.com/openeuropa/oe_search/pull/56) ([sergepavle](https://github.com/sergepavle))
+- OEL-219: Allow arbitrary URLs for entities w/o canonical URL [\#42](https://github.com/openeuropa/oe_search/pull/42) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-217: Filter items by site hash. [\#41](https://github.com/openeuropa/oe_search/pull/41) ([drishu](https://github.com/drishu))
+- OEL-204: README improvements [\#40](https://github.com/openeuropa/oe_search/pull/40) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-167: Add test for backend config form. [\#39](https://github.com/openeuropa/oe_search/pull/39) ([drishu](https://github.com/drishu))
+- OEL-193: Use epic branch for europa search client. [\#38](https://github.com/openeuropa/oe_search/pull/38) ([drishu](https://github.com/drishu))
+- OEL-193: Add http-factory-guzzle usage. [\#36](https://github.com/openeuropa/oe_search/pull/36) ([drishu](https://github.com/drishu))
+- OEL-167: Add plugin tests [\#35](https://github.com/openeuropa/oe_search/pull/35) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-149: Support multi-site & multi-index [\#34](https://github.com/openeuropa/oe_search/pull/34) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-155: Implement Text Ingestion. [\#33](https://github.com/openeuropa/oe_search/pull/33) ([drishu](https://github.com/drishu))
+- OEL-151: Create the plugin skeleton [\#31](https://github.com/openeuropa/oe_search/pull/31) ([claudiu-cristea](https://github.com/claudiu-cristea))
+- OEL-102: Structure and Service [\#29](https://github.com/openeuropa/oe_search/pull/29) ([saidatom](https://github.com/saidatom))
+- OEL-117: Update PHP \>= 7.3 [\#28](https://github.com/openeuropa/oe_search/pull/28) ([saidatom](https://github.com/saidatom))
+
+## [1.9.0](https://github.com/openeuropa/oe_search/tree/1.9.0) (2022-02-10)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/1.8.0...1.9.0)
+
+**Merged pull requests:**
+
+- Update epic europa search [\#63](https://github.com/openeuropa/oe_search/pull/63) ([hernani](https://github.com/hernani))
+- EWPP-0000: Update EuropaSearch Epic with 2.x. [\#62](https://github.com/openeuropa/oe_search/pull/62) ([hernani](https://github.com/hernani))
+- EWPP-0000: Add dealerdirect/phpcodesniffer-composer-installer to allo… [\#61](https://github.com/openeuropa/oe_search/pull/61) ([hernani](https://github.com/hernani))
+- EWPP-1909: Update to PHP7.4/8.0. [\#59](https://github.com/openeuropa/oe_search/pull/59) ([hernani](https://github.com/hernani))
+- EWPP-1926: Capitalized special fields. [\#58](https://github.com/openeuropa/oe_search/pull/58) ([hernani](https://github.com/hernani))
+- Update 2.x with 1.x. [\#55](https://github.com/openeuropa/oe_search/pull/55) ([nagyad](https://github.com/nagyad))
+- EWPP-1679: Fix typos and namings. [\#54](https://github.com/openeuropa/oe_search/pull/54) ([nagyad](https://github.com/nagyad))
+
 ## [1.8.0](https://github.com/openeuropa/oe_search/tree/1.8.0) (2021-11-08)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.7.0...1.8.0)
