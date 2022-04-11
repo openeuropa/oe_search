@@ -7,9 +7,55 @@
 
 declare(strict_types = 1);
 
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend;
+use Drupal\search_api\Plugin\search_api\datasource\ContentEntity;
+use Drupal\search_api\Entity\Server;
+use Drupal\search_api\Utility\Utility;
+
 /**
  * Implements hook_locale_translation_projects_alter().
  */
 function oe_search_locale_translation_projects_alter(&$projects) {
   $projects['oe_search']['info']['interface translation server pattern'] = drupal_get_path('module', 'oe_search') . '/translations/%project-%language.po';
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oe_search_form_search_api_index_edit_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
+  $form['#validate'][] = 'oe_search_form_search_api_index_edit_form_validate';
+}
+
+/**
+ * Ensure that only entities with canonical URLs can be ingested.
+ *
+ * @param array $form
+ *   The form definition.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state object.
+ */
+function oe_search_form_search_api_index_edit_form_validate(array $form, FormStateInterface $form_state): void {
+  $server = Server::load($form_state->getValue('server'));
+  if (!$server || !$server->getBackend() instanceof SearchApiEuropaSearchBackend) {
+    return;
+  }
+
+  /** @var \Drupal\search_api\Form\IndexForm $form_object */
+  $form_object = $form_state->getFormObject();
+  /** @var \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager */
+  $plugin_manager = \Drupal::service('plugin.manager.search_api.datasource');
+
+  /** @var \Drupal\search_api\Plugin\search_api\datasource\ContentEntity $datasource */
+  foreach ($form_state->getValue('datasources') as $datasource_id) {
+    $datasource = $plugin_manager->createInstance($datasource_id, [
+      '#index' => $form_object->getEntity(),
+    ]);
+
+    if (!$datasource instanceof ContentEntity) {
+      $form_state->setErrorByName('datasources', t('Datasource "@datasource" must be a Content Entity.', [
+        '@datasource' => Utility::escapeHtml($datasource->label()),
+      ]));
+    }
+  }
 }

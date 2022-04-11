@@ -1,0 +1,49 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_test
+    - search_api
+  config:
+    - search_api.server.europa_search_server
+id: europa_search_index
+name: 'Europa search index'
+description: 'Test index.'
+read_only: false
+field_settings:
+  id:
+    label: ID
+    type: integer
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: id
+  name:
+    label: Name
+    type: text
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: name
+    boost: 5.0
+  created:
+    label: Authored on
+    type: date
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: created
+  body:
+    label: Body
+    type: text
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: body
+datasource_settings:
+  'entity:entity_test_mulrev_changed': {  }
+  'entity:media': { }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  language_with_fallback: {  }
+  rendered_item: {  }
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  index_directly: false
+  cron_limit: 50
+server: europa_search_server

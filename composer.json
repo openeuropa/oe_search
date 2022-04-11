@@ -7,12 +7,21 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.4",
-        "drupal/core": "^9.2"
+        "drupal/core": "^9.2",
+        "drupal/core-composer-scaffold": "^8.9 || ^9.1",
+        "drupal/search_api": "^1.19",
+        "http-interop/http-factory-guzzle": "^1.0",
+        "openeuropa/europa-search-client": "1.x-dev",
+        "php-http/guzzle6-adapter": "^2.0"
     },
     "require-dev": {
         "composer/installers": "^1.5",
         "drupal/core-composer-scaffold": "^9.2",
         "drupal/config_devel": "^1.2",
+        "drupal/core-dev": "^9.2",
+        "drupal/ctools": "^3.7",
+        "drupal/http_request_mock": "^1.0",
+        "drupal/token": "^1.10",
         "drush/drush": "^10.3",
         "drupal/core-dev": "^9.2",
         "drupal/ctools": "^3.7",
@@ -45,6 +54,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "OpenEuropa\\Tests\\EuropaSearchClient\\Traits\\": "./vendor/openeuropa/europa-search-client/tests/src/Traits",
             "Drupal\\Tests\\oe_search\\": "./tests/src/"
         }
     },
