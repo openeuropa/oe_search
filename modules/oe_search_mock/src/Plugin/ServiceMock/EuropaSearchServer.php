@@ -112,7 +112,9 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         break;
 
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_SEARCH:
-        $response = $this->getSearchResponse();
+        parse_str($request->getUri()->getQuery(), $parameters);
+        $page_number = !empty($parameters['pageNumber']) ? (int) $parameters['pageNumber'] : NULL;
+        $response = $this->getSearchResponse($page_number);
         break;
 
       default:
@@ -204,11 +206,18 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
   /**
    * Get mocked search response.
    *
+   * @param int|null $page_number
+   *   The page number.
+   *
    * @return \Psr\Http\Message\ResponseInterface
    *   The mocked response.
    */
-  protected function getSearchResponse(): ResponseInterface {
-    return new Response(200, [], $this->mockedResponses['simple_search_response'] ?? '{}');
+  protected function getSearchResponse(int $page_number = NULL): ResponseInterface {
+    $response = $this->mockedResponses['simple_search_response'];
+    if ($page_number) {
+      $response = $this->mockedResponses['simple_search_response_page_' . $page_number] ?? NULL;
+    }
+    return new Response(200, [], $response ?? '{}');
   }
 
 }

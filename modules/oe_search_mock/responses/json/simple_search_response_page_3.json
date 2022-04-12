@@ -1,0 +1,22 @@
+{
+    "apiVersion":"2.69",
+    "terms":"\"Programme managers\"",
+    "responseTime":44,
+    "totalResults":2,
+    "pageNumber":3,
+    "pageSize":50,
+    "sort":"title:ASC",
+    "groupByField":null,
+    "queryLanguage":{
+       "language":"en",
+       "probability":0
+    },
+    "spellingSuggestion":"<b>programmes managed<\/b>",
+    "bestBets":[
+       
+    ],
+    "results":[],
+    "warnings":[
+       
+    ]
+}

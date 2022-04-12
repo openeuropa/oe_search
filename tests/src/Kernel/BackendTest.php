@@ -102,6 +102,13 @@ class BackendTest extends KernelTestBase {
   protected $mediaItemIds;
 
   /**
+   * Media type.
+   *
+   * @var \Drupal\media\MediaTypeInterface
+   */
+  protected $mediaType;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
@@ -130,6 +137,9 @@ class BackendTest extends KernelTestBase {
       \Drupal::state()->set('search_api_use_tracking_batch', FALSE);
     }
 
+    // Set constant site_hash value for test purpose aligned to mocked requests.
+    \Drupal::state()->set('oe_search.site_hash', 'xxxxx');
+
     $this->setUpExampleStructure();
     $this->insertExampleContent();
 
@@ -156,7 +166,7 @@ class BackendTest extends KernelTestBase {
     }, $this->entities);
 
     // Create test medias.
-    $media_type = $this->createMediaType('file');
+    $this->mediaType = $this->createMediaType('file');
     for ($i = 1; $i <= 5; $i++) {
       $file = File::create([
         'uri' => $this->getTestFiles('image')[0]->uri,
@@ -166,7 +176,7 @@ class BackendTest extends KernelTestBase {
 
       $media = Media::create([
         'name' => 'Test file media ' . $i,
-        'bundle' => $media_type->id(),
+        'bundle' => $this->mediaType->id(),
         'field_media_file' => $file->id(),
       ]);
       $media->save();
