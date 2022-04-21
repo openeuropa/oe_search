@@ -32,6 +32,9 @@ class EuropaSearchMockEventSubscriber implements EventSubscriberInterface {
       'info_response',
       'jwt_response',
       'simple_search_response',
+      'simple_search_response_page_1',
+      'simple_search_response_page_2',
+      'simple_search_response_page_3',
       'text_ingestion_response',
     ];
     foreach ($responses_json as $response_name) {
