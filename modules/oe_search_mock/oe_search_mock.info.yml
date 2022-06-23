@@ -2,7 +2,7 @@ name: 'OpenEuropa Search mock'
 description: 'Module to mock Europa Search server.'
 package: EWCMS
 type: module
-core_version_requirement: ^8.9 || ^9.2
+core_version_requirement: ^9.3
 
 dependencies:
   - http_request_mock:http_request_mock
