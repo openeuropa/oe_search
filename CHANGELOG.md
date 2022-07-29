@@ -1,13 +1,25 @@
 # Changelog
 
-## [2.0.0-alpha2](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha2) (2022-06-21)
+## [2.0.0-alpha3](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha3) (2022-07-29)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha2...2.0.0-alpha3)
+
+**Merged pull requests:**
+
+- EWPP-2375: Add Luxembourgish string translation. [\#75](https://github.com/openeuropa/oe_search/pull/75) ([22Alexandra](https://github.com/22Alexandra))
+- EWPP-2358: Drupal 9.4 support for branch 2.x [\#74](https://github.com/openeuropa/oe_search/pull/74) ([yenyasinn](https://github.com/yenyasinn))
+
+## [2.0.0-alpha2](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha2) (2022-06-22)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha1...2.0.0-alpha2)
 
 **Merged pull requests:**
 
+- Prepare release 2.0.0-alpha2. [\#72](https://github.com/openeuropa/oe_search/pull/72) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-2077: Remove delete item limit in deleteAllIndexItems. [\#71](https://github.com/openeuropa/oe_search/pull/71) ([sergepavle](https://github.com/sergepavle))
 
 ## [2.0.0-alpha1](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha1) (2022-04-11)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.9.0...2.0.0-alpha1)
 
 **Merged pull requests:**
