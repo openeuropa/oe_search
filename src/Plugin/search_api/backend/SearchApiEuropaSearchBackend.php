@@ -8,9 +8,12 @@ use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\node\Entity\Node;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Drupal\oe_search\IngestionDocument;
 use Drupal\oe_search\Utility;
@@ -18,6 +21,8 @@ use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
+use Drupal\search_api\Query\Condition;
+use Drupal\search_api\Query\ConditionGroup;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
@@ -407,6 +412,289 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function search(QueryInterface $query): void {
+    $results = $query->getResults();
+    $page_number = NULL;
+
+    // Set page number.
+    if (!empty($query->getOptions()['offset']) && !empty($query->getOptions()['limit'])) {
+      $offset = $query->getOptions()['offset'];
+      $limit = $query->getOptions()['limit'];
+      $page_number = ($offset / $limit) + 1;
+    }
+
+    // Get text keys.
+    $text = NULL;
+    if (!empty($query->getKeys())) {
+      $text = $query->getKeys()[0];
+    }
+
+    // Get term conditions.
+    $query_conjuction = $query->getConditionGroup()->getConjunction() ?? NULL;
+    $terms_expression = $this->buildConditionGroup($query_conjuction, $query->getConditionGroup()->getConditions());
+
+    // Handle sorting.
+    // @todo Multifield sorting is not supported yet by the client.
+    $sort_field = $sort_order = NULL;
+    $sorts = $query->getSorts();
+    if (!empty($sorts)) {
+      $sort_field = strtoupper(key($sorts));
+      $sort_order = reset($sorts);
+    }
+
+    // Handle facets.
+    if ($available_facets = $query->getOption('search_api_facets')) {
+      $facets = $this->getFacets($available_facets, $text, $terms_expression);
+      $results->setExtraData('search_api_facets', $facets);
+    }
+
+    // In case of local entities.
+    /*
+    $terms_expression = [
+    'bool' => [
+    'must' => [
+    'term' => [
+    'SEARCH_API_SITE_HASH' => Utility::getSiteHash()
+    ]
+    ]
+    ]
+    ];
+     */
+
+    // Execute search.
+    $europa_response = $this->getClient()->search($text, NULL, $terms_expression, $sort_field, $sort_order, $page_number);
+    $results->setResultCount($europa_response->getTotalResults());
+    // @todo Adapt for generic entities.
+    $index_fields = $query->getIndex()->getFieldsByDatasource('entity:node');
+
+    foreach ($europa_response->getResults() as $item) {
+      $metadata = $item->getMetadata();
+      $datasource = $query->getIndex()->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
+      $item_id = $item->getUrl();
+      $item_id = $metadata['SEARCH_API_ID'][0];
+      $result_item = $this->getFieldsHelper()->createItem($query->getIndex(), $item_id, $datasource);
+
+      try {
+        /*
+        $entity = $this->getMappedEntity($metadata, $index_fields);
+        // Needed to avoid loading entity in translations.
+        $entity->in_preview = TRUE;
+        $object = EntityAdapter::createFromEntity($entity);
+        $result_item->setOriginalObject($object);
+         */
+        $results->addResultItem($result_item);
+      }
+      catch (EntityStorageException $e) {
+
+      }
+    }
+  }
+
+  /**
+   * Builds a condition group for ES.
+   *
+   * @param string $query_conjunction
+   *   The query conjunction.
+   * @param array $query_conditions
+   *   The query conditions.
+   *
+   * @return array
+   *   The condition group to be used in ES.
+   */
+  protected function buildConditionGroup(string $query_conjunction, array $query_conditions) : array {
+    $conditions = [];
+
+    if (empty($query_conjunction)) {
+      return $conditions;
+    }
+
+    foreach ($query_conditions as $condition) {
+      if ($condition instanceof Condition) {
+        if (empty($condition->getValue())) {
+          continue;
+        }
+        $conditions[] = $this->addCondition($condition);
+
+      }
+      elseif ($condition instanceof ConditionGroup) {
+        $conditions[] = $this->buildConditionGroup($condition->getConjunction(), $condition->getConditions());
+      }
+    }
+
+    // We don't need a condition group for a single condition.
+    if (count($conditions) == 1) {
+      return $conditions[0];
+    }
+
+    // @todo Support for negation operator (must_not).
+    $conjuction = ($query_conjunction == 'AND') ? 'must' : 'should';
+    return [
+      'bool' => [
+        $conjuction => $conditions,
+      ],
+    ];
+  }
+
+  /**
+   * Adds condition to the condition group.
+   *
+   * @param \Drupal\search_api\Query\Condition $condition
+   *   The query condition.
+   *
+   * @return array
+   *   The array with resulting condition.
+   */
+  protected function addCondition(Condition $condition) {
+    if ($condition->getOperator() == '>') {
+      return ['range' => [strtoupper($condition->getField()) => ['gt' => $condition->getValue()]]];
+    }
+    elseif ($condition->getOperator() == '>=') {
+      return ['range' => [strtoupper($condition->getField()) => ['gte' => $condition->getValue()]]];
+    }
+    elseif ($condition->getOperator() == '<') {
+      return ['range' => [strtoupper($condition->getField()) => ['lt' => $condition->getValue()]]];
+    }
+    elseif ($condition->getOperator() == '<=') {
+      return ['range' => [strtoupper($condition->getField()) => ['lte' => $condition->getValue()]]];
+    }
+    else {
+      return ['term' => [strtoupper($condition->getField()) => $condition->getValue()]];
+    }
+  }
+
+  /**
+   * Handle facets.
+   *
+   * @param array $available_facets
+   *   The configured facets for the index.
+   * @param string $text
+   *   Fulltext keys to search.
+   * @param array $terms_expression
+   *   Query conditions.
+   *
+   * @return array
+   *   Facets keyed by facet_id.
+   */
+  protected function getFacets(array $available_facets = [], string $text = NULL, array $terms_expression = []) {
+    $facets = $response_facets = [];
+    $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $terms_expression);
+
+    // Prepare response facets.
+    foreach ($europa_response->getFacets() as $facet) {
+      $facet_name = strtolower($facet->getRawName());
+      $response_facets[$facet_name] = $facet;
+    }
+
+    // Loop through available facets to build the ones with results.
+    foreach ($available_facets as $available_facet) {
+      $facet_name = $available_facet['field'];
+      if (!empty($response_facets[$facet_name])) {
+        $response_facet = $response_facets[$facet_name];
+        $facet_results = [];
+        foreach ($response_facet->getValues() as $value) {
+          $facet_results[] = [
+            'filter' => $value->getRawValue(),
+            'count' => $value->getCount(),
+          ];
+        }
+
+        $facets[$facet_name] = $facet_results;
+      }
+    }
+
+    return $facets;
+  }
+
+  /**
+   * Returns an entity from mapped values.
+   *
+   * @param array $metadata
+   *   The metadata array.
+   * @param array $index_fields
+   *   The index fields.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface
+   *   The mapped entity.
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+   */
+  protected function getMappedEntity(array $metadata, array $index_fields) : ContentEntityInterface {
+    foreach ($index_fields as $field) {
+      $metadata_key = strtoupper($field->getFieldIdentifier());
+
+      // Non supported types.
+      // @todo Better support all field types.
+      if (!in_array($field->getType(), [
+        'integer',
+        'string',
+        'text',
+        'fulltext',
+        'date',
+      ])) {
+        continue;
+      }
+
+      if (!($field->getDataDefinition() instanceof FieldItemDataDefinition)) {
+        continue;
+      }
+
+      // @todo Better support original fields.
+      $entity_reference_types = [
+        'entity_reference',
+        'entity_reference_revisions',
+      ];
+      if ($metadata_key != 'TYPE' && in_array($field->getDataDefinition()->getFieldDefinition()->getType(), $entity_reference_types)) {
+        continue;
+      }
+
+      if (empty($metadata[$metadata_key][0])) {
+        continue;
+      }
+
+      // Dates need to be converted.
+      // @todo Proper support for date fields and types.
+      if ($field->getType() == 'date') {
+        $time = strtotime($metadata[$metadata_key][0]);
+
+        if ($field->getDataDefinition()->getFieldDefinition()->getType() == 'daterange_timezone') {
+          $values[$field->getOriginalFieldIdentifier()] = [
+            'value' => date('Y-m-d\TH:i:s', $time),
+            'end_value' => date('Y-m-d\TH:i:s', $time),
+            'timezone' => 'Europe/Brussels',
+          ];
+        }
+        elseif ($field->getDataDefinition()->getFieldDefinition()->getType() == 'datetime') {
+          $values[$field->getOriginalFieldIdentifier()] = date('Y-m-d', $time);
+        }
+        else {
+          $values[$field->getOriginalFieldIdentifier()] = $time;
+        }
+      }
+      else {
+        $values[$field->getOriginalFieldIdentifier()] = $metadata[$metadata_key][0];
+      }
+
+    }
+    // @todo This is only needed because of link lists as DefaultEntityValueResolverSubscriber would fail otherwise.
+    $values['nid'] = 9999999999;
+
+    // @todo Change to generic entities.
+    $entity = Node::create($values);
+
+    // @todo Find a better way to force redirect.
+    $entity->europa_list_redirect_link = $metadata['esST_URL'][0];
+    return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedFeatures() {
+    $features = [
+      'search_api_facets',
+      'search_api_facets_operator_or',
+    ];
+
+    return $features;
   }
 
   /**
