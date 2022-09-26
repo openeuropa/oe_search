@@ -59,3 +59,73 @@ function oe_search_form_search_api_index_edit_form_validate(array $form, FormSta
     }
   }
 }
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function oe_search_form_search_api_index_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  // We need to restrict by form ID here because this function is also called
+  // via hook_form_BASE_FORM_ID_alter (which is wrong, e.g. in the case of the
+  // form ID search_api_field_config).
+  if (!in_array($form_id, [
+    'search_api_index_form',
+    'search_api_index_edit_form',
+  ])) {
+    return;
+  }
+  /** @var \Drupal\search_api\IndexInterface $index */
+  $index = $form_state->getFormObject()->getEntity();
+
+  $options = [
+    'local' => t('Local - Entities will be loaded from database, only entities from this website will be fetch and loaded.'),
+    'remote' => t('Remote - Entities will be loaded from Europa Search documents. Entities from other sources than this website can be returned.'),
+  ];
+
+  $form['third_party_settings']['oe_search'] = [
+    '#tree' => TRUE,
+    '#type' => 'details',
+    '#title' => t('Europa search index options'),
+    '#open' => TRUE,
+    '#states' => [
+      'visible' => [
+        ':input[name="server"]' => _oe_search_get_europa_servers(),
+      ],
+    ],
+  ];
+
+  $form['third_party_settings']['oe_search']['europa_search_entity_mode'] = [
+    '#type' => 'radios',
+    '#title' => t('Entity load type'),
+    '#options' => $options,
+    '#required' => TRUE,
+    '#description' => t('Choose how entities should be fetch and loaded from Europa Search.'),
+    '#default_value' => $index->getThirdPartySetting('oe_search', 'europa_search_entity_mode', 'local'),
+  ];
+}
+
+/**
+ * Gets a lists of servers from europa search backend.
+ *
+ * @return array
+ *   The list of servers.
+ */
+function _oe_search_get_europa_servers() {
+  $valid_options = [];
+  $storage = \Drupal::entityTypeManager()->getStorage('search_api_server');
+  /** @var \Drupal\search_api\ServerInterface[] $servers */
+  $servers = $storage->loadByProperties(['status' => TRUE]);
+  foreach ($servers as $server) {
+    if (
+      $server->hasValidBackend() &&
+      $server->getBackend() instanceof SearchApiEuropaSearchBackend
+    ) {
+      $europa_servers[$server->id()] = $server;
+    }
+  }
+  foreach ($europa_servers as $server) {
+    $valid_options[] = [
+      'value' => $server->id(),
+    ];
+  }
+  return $valid_options;
+}

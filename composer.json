@@ -6,6 +6,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
+        "cweagans/composer-patches": "^1.6",
         "php": ">=7.4",
         "drupal/core": "^9.3",
         "drupal/search_api": "^1.19",
@@ -68,6 +69,12 @@
             "locations": {
                 "web-root": "./build"
             }
+        },
+        "patches": {
+            "openeuropa/europa_search-client": {
+                "latest-master": "https://github.com/openeuropa/oe_list_pages/compare/1.0.0-alpha2...EWPP-EWPP-2629.diff"
+            }
+
         }
     },
     "config": {

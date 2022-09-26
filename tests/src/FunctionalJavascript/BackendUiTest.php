@@ -121,4 +121,72 @@ class BackendUiTest extends WebDriverTestBase {
     $assert_session->elementNotExists('css', '#edit-backend-config-ingestion-settings');
   }
 
+  /**
+   * @covers oe_search_form_search_api_index_form_alter().
+   */
+  public function testIndexConfiguration() {
+    $admin_user = $this->drupalCreateUser([
+      'administer search_api',
+      'access content',
+    ]);
+    $this->drupalLogin($admin_user);
+    // Create server.
+    $this->drupalGet('admin/config/search/search-api/add-server');
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+    $page->fillField('Server name', 'Europa search server');
+    $assert_session->waitForElementVisible('css', '#edit-id');
+
+    $page->fillField('API key', 'api-key');
+    $page->fillField('Database', 'db');
+    $page->checkField('Enable ingestion');
+    $page->fillField('Info API endpoint', 'http://example.com/search/info');
+    $page->fillField('Search API endpoint', 'http://example.com/search/search');
+    $page->fillField('Facets API endpoint', 'http://example.com/search/facet');
+    $page->fillField('Token API endpoint', 'http://example.com/token');
+    $page->fillField('Text ingestion API endpoint', 'http://example.com/ingest/text');
+    $page->fillField('File ingestion API endpoint', 'http://example.com/ingest/file');
+    $page->fillField('Delete API endpoint', 'http://example.com/ingest/delete');
+    $page->pressButton('Save');
+    $assert_session->pageTextContains('The server was successfully saved.');
+
+    $server_id = 'europa_search_server';
+    $settings = [];
+    $settings['settings']['oe_search']['server'][$server_id]['consumer_key'] = (object) [
+      'value' => 'consumer key value',
+      'required' => TRUE,
+    ];
+    $settings['settings']['oe_search']['server'][$server_id]['consumer_secret'] = (object) [
+      'value' => 'consumer secret value',
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+
+    // Create index.
+    $this->drupalGet('admin/config/search/search-api/add-index');
+    $page->fillField('Index name', 'Europa search index');
+    $assert_session->waitForElementVisible('css', '#edit-id');
+    $page->checkField('datasources[entity:user]');
+    $assert_session->fieldExists('server')->selectOption('europa_search_server');
+    $assert_session->fieldExists('third_party_settings[oe_search][europa_search_entity_mode]')->selectOption('remote');
+    $page->pressButton('Save');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $assert_session->pageTextContains('The index was successfully saved.');
+
+    // Was Correctly saved?
+    $this->drupalGet("admin/config/search/search-api/index/europa_search_index/edit");
+    $this->assertSession()->fieldValueEquals('third_party_settings[oe_search][europa_search_entity_mode]', 'remote');
+
+    // Change to local.
+    $assert_session->fieldExists('third_party_settings[oe_search][europa_search_entity_mode]')->selectOption('remote');
+    $page->pressButton('Save');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $assert_session->pageTextContains('The index was successfully saved.');
+
+    // Was Correctly saved?
+    $this->drupalGet("admin/config/search/search-api/index/europa_search_index/edit");
+    $this->assertSession()->fieldValueEquals('third_party_settings[oe_search][europa_search_entity_mode]', 'remote');
+  }
+
 }
