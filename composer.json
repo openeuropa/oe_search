@@ -71,8 +71,8 @@
             }
         },
         "patches": {
-            "openeuropa/europa_search-client": {
-                "latest-master": "https://github.com/openeuropa/oe_list_pages/compare/1.0.0-alpha2...EWPP-EWPP-2629.diff"
+            "openeuropa/europa-search-client": {
+                "latest-master": "https://github.com/openeuropa/europa-search-client/compare/1.0.0-alpha2...1.x.diff"
             }
 
         }

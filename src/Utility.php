@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search;
 
+use Drupal\search_api\Processor\ProcessorInterface;
+use Drupal\search_api\Query\Query;
+
 /**
  * Specific utility methods.
  */
@@ -59,6 +62,27 @@ class Utility {
    */
   public static function destructReference(string $reference): array {
     return explode('-', $reference);
+  }
+
+  /**
+   * Get original field name for ES.
+   *
+   * Uppercase the field name in case uppercase processor is added.
+   *
+   * @param string $field
+   *   The original field name.
+   * @param \Drupal\search_api\Query\Query $query
+   *   The query.
+   *
+   * @return string
+   *   The translated field name.
+   */
+  public static function getEsFieldName(string $field, Query $query): string {
+    $processors = $query->getIndex()->getProcessorsByStage(ProcessorInterface::STAGE_PREPROCESS_INDEX);
+    if (!empty($processors['europa_search_uppercase_field_names'])) {
+      $field = strtoupper($field);
+    }
+    return $field;
   }
 
 }

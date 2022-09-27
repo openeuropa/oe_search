@@ -13,8 +13,10 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Error;
+use Drupal\oe_search\EntityMapper;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Drupal\oe_search\IngestionDocument;
+use Drupal\oe_search\QueryExpressionBuilder;
 use Drupal\oe_search\Utility;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
@@ -114,6 +116,20 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $eventService;
 
   /**
+   * The query expression builder.
+   *
+   * @var \Drupal\oe_search\QueryExpressionBuilder
+   */
+  protected $queryExpressionBuilder;
+
+  /**
+   * The entity mapper service.
+   *
+   * @var \Drupal\oe_search\EntityMapper
+   */
+  protected $entityMapper;
+
+  /**
    * Constructs a new plugin instance.
    *
    * @param array $configuration
@@ -128,12 +144,18 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The site settings.
    * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_service
    *   The event service.
+   * @param \Drupal\oe_search\QueryExpressionBuilder $query_expression_builder
+   *   The query expression builder service.
+   * @param \Drupal\oe_search\EntityMapper $entity_mapper
+   *   The entity mapper service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, ContainerAwareEventDispatcher $event_service) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, ContainerAwareEventDispatcher $event_service, QueryExpressionBuilder $query_expression_builder, EntityMapper $entity_mapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
     $this->eventService = $event_service;
+    $this->queryExpressionBuilder = $query_expression_builder;
+    $this->entityMapper = $entity_mapper;
   }
 
   /**
@@ -146,7 +168,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $plugin_definition,
       $container->get('http_client'),
       $container->get('settings'),
-      $container->get('event_dispatcher')
+      $container->get('event_dispatcher'),
+      $container->get('oe_search.query_expression_builder'),
+      $container->get('oe_search.entity_mapper')
     );
   }
 
@@ -416,8 +440,132 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
   /**
    * {@inheritdoc}
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+   * @SuppressWarnings(PHPMD.NPathComplexity)
    */
   public function search(QueryInterface $query): void {
+    $results = $query->getResults();
+    $page_number = NULL;
+
+    // Set page number.
+    if (!empty($query->getOptions()['offset']) && !empty($query->getOptions()['limit'])) {
+      $offset = $query->getOptions()['offset'];
+      $limit = $query->getOptions()['limit'];
+      $page_number = ($offset / $limit) + 1;
+    }
+
+    // Get text keys.
+    $text = NULL;
+    if (!empty($query->getKeys())) {
+      $text = $query->getKeys()[0];
+    }
+
+    // Handle sorting.
+    $sort_field = $sort_order = NULL;
+    $sorts = $query->getSorts();
+    if (!empty($sorts)) {
+      foreach ($sorts as $field => $direction) {
+        $field_name = Utility::getEsFieldName($field, $query);
+        $sort_field[] = [$field_name, $direction];
+      }
+    }
+
+    $index = $query->getIndex();
+    $entity_load_mode = $index->getThirdPartySettings('oe_search')['europa_search_entity_mode'] ?? 'local';
+
+    if ($entity_load_mode == 'local') {
+      $query->addCondition(Utility::getEsFieldName('search_api_site_hash', $query), Utility::getSiteHash());
+      $query->addCondition(Utility::getEsFieldName('search_api_index_id', $query), $index->id());
+    }
+
+    // Prepares query expression.
+    $query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
+
+    // Handle facets.
+    if ($available_facets = $query->getOption('search_api_facets')) {
+      $facets = $this->getFacets($available_facets, $text, $query_expression);
+      $results->setExtraData('search_api_facets', $facets);
+    }
+
+    // Execute search.
+    try {
+      $europa_response = $this->getClient()->search($text, NULL, $query_expression, $sort_field, $sort_order, $page_number);
+    }
+    catch (\Exception $e) {
+      $this->getLogger()->error($e->getMessage());
+      return;
+    }
+
+    $results->setResultCount($europa_response->getTotalResults());
+
+    foreach ($europa_response->getResults() as $item) {
+      $metadata = $item->getMetadata();
+      $datasource = $query->getIndex()->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
+      $item_id = ($entity_load_mode == 'local') ? $metadata['SEARCH_API_ID'][0] : $item->getUrl();
+      $result_item = $this->getFieldsHelper()->createItem($index, $item_id, $datasource);
+
+      if ($entity_load_mode == 'remote' && $mapped_entity = $this->entityMapper->map($metadata, $query)) {
+        $result_item->setOriginalObject($mapped_entity);
+      }
+
+      $results->addResultItem($result_item);
+    }
+  }
+
+  /**
+   * Handle facets.
+   *
+   * @param array $available_facets
+   *   The configured facets for the index.
+   * @param string $text
+   *   Fulltext keys to search.
+   * @param array $query_expression
+   *   Query conditions.
+   *
+   * @return array
+   *   Facets keyed by facet_id.
+   */
+  protected function getFacets(array $available_facets = [], string $text = NULL, array $query_expression = []) {
+    $facets = $response_facets = [];
+    $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression);
+
+    // Prepare response facets.
+    foreach ($europa_response->getFacets() as $facet) {
+      $facet_name = strtolower($facet->getRawName());
+      $response_facets[$facet_name] = $facet;
+    }
+
+    // Loop through available facets to build the ones with results.
+    foreach ($available_facets as $available_facet) {
+      $facet_name = $available_facet['field'];
+      if (!empty($response_facets[$facet_name])) {
+        $response_facet = $response_facets[$facet_name];
+        $facet_results = [];
+        foreach ($response_facet->getValues() as $value) {
+          $facet_results[] = [
+            'filter' => $value->getRawValue(),
+            'count' => $value->getCount(),
+          ];
+        }
+
+        $facets[$facet_name] = $facet_results;
+      }
+    }
+
+    return $facets;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedFeatures() {
+    $features = [
+      'search_api_facets',
+      'search_api_facets_operator_or',
+    ];
+
+    return $features;
   }
 
   /**

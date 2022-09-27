@@ -4,3 +4,13 @@ services:
     arguments: [ '@entity_type.manager' ]
     tags:
       - { name: 'event_subscriber' }
+  oe_search.metadata_mapping_event_subscriber:
+    class: Drupal\oe_search\EventSubscriber\MetadataMappingSubscriber
+    arguments: [ '@entity_type.manager' ]
+    tags:
+      - { name: 'event_subscriber' }
+  oe_search.query_expression_builder:
+    class: Drupal\oe_search\QueryExpressionBuilder
+  oe_search.entity_mapper:
+    class: Drupal\oe_search\EntityMapper
+    arguments: [ '@entity_type.manager', '@event_dispatcher']
