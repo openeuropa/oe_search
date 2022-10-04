@@ -62,21 +62,24 @@ class QueryExpressionBuilder {
       return $conditions[0];
     }
 
+    // Both conditions are empty.
+    if (empty($conditions) && empty($negated_conditions)) {
+      return [];
+    }
+
     // Support for negated conditions (must_not).
     if (!empty($negated_conditions)) {
-      return [
-        'bool' => [
-          'must_not' => $negated_conditions,
-        ],
-      ];
+      $query_conjunctions['must_not'] = $negated_conditions;
     }
 
     // Support for AND, OR.
-    $conjuction = ($query_conjunction == 'AND') ? 'must' : 'should';
+    if (!empty($conditions)) {
+      $conjuction = ($query_conjunction == 'AND') ? 'must' : 'should';
+      $query_conjunctions[$conjuction] = $conditions;
+    }
+
     return [
-      'bool' => [
-        $conjuction => $conditions,
-      ],
+      'bool' => $query_conjunctions,
     ];
   }
 
