@@ -9,6 +9,7 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Drupal\http_request_mock\ServiceMockPluginInterface;
 use Drupal\oe_search_mock\EuropaSearchMockEvent;
+use Drupal\oe_search_mock\EuropaSearchMockResponseEvent;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -111,6 +112,10 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         $response = $this->getDeleteResponse();
         break;
 
+      case EuropaSearchMockServerConfigOverrider::ENDPOINT_FACET:
+        $response = $this->getFacetsResponse();
+        break;
+
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_SEARCH:
         parse_str($request->getUri()->getQuery(), $parameters);
         $page_number = !empty($parameters['pageNumber']) ? (int) $parameters['pageNumber'] : NULL;
@@ -122,7 +127,9 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         break;
     }
 
-    return $response;
+    $event = new EuropaSearchMockResponseEvent($request, $response);
+    $this->eventDispatcher->dispatch(EuropaSearchMockResponseEvent::EUROPA_SEARCH_MOCK_RESPONSE_EVENT, $event);
+    return $event->getResponse();
   }
 
   /**
@@ -201,6 +208,16 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
    */
   protected function getDeleteResponse(): ResponseInterface {
     return new Response(200, [], $this->mockedResponses['delete_document_response'] ?? '{}');
+  }
+
+  /**
+   * Get mocked facets response.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The mocked response.
+   */
+  protected function getFacetsResponse(): ResponseInterface {
+    return new Response(200, [], $this->mockedResponses['facets_response'] ?? '{}');
   }
 
   /**
