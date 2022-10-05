@@ -458,7 +458,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     // Get text keys.
     $text = NULL;
     if (!empty($query->getKeys())) {
-      $text = $query->getKeys()[0];
+      $keys = $query->getKeys();
+      if (isset($keys['#conjunction'])) {
+        unset($keys['#conjunction']);
+      }
+      $text = "\"" . implode(" ", $keys) . "\"";
     }
 
     // Handle sorting.
@@ -501,6 +505,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
     foreach ($europa_response->getResults() as $item) {
       $metadata = $item->getMetadata();
+
+      if (empty($metadata['SEARCH_API_DATASOURCE'][0])) {
+        continue;
+      }
+
       $datasource = $query->getIndex()->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
       $item_id = ($entity_load_mode == 'local') ? $metadata['SEARCH_API_ID'][0] : $item->getUrl();
       $result_item = $this->getFieldsHelper()->createItem($index, $item_id, $datasource);
