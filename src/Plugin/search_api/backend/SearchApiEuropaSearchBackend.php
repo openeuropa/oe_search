@@ -488,7 +488,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
     // Handle facets.
     if ($available_facets = $query->getOption('search_api_facets')) {
-      $facets = $this->getFacets($available_facets, $text, $query_expression);
+      $facets = $this->getFacets($available_facets, $text, $query, $query_expression);
       $results->setExtraData('search_api_facets', $facets);
     }
 
@@ -527,17 +527,20 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *
    * @param array $available_facets
    *   The configured facets for the index.
-   * @param string $text
+   * @param string|null $text
    *   Fulltext keys to search.
+   * @param \Drupal\search_api\Query\QueryInterface $query
+   *   The query.
    * @param array $query_expression
    *   Query conditions.
    *
    * @return array
    *   Facets keyed by facet_id.
    */
-  protected function getFacets(array $available_facets = [], string $text = NULL, array $query_expression = []) {
+  protected function getFacets(array $available_facets = [], string $text = NULL, QueryInterface $query, array $query_expression = []) {
     $facets = $response_facets = [];
     $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression);
+    $fields = $query->getIndex()->getFields();
 
     // Prepare response facets.
     foreach ($europa_response->getFacets() as $facet) {
@@ -552,8 +555,14 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         $response_facet = $response_facets[$facet_name];
         $facet_results = [];
         foreach ($response_facet->getValues() as $value) {
+          $filter = $value->getRawValue();
+          // Convert boolean values.
+          if (!empty($fields[$facet_name]) && $fields[$facet_name]->getType() == 'boolean') {
+            $filter = $value->getRawValue() === 'true' ? 1 : 0;
+          }
+
           $facet_results[] = [
-            'filter' => $value->getRawValue(),
+            'filter' => '"' . $filter . '"',
             'count' => $value->getCount(),
           ];
         }
