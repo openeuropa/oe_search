@@ -22,6 +22,7 @@ use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
+use Drupal\search_api\Query\ConditionGroup;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
@@ -486,12 +487,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     // Prepares query expression.
     $query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
 
-    // Handle facets.
-    if ($available_facets = $query->getOption('search_api_facets')) {
-      $facets = $this->getFacets($available_facets, $text, $query, $query_expression);
-      $results->setExtraData('search_api_facets', $facets);
-    }
-
     // Execute search.
     try {
       $europa_response = $this->getClient()->search($text, NULL, $query_expression, $sort_field, $sort_order, $page_number);
@@ -502,6 +497,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     $results->setResultCount($europa_response->getTotalResults());
+
+    // Handle facets.
+    // Only needed in case there are results.
+    if ($results->getResultCount() && $available_facets = $query->getOption('search_api_facets')) {
+      $facets = $this->getFacets($available_facets, $text, $query);
+      $results->setExtraData('search_api_facets', $facets);
+    }
 
     foreach ($europa_response->getResults() as $item) {
       $metadata = $item->getMetadata();
@@ -531,28 +533,61 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   Fulltext keys to search.
    * @param \Drupal\search_api\Query\QueryInterface $query
    *   The query.
-   * @param array $query_expression
-   *   Query conditions.
    *
    * @return array
    *   Facets keyed by facet_id.
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+   * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  protected function getFacets(array $available_facets = [], string $text = NULL, QueryInterface $query, array $query_expression = []) {
-    $facets = $response_facets = [];
-    $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression);
+  protected function getFacets(array $available_facets = [], string $text = NULL, QueryInterface $query) {
+    $facets = $response_facets = $or_response_facets = [];
+    $query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
+    // Used for or facets.
+    $or_query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query, TRUE);
     $fields = $query->getIndex()->getFields();
+
+    // Find which facets are OR facets.
+    // We need this to support all results in OR facets when they
+    // have active results.
+    $or_facets = [];
+    foreach ($query->getConditionGroup()->getConditions() as $condition) {
+      if (!$condition instanceof ConditionGroup || $condition->getConjunction() != 'OR') {
+        continue;
+      }
+
+      $tags = $condition->getTags();
+      foreach ($tags as $tag) {
+        if (strpos($tag, 'facet:') === 0) {
+          $facet_name = explode(':', $tag)[1];
+          $or_facets[$facet_name] = $facet_name;
+        }
+      }
+    }
+
+    $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression);
 
     // Prepare response facets.
     foreach ($europa_response->getFacets() as $facet) {
       $facet_name = strtolower($facet->getRawName());
-      $response_facets[$facet_name] = $facet;
+      $response_facets[$facet_name] = $or_response_facets[$facet_name] = $facet;
+    }
+
+    // Prepare OR response facets.
+    // We only need to do this in the presence of active OR facets.
+    if (count($or_facets) == 1) {
+      $or_europa_response = $this->getClient()->getFacets($text, NULL, NULL, $or_query_expression);
+      foreach ($or_europa_response->getFacets() as $facet) {
+        $facet_name = strtolower($facet->getRawName());
+        $or_response_facets[$facet_name] = $facet;
+      }
     }
 
     // Loop through available facets to build the ones with results.
     foreach ($available_facets as $available_facet) {
       $facet_name = $available_facet['field'];
       if (!empty($response_facets[$facet_name])) {
-        $response_facet = $response_facets[$facet_name];
+        $response_facet = !empty($or_facets[$facet_name]) ? $or_response_facets[$facet_name] : $response_facets[$facet_name];
         $facet_results = [];
         foreach ($response_facet->getValues() as $value) {
           $filter = $value->getRawValue();

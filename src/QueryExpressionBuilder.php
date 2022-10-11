@@ -20,6 +20,8 @@ class QueryExpressionBuilder {
    *   The condition group.
    * @param \Drupal\search_api\Query\Query $query
    *   The original query.
+   * @param bool $exclude_or
+   *   Whether to exclude or conditions (used for facets).
    *
    * @return array
    *   The condition group to be used in ES.
@@ -27,13 +29,25 @@ class QueryExpressionBuilder {
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  public function prepareConditionGroup(ConditionGroup $conditionGroup, Query $query) : array {
+  public function prepareConditionGroup(ConditionGroup $conditionGroup, Query $query, $exclude_or = FALSE) : array {
     $query_conjunction = $conditionGroup->getConjunction();
     $conditions = $negated_conditions = $return = [];
     $query_conditions = $conditionGroup->getConditions();
 
     if (empty($query_conjunction)) {
       return $conditions;
+    }
+
+    // We exclude conditions which are prepared for facets.
+    // These conditions should not be applied in case of OR facets.
+    // They are identified with the presence of the tag.
+    if ($exclude_or && !empty($conditionGroup->getTags())) {
+      $tags = $conditionGroup->getTags();
+      foreach ($tags as $tag) {
+        if (strpos($tag, 'facet:') === 0) {
+          return $conditions;
+        }
+      }
     }
 
     // Loop through the conditions.
@@ -53,7 +67,10 @@ class QueryExpressionBuilder {
       }
       // Recursively handle condition.
       elseif ($condition instanceof ConditionGroup) {
-        $conditions[] = $this->prepareConditionGroup($condition, $query);
+        $prepared_condition = $this->prepareConditionGroup($condition, $query, $exclude_or);
+        if (!empty($prepared_condition)) {
+          $conditions[] = $prepared_condition;
+        }
       }
     }
 
