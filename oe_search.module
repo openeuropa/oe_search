@@ -129,3 +129,12 @@ function _oe_search_get_europa_servers() {
   }
   return $valid_options;
 }
+
+/**
+ * Implements hook_facets_search_api_query_type_mapping_alter().
+ */
+function oe_search_facets_search_api_query_type_mapping_alter($backend_plugin_id, array &$query_types) {
+  if ($backend_plugin_id == 'search_api_europa_search') {
+    $query_types['string'] = 'europa_search_api_string';
+  }
+}

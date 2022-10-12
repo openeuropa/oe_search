@@ -53,7 +53,7 @@ class QueryExpressionBuilder {
     // Loop through the conditions.
     foreach ($query_conditions as $condition) {
       if ($condition instanceof Condition) {
-        if (empty($condition->getValue())) {
+        if (empty($condition->getField())) {
           continue;
         }
         $europa_condition = $this->prepareCondition($condition, $query);

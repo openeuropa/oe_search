@@ -501,7 +501,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     // Handle facets.
     // Only needed in case there are results.
     if ($results->getResultCount() && $available_facets = $query->getOption('search_api_facets')) {
-      $facets = $this->getFacets($available_facets, $text, $query);
+      $facets = $this->getFacets($query, $available_facets, $text);
       $results->setExtraData('search_api_facets', $facets);
     }
 
@@ -527,12 +527,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   /**
    * Handle facets.
    *
+   * @param \Drupal\search_api\Query\QueryInterface $query
+   *   The query.
    * @param array $available_facets
    *   The configured facets for the index.
    * @param string|null $text
    *   Fulltext keys to search.
-   * @param \Drupal\search_api\Query\QueryInterface $query
-   *   The query.
    *
    * @return array
    *   Facets keyed by facet_id.
@@ -540,12 +540,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  protected function getFacets(array $available_facets = [], string $text = NULL, QueryInterface $query) {
+  protected function getFacets(QueryInterface $query, array $available_facets = [], string $text = NULL) {
     $facets = $response_facets = $or_response_facets = [];
     $query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
     // Used for or facets.
     $or_query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query, TRUE);
-    $fields = $query->getIndex()->getFields();
 
     // Find which facets are OR facets.
     // We need this to support all results in OR facets when they
@@ -565,7 +564,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       }
     }
 
-    $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression);
+    try {
+      $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression);
+    }
+    catch (\Exception $e) {
+      $this->getLogger()->error($e->getMessage());
+      return $facets;
+    }
 
     // Prepare response facets.
     foreach ($europa_response->getFacets() as $facet) {
@@ -576,7 +581,14 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     // Prepare OR response facets.
     // We only need to do this in the presence of active OR facets.
     if (count($or_facets) == 1) {
-      $or_europa_response = $this->getClient()->getFacets($text, NULL, NULL, $or_query_expression);
+      try {
+        $or_europa_response = $this->getClient()->getFacets($text, NULL, NULL, $or_query_expression);
+      }
+      catch (\Exception $e) {
+        $this->getLogger()->error($e->getMessage());
+        return $facets;
+      }
+
       foreach ($or_europa_response->getFacets() as $facet) {
         $facet_name = strtolower($facet->getRawName());
         $or_response_facets[$facet_name] = $facet;
@@ -591,11 +603,6 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         $facet_results = [];
         foreach ($response_facet->getValues() as $value) {
           $filter = $value->getRawValue();
-          // Convert boolean values.
-          if (!empty($fields[$facet_name]) && $fields[$facet_name]->getType() == 'boolean') {
-            $filter = $value->getRawValue() === 'true' ? 1 : 0;
-          }
-
           $facet_results[] = [
             'filter' => '"' . $filter . '"',
             'count' => $value->getCount(),

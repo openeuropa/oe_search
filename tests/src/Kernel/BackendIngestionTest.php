@@ -27,7 +27,7 @@ use Psr\Http\Message\RequestInterface;
  * @coversDefaultClass \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend
  * @group oe_search
  */
-class BackendTest extends KernelTestBase {
+class BackendIngestionTest extends KernelTestBase {
 
   use ExampleContentTrait;
   use AssertTestRequestTrait;
