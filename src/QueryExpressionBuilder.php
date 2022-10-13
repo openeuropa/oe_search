@@ -125,6 +125,16 @@ class QueryExpressionBuilder {
     elseif ($condition->getOperator() == '<=') {
       return ['range' => [$field => ['lte' => $condition->getValue()]]];
     }
+    elseif ($condition->getOperator() == 'BETWEEN') {
+      return [
+        'range' => [
+          $field => [
+            'gte' => $condition->getValue()[0],
+            'lte' => $condition->getValue()[1],
+          ],
+        ],
+      ];
+    }
     elseif ($condition->getOperator() == 'IN') {
       return ['terms' => [$field => array_values($condition->getValue())]];
     }
