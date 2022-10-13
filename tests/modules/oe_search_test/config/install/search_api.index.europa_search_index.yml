@@ -6,6 +6,9 @@ dependencies:
     - search_api
   config:
     - search_api.server.europa_search_server
+third_party_settings:
+  oe_search:
+    europa_search_entity_mode: remote
 id: europa_search_index
 name: 'Europa search index'
 description: 'Test index.'

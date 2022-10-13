@@ -61,6 +61,7 @@ class QueryBuilderTest extends KernelTestBase {
     'media',
     'image',
     'file',
+    'views',
   ];
 
   /**
@@ -79,8 +80,10 @@ class QueryBuilderTest extends KernelTestBase {
     $this->installEntitySchema('search_api_task');
     $this->installConfig([
       'search_api',
+      'system',
       'oe_search',
       'oe_search_test',
+      'views',
     ]);
 
     $this->queryBuilder = $this->container->get('oe_search.query_expression_builder');
