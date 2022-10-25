@@ -9,8 +9,10 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Utility\Error;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Drupal\oe_search\IngestionDocument;
 use Drupal\oe_search\Utility;
@@ -178,7 +180,16 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * {@inheritdoc}
    */
   public function isAvailable(): bool {
-    $info = $this->getClient()->getInfo();
+    try {
+      $info = $this->getClient()->getInfo();
+    }
+    catch (\Throwable $e) {
+      // If this fails for any reason, we log it without making the
+      // application fail.
+      $variables = Error::decodeException($e);
+      $this->getLogger()->log(RfcLogLevel::ERROR, '%type: @message in %function (line %line of %file).', $variables);
+    }
+
     return !empty($info);
   }
 
