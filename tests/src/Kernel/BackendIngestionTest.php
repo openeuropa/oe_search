@@ -278,15 +278,13 @@ class BackendIngestionTest extends KernelTestBase {
   public function testDeleteAllIndexItems(): void {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
     $this->backend->deleteAllIndexItems($this->index);
-    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 5, 5);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 15, 15);
     // Compare sent data with received data.
     $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
-    $this->assertCount(5, $requests);
-    $this->assertDeletedItem($requests[0], 1);
-    $this->assertDeletedItem($requests[1], 2);
-    $this->assertDeletedItem($requests[2], 3);
-    $this->assertDeletedItem($requests[3], 4);
-    $this->assertDeletedItem($requests[4], 5);
+    $this->assertCount(15, $requests);
+    for ($i = 1; $i <= 5; $i++) {
+      $this->assertDeletedItem($requests[$i - 1], $i);
+    }
   }
 
   /**

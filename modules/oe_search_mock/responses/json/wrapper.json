@@ -1,0 +1,17 @@
+{
+  "apiVersion": "2.91",
+  "terms": "",
+  "responseTime": 68,
+  "totalResults": 12,
+  "pageNumber": 1,
+  "pageSize": 10,
+  "sort": "",
+  "groupByField": null,
+  "queryLanguage": {
+    "language": "en",
+    "probability": 0.0
+  },
+  "spellingSuggestion": "",
+  "bestBets": [],
+  "results": [],
+  "warnings": []
