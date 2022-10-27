@@ -29,7 +29,7 @@ class EuropaSearchFixturesGenerator {
     ];
     $entities[2] = [
       'name' => 'item 2',
-      'body' => 'bar test casE',
+      'body' => 'barista test casE',
       'type' => 'item',
       'language' => 'en',
       'keywords' => ['orange', 'apple', 'grape'],
@@ -37,7 +37,7 @@ class EuropaSearchFixturesGenerator {
     ];
     $entities[3] = [
       'name' => 'item 3',
-      'body' => 'bar test casE',
+      'body' => 'barista test casE',
       'type' => 'item',
       'language' => 'en',
       'keywords' => ['orange', 'apple', 'grape'],
@@ -204,14 +204,48 @@ class EuropaSearchFixturesGenerator {
       /*
        * Queries items, no filters.
        */
+      // Used for deleteItems() test, all items, no pagination.
+      // Used for search view, no contextual filters, page 1.
       case '521068af216646bdd2338ecf7f7b0db9':
-        $entities = static::filterEntities();
+      case '22718631383982236b8f3940b7167c9a':
+        $entities = static::filterEntities([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         $json['results'] = $entities;
+        $json['totalResults'] = 15;
+        break;
 
-        return json_encode($json);
+      // Used for search view, no contextual filters, page 2.
+      case '293cdb5d284b50bb29302f205fee2f24':
+      case '422d0b6d241e9e08f0c1763e53dde6d9':
+        $entities = static::filterEntities([11, 12, 13, 14, 15]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 15;
+        break;
+
+      // Filter by type = item.
+      case 'b7f732953e01d78a89936317e08779e3':
+      case '2c03c8d35e13b542e1d21aa5801f7a41':
+        $entities = static::filterEntities([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 10;
+        break;
+
+      // Filter by type = article.
+      case '760af89bb2eead3c40e789818dde8bec':
+        $entities = static::filterEntities([11, 12, 13, 14, 15]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 5;
+        break;
+
+      // Filter by text = barista.
+      case 'ef178f7bcda0e0d0b286bcff9b1cf581':
+        $entities = static::filterEntities([2, 3]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 2;
+        break;
+
     }
 
-    return file_get_contents($path . '/empty.json');
+    return json_encode($json);
   }
 
   /**
@@ -227,7 +261,7 @@ class EuropaSearchFixturesGenerator {
     $entities = static::getEntities();
     if (!empty($ids)) {
       $entities = array_filter($entities, function ($entity, $id) use ($ids) {
-        return in_array($entity['id'], $ids);
+        return in_array($id, $ids);
       }, ARRAY_FILTER_USE_BOTH);
     }
 

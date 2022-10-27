@@ -6,9 +6,6 @@ dependencies:
     - search_api
   config:
     - search_api.server.europa_search_server
-third_party_settings:
-  oe_search:
-    europa_search_entity_mode: remote
 id: europa_search_index
 name: 'Europa search index'
 description: 'Test index.'
@@ -19,22 +16,42 @@ field_settings:
     type: integer
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: id
+    dependencies:
+      module:
+        - entity_test
   name:
     label: Name
     type: text
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: name
     boost: 5.0
+    dependencies:
+      module:
+        - entity_test
   created:
     label: Authored on
     type: date
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: created
+    dependencies:
+      module:
+        - entity_test
   body:
     label: Body
     type: text
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: body
+    dependencies:
+      module:
+        - entity_test
+  type:
+    label: 'Test entity - revisions and data table bundle'
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - entity_test
 datasource_settings:
   'entity:entity_test_mulrev_changed': {  }
   'entity:media': { }

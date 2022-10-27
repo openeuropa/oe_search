@@ -2,7 +2,7 @@
   "apiVersion": "2.91",
   "terms": "",
   "responseTime": 68,
-  "totalResults": 12,
+  "totalResults": 0,
   "pageNumber": 1,
   "pageSize": 10,
   "sort": "",
@@ -15,3 +15,4 @@
   "bestBets": [],
   "results": [],
   "warnings": []
+}

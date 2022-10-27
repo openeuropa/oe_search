@@ -319,6 +319,7 @@ class BackendIngestionTest extends KernelTestBase {
       'id' => [$id],
       'name' => [$entity->label()],
       'created' => [$item->getField('created')->getValues()['0'] * 1000],
+      'type' => [$entity->bundle()],
     ]);
 
     $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
