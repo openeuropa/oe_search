@@ -1,11 +1,20 @@
 # Changelog
 
-## [2.0.0-alpha3](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha3) (2022-07-29)
+## [2.0.0-alpha4](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha4) (2022-11-04)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha3...2.0.0-alpha4)
+
+**Merged pull requests:**
+
+- EWPP-2437: Ensure search api backend pages won't crash. [\#78](https://github.com/openeuropa/oe_search/pull/78) ([nagyad](https://github.com/nagyad))
+
+## [2.0.0-alpha3](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha3) (2022-08-02)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha2...2.0.0-alpha3)
 
 **Merged pull requests:**
 
+- Prepare release 2.0.0-alpha3. [\#76](https://github.com/openeuropa/oe_search/pull/76) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-2375: Add Luxembourgish string translation. [\#75](https://github.com/openeuropa/oe_search/pull/75) ([22Alexandra](https://github.com/22Alexandra))
 - EWPP-2358: Drupal 9.4 support for branch 2.x [\#74](https://github.com/openeuropa/oe_search/pull/74) ([yenyasinn](https://github.com/yenyasinn))
 
