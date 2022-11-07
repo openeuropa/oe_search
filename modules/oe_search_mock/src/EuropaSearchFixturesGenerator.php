@@ -5,12 +5,13 @@ declare(strict_types = 1);
 namespace Drupal\oe_search_mock;
 
 use Drupal\oe_search\Utility;
-use Drupal\oe_search_mock\Plugin\ServiceMock\EuropaSearchServer;
 
 /**
  * Generates ES search responses.
  */
 class EuropaSearchFixturesGenerator {
+
+  use EuropaSearchMockTrait;
 
   /**
    * Return an array of entities.
@@ -158,7 +159,7 @@ class EuropaSearchFixturesGenerator {
       return file_get_contents($path . '/empty.json');
     }
 
-    $info = EuropaSearchServer::getMockInfoFromFilters($filters);
+    $info = static::getMockInfoFromFilters($filters);
     if (!$info) {
       return file_get_contents($path . '/empty.json');
     }

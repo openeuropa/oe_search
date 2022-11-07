@@ -9,11 +9,10 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Drupal\http_request_mock\ServiceMockPluginInterface;
-use Drupal\oe_search_mock\EuropaSearchFixturesGenerator;
 use Drupal\oe_search_mock\EuropaSearchMockEvent;
 use Drupal\oe_search_mock\EuropaSearchMockResponseEvent;
+use Drupal\oe_search_mock\EuropaSearchMockTrait;
 use GuzzleHttp\Psr7\Response;
-use OpenEuropa\Tests\EuropaSearchClient\Traits\AssertTestRequestTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterface, ContainerFactoryPluginInterface {
 
-  use AssertTestRequestTrait;
+  use EuropaSearchMockTrait;
 
   /**
    * The event dispatcher service.
@@ -131,12 +130,6 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         $response = $this->getFacetsResponse();
         break;
 
-      case EuropaSearchMockServerConfigOverrider::ENDPOINT_SEARCH:
-        $filters = $this->getFiltersFromRequest($request);
-        $json = EuropaSearchFixturesGenerator::getSearchJson($filters);
-        $response = new Response(200, [], $json);
-        break;
-
       default:
         $response = new Response(200, [], 'Mocking example.com response');
         break;
@@ -145,101 +138,6 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
     $event = new EuropaSearchMockResponseEvent($request, $response);
     $this->eventDispatcher->dispatch(EuropaSearchMockResponseEvent::EUROPA_SEARCH_MOCK_RESPONSE_EVENT, $event);
     return $event->getResponse();
-  }
-
-  /**
-   * Returns the request filters.
-   *
-   * @param \Psr\Http\Message\RequestInterface $request
-   *   The request.
-   *
-   * @return array
-   *   The filters.
-   *
-   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-   * @SuppressWarnings(PHPMD.NPathComplexity)
-   */
-  public function getFiltersFromRequest(RequestInterface $request): array {
-    $request->getBody()->rewind();
-    $boundary = $this->getRequestBoundary($request);
-    if (!$boundary) {
-      return [];
-    }
-    $request_parts = $this->getRequestMultipartStreamResources($request, $boundary);
-    $request->getBody()->rewind();
-    $search_parts = explode("\r\n", $request_parts[0]);
-    $sort_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
-    $query_parameters = json_decode($search_parts[5], TRUE);
-    if (!$query_parameters || !isset($query_parameters['bool']['must'])) {
-      return [];
-    }
-
-    // Prepare the filters.
-    $filters = [];
-    foreach ($query_parameters['bool']['must'] as $key => $param) {
-      if (isset($param['term'])) {
-        $filters[key($param['term'])] = reset($param['term']);
-      }
-      if (isset($param['terms'])) {
-        $filters += $param['terms'];
-      }
-      if (isset($param['range'])) {
-        $filters[key($param['range'])] = reset($param['range']);
-      }
-    }
-    parse_str($request->getUri()->getQuery(), $url_query_parameters);
-    if (isset($url_query_parameters['text'])) {
-      $filters['TEXT'] = $url_query_parameters['text'];
-    }
-    if (isset($url_query_parameters['pageNumber'])) {
-      $filters['PAGE'] = $url_query_parameters['pageNumber'];
-    }
-
-    if ($sort_parts) {
-      $sorts = json_decode($sort_parts[5], TRUE);
-      $filters['sort'] = $sorts;
-    }
-
-    $unset = [
-      'SEARCH_API_SITE_HASH',
-      'SEARCH_API_INDEX_ID',
-    ];
-
-    foreach ($unset as $field) {
-      if (isset($filters[$field])) {
-        unset($filters[$field]);
-      }
-    }
-
-    asort($filters);
-
-    return $filters;
-  }
-
-  /**
-   * Returns the basic info for the mock given the filters.
-   *
-   * Returns a generated ID based on the filters and the entity type and bundle
-   * of the request.
-   *
-   * @param array $filters
-   *   The filters.
-   *
-   * @return array
-   *   The info.
-   */
-  public static function getMockInfoFromFilters(array $filters): array {
-    $scenario_id = md5(serialize($filters));
-
-    $entity_type = explode(':', $filters['SEARCH_API_DATASOURCE'] ?? 'entity:node');
-    $entity_type = $entity_type[1];
-    $bundle = $filters['TYPE'] ?? NULL;
-
-    return [
-      'id' => $scenario_id,
-      'entity_type' => $entity_type,
-      'bundle' => $bundle,
-    ];
   }
 
   /**
