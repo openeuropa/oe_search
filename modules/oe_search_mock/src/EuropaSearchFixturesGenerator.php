@@ -141,6 +141,49 @@ class EuropaSearchFixturesGenerator {
       'category' => 'item_category',
     ];
 
+    $entities[16] = [
+      'name' => 'Remote article',
+      'body' => 'bar article',
+      'type' => 'article',
+      'language' => 'en',
+      'keywords' => ['orange', 'apple', 'grape'],
+      'highlighted' => 'true',
+      'publication_date' => '2022-01-03T13:00:00.000+0100',
+      'cron_time' => '2032-10-10T15:41:05.000+0200',
+    ];
+
+    $entities[17] = [
+      'name' => 'remote item',
+      'body' => 'bar iteM',
+      'type' => 'item',
+      'language' => 'en',
+      'highlighted' => 'false',
+      'publication_date' => '2022-05-03T13:00:00.000+0100',
+      'cron_time' => '2022-10-10T15:41:05.000+0200',
+    ];
+
+    $entities[18] = [
+      'name' => 'Remote article 2',
+      'body' => 'bar article 2. remote barista.',
+      'type' => 'article',
+      'language' => 'en',
+      'keywords' => ['apple', 'grape'],
+      'highlighted' => 'false',
+      'publication_date' => '2024-01-03T13:00:00.000+0100',
+      'cron_time' => '2034-10-10T15:41:05.000+0200',
+    ];
+
+    $entities[19] = [
+      'name' => 'remote item2',
+      'body' => 'bar iteM2. remote barista.',
+      'type' => 'item',
+      'language' => 'en',
+      'highlighted' => 'true',
+      'keywords' => ['grape', 'pineapple'],
+      'publication_date' => '2024-05-03T13:00:00.000+0100',
+      'cron_time' => '2024-10-10T15:41:05.000+0200',
+    ];
+
     return $entities;
   }
 
@@ -166,7 +209,7 @@ class EuropaSearchFixturesGenerator {
 
     $id = $info['id'];
     $entity_type = $info['entity_type'];
-    $bundle = $info['bundle'];
+    $bundle = $info['bundle'] ?? '';
 
     return static::buildScenario($id, $filters, $entity_type, $bundle);
   }
@@ -189,7 +232,7 @@ class EuropaSearchFixturesGenerator {
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  protected static function buildScenario(string $scenario_id, array $filters, string $entity_type, $bundle = ''): string {
+  protected static function buildScenario(string $scenario_id, array $filters, string $entity_type, string $bundle = ''): string {
     $path = static::getFixturesBasePath();
     $language = $filters['LANGUAGE_WITH_FALLBACK'] ?? 'en';
 
@@ -209,6 +252,13 @@ class EuropaSearchFixturesGenerator {
       // Used for search view, no contextual filters, page 1.
       case '521068af216646bdd2338ecf7f7b0db9':
       case '22718631383982236b8f3940b7167c9a':
+        $entities = static::filterEntities([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 15;
+        break;
+
+      // All entities. No filters.
+      case '1cc193e0d8cb8cc5cd1423f032453ea0':
         $entities = static::filterEntities([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         $json['results'] = $entities;
         $json['totalResults'] = 15;
@@ -238,12 +288,46 @@ class EuropaSearchFixturesGenerator {
         break;
 
       // Filter by text = barista.
-      case 'ef178f7bcda0e0d0b286bcff9b1cf581':
+      case '8d57bb64c43dfec6266ae3b5f58fae5c':
         $entities = static::filterEntities([2, 3]);
         $json['results'] = $entities;
         $json['totalResults'] = 2;
         break;
 
+      // Filter by type item, page 1.
+      case '55b66d3c554b10ea6266b4398dd5a872':
+        $entities = static::filterEntities([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 12;
+        break;
+
+      // Filter by type item, page 2.
+      case '8cf0d00d710f647afb004c0d5fb6c695':
+        $entities = static::filterEntities([17, 19]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 12;
+        break;
+
+      // Filter by type article, remote.
+      case 'dfc89f7298b9febe2ba79b0da58aff39':
+        $entities = static::filterEntities([11, 12, 13, 14, 15, 16, 18]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 7;
+        break;
+
+      // Filter by text, remote barista, no filters.
+      case '24ae3b1985eb241a688ca6afb28a4b9e':
+        $entities = static::filterEntities([18, 19]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 2;
+        break;
+
+      // Filter by type item, keywords pineapple.
+      case 'd7af151c74fbe829da9e6f80ccd2211f':
+        $entities = static::filterEntities([19]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 1;
+        break;
     }
 
     return json_encode($json);
@@ -293,13 +377,20 @@ class EuropaSearchFixturesGenerator {
       $entity->database = 'OE_SEARCH_DEMO';
       $entity->content = "xxxxx";
       $entity->metadata = [
-        'title' => [$result['name']],
-        'type' => [$result['type']],
+        'NAME' => [$result['name']],
+        'TYPE' => [$result['type']],
+        'BODY' => [$result['body']],
+        'LANGUAGE' => [$result['language']],
+        'KEYWORDS' => [$result['keywords'] ?? ''],
+        'CATEGORY' => [$result['category'] ?? ''],
+        'HIGHLIGHTED' => [$result['highlighted'] ?? ''],
+        'PUBLICATION_DATE' => [$result['publication_date'] ?? ''],
+        'CRON_TIME' => [$result['cron_time'] ?? ''],
         'SEARCH_API_ID' => ['entity:entity_test_mulrev_changed' . '/' . $id . ':' . $language],
         'SEARCH_API_DATASOURCE' => ['entity:entity_test_mulrev_changed'],
         'SEARCH_API_LANGUAGE' => [$language],
       ];
-      // $entity->metadata += $extra_metadata;
+
       $entity->children = [];
       $json_entities[] = $entity;
     }

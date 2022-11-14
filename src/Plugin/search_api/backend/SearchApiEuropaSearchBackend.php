@@ -447,7 +447,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   public function search(QueryInterface $query): void {
     $results = $query->getResults();
-    $page_number = NULL;
+    $page_number = $limit = NULL;
 
     // Set page number.
     if (!empty($query->getOptions()['offset']) && !empty($query->getOptions()['limit'])) {
@@ -489,7 +489,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
     // Execute search.
     try {
-      $europa_response = $this->getClient()->search($text, NULL, $query_expression, $sort_field, $sort_order, $page_number);
+      $europa_response = $this->getClient()->search($text, NULL, $query_expression, $sort_field, $sort_order, $page_number, $limit);
     }
     catch (\Exception $e) {
       $this->getLogger()->error($e->getMessage());

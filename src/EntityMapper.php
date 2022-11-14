@@ -87,11 +87,11 @@ class EntityMapper {
       if (!empty($metadata[$metadata_key][0])) {
         $entity_values[$field->getOriginalFieldIdentifier()] = $metadata[$metadata_key][0];
       }
-
-      $event = new MetadataMappingEvent($query, $metadata, $metadata_key, $field, $entity_values);
-      $this->eventDispatcher->dispatch($event, MetadataMappingEvent::class);
-      $entity_values = $event->getValues();
     }
+
+    $event = new MetadataMappingEvent($query, $metadata, $index_fields, $entity_values);
+    $this->eventDispatcher->dispatch($event, MetadataMappingEvent::class);
+    $entity_values = $event->getValues();
 
     // We want to be able to call getUrl() on the entity, so we set a fake id.
     $entity_values[$entity_id_key] = PHP_INT_MAX;

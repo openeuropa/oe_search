@@ -61,37 +61,45 @@ trait EuropaSearchMockTrait {
   public function getFiltersFromRequest(RequestInterface $request): array {
     $request->getBody()->rewind();
     $boundary = $this->getRequestBoundary($request);
-    if (!$boundary) {
-      return [];
-    }
-    $request_parts = $this->getRequestMultipartStreamResources($request, $boundary);
-    $request->getBody()->rewind();
-    $search_parts = explode("\r\n", $request_parts[0]);
-    $sort_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
-    $query_parameters = json_decode($search_parts[5], TRUE);
-    if (!$query_parameters || !isset($query_parameters['bool']['must'])) {
-      return [];
+    $filters = $sort_parts = [];
+    if (!empty($boundary)) {
+      $request_parts = $this->getRequestMultipartStreamResources($request, $boundary);
+      $request->getBody()->rewind();
+      $search_parts = explode("\r\n", $request_parts[0]);
+      $sort_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
+      $query_parameters = json_decode($search_parts[5], TRUE);
+      // Single term conversion.
+      if (!empty($query_parameters) && empty($query_parameters['bool']) && !empty($query_parameters['term'])) {
+        $query_parameters = ['bool' => ['must' => [$query_parameters]]];
+      }
+
+      if (!$query_parameters || !isset($query_parameters['bool']['must'])) {
+        return [];
+      }
+
+      // Prepare the filters.
+      foreach ($query_parameters['bool']['must'] as $key => $param) {
+        if (isset($param['term'])) {
+          $filters[key($param['term'])] = reset($param['term']);
+        }
+        if (isset($param['terms'])) {
+          $filters += $param['terms'];
+        }
+        if (isset($param['range'])) {
+          $filters[key($param['range'])] = reset($param['range']);
+        }
+      }
     }
 
-    // Prepare the filters.
-    $filters = [];
-    foreach ($query_parameters['bool']['must'] as $key => $param) {
-      if (isset($param['term'])) {
-        $filters[key($param['term'])] = reset($param['term']);
-      }
-      if (isset($param['terms'])) {
-        $filters += $param['terms'];
-      }
-      if (isset($param['range'])) {
-        $filters[key($param['range'])] = reset($param['range']);
-      }
-    }
     parse_str($request->getUri()->getQuery(), $url_query_parameters);
     if (isset($url_query_parameters['text'])) {
       $filters['TEXT'] = $url_query_parameters['text'];
     }
     if (isset($url_query_parameters['pageNumber'])) {
       $filters['PAGE'] = $url_query_parameters['pageNumber'];
+    }
+    if (isset($url_query_parameters['pageSize']) && $url_query_parameters['pageSize'] !== "10") {
+      $filters['page_size'] = $url_query_parameters['pageSize'];
     }
 
     if ($sort_parts) {

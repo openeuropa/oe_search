@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\oe_search\Event;
 
-use Drupal\search_api\Item\Field;
 use Drupal\search_api\Query\Query;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -24,18 +23,11 @@ class MetadataMappingEvent extends Event {
   protected $metadata;
 
   /**
-   * The metadata key.
+   * The index fields.
    *
-   * @var string
+   * @var array
    */
-  protected $metadataKey;
-
-  /**
-   * The field.
-   *
-   * @var Drupal\search_api\Item\Field
-   */
-  protected $field;
+  protected $indexFields;
 
   /**
    * The values already mapped.
@@ -58,18 +50,15 @@ class MetadataMappingEvent extends Event {
    *   The query.
    * @param array $metadata
    *   The metadata array.
-   * @param string $metadata_key
-   *   The metadata key.
-   * @param \Drupal\search_api\Item\Field $field
-   *   The search api field.
+   * @param array $index_fields
+   *   The index fields.
    * @param array $values
    *   The mapped values.
    */
-  public function __construct(Query $query, array $metadata, string $metadata_key, Field $field, array $values) {
+  public function __construct(Query $query, array $metadata, array $index_fields, array $values) {
     $this->query = $query;
     $this->metadata = $metadata;
-    $this->metadataKey = $metadata_key;
-    $this->field = $field;
+    $this->indexFields = $index_fields;
     $this->values = $values;
   }
 
@@ -91,46 +80,6 @@ class MetadataMappingEvent extends Event {
    */
   public function setMetadata(array $metadata): void {
     $this->metadata = $metadata;
-  }
-
-  /**
-   * Get the metadata key.
-   *
-   * @return string
-   *   The metadata key.
-   */
-  public function getMetadataKey(): string {
-    return $this->metadataKey;
-  }
-
-  /**
-   * Set the metadata key.
-   *
-   * @param string $metadataKey
-   *   The metadata key.
-   */
-  public function setMetadataKey(string $metadataKey): void {
-    $this->metadataKey = $metadataKey;
-  }
-
-  /**
-   * Get the field.
-   *
-   * @return \Drupal\search_api\Item\Field
-   *   The field.
-   */
-  public function getField(): Field {
-    return $this->field;
-  }
-
-  /**
-   * Set the field.
-   *
-   * @param \Drupal\search_api\Item\Field $field
-   *   The field.
-   */
-  public function setField(Field $field): void {
-    $this->field = $field;
   }
 
   /**
@@ -171,6 +120,26 @@ class MetadataMappingEvent extends Event {
    */
   public function setQuery(Query $query): void {
     $this->query = $query;
+  }
+
+  /**
+   * Get the index fields.
+   *
+   * @return array
+   *   The index fields.
+   */
+  public function getIndexFields(): array {
+    return $this->indexFields;
+  }
+
+  /**
+   * Sets the index fields.
+   *
+   * @param array $indexFields
+   *   The index Fields.
+   */
+  public function setIndexFields(array $indexFields): void {
+    $this->indexFields = $indexFields;
   }
 
 }

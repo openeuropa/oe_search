@@ -106,14 +106,14 @@ class QueryBuilderTest extends KernelTestBase {
             [
               [
                 'term' => [
-                  'id' => 10,
+                  'ID' => 10,
                 ],
               ]
               ,
               [
                 'term' =>
                   [
-                    'body' => 'hello',
+                    'BODY' => 'hello',
                   ],
               ],
             ],
@@ -128,13 +128,13 @@ class QueryBuilderTest extends KernelTestBase {
    */
   public function testComparisonOperators() {
     $query = new Query($this->index);
-    $query->addCondition('id', 10);
-    $query->addCondition('id', 1, '<>');
-    $query->addCondition('id', 10, '>');
-    $query->addCondition('id', 10, '<');
-    $query->addCondition('id', 10, '>=');
-    $query->addCondition('id', 10, '<=');
-    $query->addCondition('id', [10, 100], 'IN');
+    $query->addCondition('ID', 10);
+    $query->addCondition('ID', 1, '<>');
+    $query->addCondition('ID', 10, '>');
+    $query->addCondition('ID', 10, '<');
+    $query->addCondition('ID', 10, '>=');
+    $query->addCondition('ID', 10, '<=');
+    $query->addCondition('ID', [10, 100], 'IN');
 
     $query_expression = $this->queryBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
     $expected = [
@@ -144,40 +144,40 @@ class QueryBuilderTest extends KernelTestBase {
             [
               [
                 'term' => [
-                  'id' => 10,
+                  'ID' => 10,
                 ],
               ],
               [
                 'range' => [
-                  'id' => [
+                  'ID' => [
                     'gt' => 10,
                   ],
                 ],
               ],
               [
                 'range' => [
-                  'id' => [
+                  'ID' => [
                     'lt' => 10,
                   ],
                 ],
               ],
               [
                 'range' => [
-                  'id' => [
+                  'ID' => [
                     'gte' => 10,
                   ],
                 ],
               ],
               [
                 'range' => [
-                  'id' => [
+                  'ID' => [
                     'lte' => 10,
                   ],
                 ],
               ],
               [
                 'terms' => [
-                  'id' => [
+                  'ID' => [
                     10,
                     100,
                   ],
@@ -188,7 +188,7 @@ class QueryBuilderTest extends KernelTestBase {
             [
               [
                 'term' => [
-                  'id' => 1,
+                  'ID' => 1,
                 ],
               ],
             ],
@@ -216,14 +216,14 @@ class QueryBuilderTest extends KernelTestBase {
             [
               [
                 'term' => [
-                  'id' => 10,
+                  'ID' => 10,
                 ],
               ]
               ,
               [
                 'term' =>
                   [
-                    'body' => 'hello',
+                    'BODY' => 'hello',
                   ],
               ],
             ],
@@ -250,7 +250,7 @@ class QueryBuilderTest extends KernelTestBase {
             [
               [
                 'term' => [
-                  'id' => 10,
+                  'ID' => 10,
                 ],
               ],
             ],
@@ -290,7 +290,7 @@ class QueryBuilderTest extends KernelTestBase {
                       [
                         [
                           'term' => [
-                            'id' => 10,
+                            'ID' => 10,
                           ],
                         ],
                       ],
@@ -303,12 +303,12 @@ class QueryBuilderTest extends KernelTestBase {
                       [
                         [
                           'term' => [
-                            'body' => 'Node body',
+                            'BODY' => 'Node body',
                           ],
                         ],
                         [
                           'range' => [
-                            'created' => [
+                            'CREATED' => [
                               'gt' => '1664883852',
                             ],
                           ],
@@ -341,12 +341,12 @@ class QueryBuilderTest extends KernelTestBase {
                       [
                         [
                           'term' => [
-                            'body' => 'Node body',
+                            'BODY' => 'Node body',
                           ],
                         ],
                         [
                           'range' => [
-                            'created' => [
+                            'CREATED' => [
                               'gt' => '1664883852',
                             ],
                           ],
@@ -361,7 +361,7 @@ class QueryBuilderTest extends KernelTestBase {
                       [
                         [
                           'term' => [
-                            'id' => 10,
+                            'ID' => 10,
                           ],
                         ],
                       ],

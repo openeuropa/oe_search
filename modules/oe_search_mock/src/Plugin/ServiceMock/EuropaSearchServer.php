@@ -50,7 +50,7 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
+  protected $entityTypeBundleInfo;
 
   /**
    * Constructs a GotoAction object.

@@ -56,3 +56,11 @@ search_api.index.*.third_party.oe_search:
     europa_search_entity_mode:
       type: string
       label: 'Entity load mode for europa search.'
+
+plugin.plugin_configuration.search_api_processor.europa_search_uppercase_field_names:
+  type: search_api.fields_processor_configuration
+  label: 'Uppercase field names processor configuration'
+  mapping:
+    all_fields:
+      type: integer
+      label: 'Whether to include all fields'

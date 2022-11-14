@@ -50,62 +50,73 @@ class MetadataMappingSubscriber implements EventSubscriberInterface {
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
   public function map(MetadataMappingEvent $event): void {
-    $field = $event->getField();
+
     $metadata = $event->getMetadata();
-    $metadata_key = $event->getMetadataKey();
+    $index_fields = $event->getIndexFields();
     $values = $event->getValues();
     $query = $event->getQuery();
-    $original_field_id = $field->getOriginalFieldIdentifier();
-    $original_field_type = $field->getDataDefinition()->getFieldDefinition()->getType();
-    $datasource = $event->getQuery()->getIndex()->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
+    $datasource = $event->getQuery()
+      ->getIndex()
+      ->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
     $entity_type_id = $datasource->getDerivativeId();
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $entity_bundle_key = $entity_type->getKey('bundle');
 
-    // We only map here values present in metadata.
-    if (empty($values[$original_field_id])) {
-      return;
-    }
+    foreach ($index_fields as $field) {
+      $metadata_key = Utility::getEsFieldName($field->getFieldIdentifier(), $query);
+      $original_field_id = $field->getOriginalFieldIdentifier();
+      $original_field_type = $field->getDataDefinition()
+        ->getFieldDefinition()
+        ->getType();
 
-    // Drop entity references, unless they are the bundle key.
-    $entity_reference_types = [
-      'entity_reference',
-      'entity_reference_revisions',
-    ];
-
-    if ($metadata_key != Utility::getEsFieldName($entity_bundle_key, $query) && in_array($original_field_type, $entity_reference_types)) {
-      unset($values[$original_field_id]);
-    }
-
-    // Support for booleans.
-    if ($field->getType() == 'boolean') {
-      $values[$original_field_id] = filter_var($values[$original_field_id], FILTER_VALIDATE_BOOLEAN);
-    }
-    elseif ($field->getType() == 'date') {
-      $date = \DateTime::createFromFormat('Y-m-d\TH:i:s.vp', $metadata[$metadata_key][0]);
-
-      $date_type = $field->getDataDefinition()->getFieldDefinition()->getType();
-      if ($date_type == 'datetime') {
-        $datetime_type = $field->getDataDefinition()->getSettings()['datetime_type'];
+      // We only map here values present in metadata.
+      if (empty($values[$original_field_id])) {
+        continue;
       }
 
-      // Date time fields with date only.
-      if ($date_type == 'datetime' && $datetime_type == 'date') {
-        $values[$original_field_id] = date('Y-m-d', $date->getTimestamp());
+      // Drop entity references, unless they are the bundle key.
+      $entity_reference_types = [
+        'entity_reference',
+        'entity_reference_revisions',
+      ];
+
+      if ($metadata_key != Utility::getEsFieldName($entity_bundle_key, $query) && in_array($original_field_type, $entity_reference_types)) {
+        unset($values[$original_field_id]);
       }
-      // Date time fields with date and time.
-      elseif ($date_type == 'datetime' && $datetime_type == 'datetime') {
-        $values[$original_field_id] = date('Y-m-d\TH:i:s', $date->getTimestamp());
+
+      // Support for booleans.
+      if ($field->getType() == 'boolean') {
+        $values[$original_field_id] = filter_var($values[$original_field_id], FILTER_VALIDATE_BOOLEAN);
       }
-      elseif ($date_type == 'daterange_timezone') {
-        $values[$field->getOriginalFieldIdentifier()] = [
-          'value' => date('Y-m-d\TH:i:s', $date->getTimestamp()),
-          'end_value' => date('Y-m-d\TH:i:s', $date->getTimestamp()),
-          'timezone' => $date->getTimezone()->getName(),
-        ];
-      }
-      else {
-        $values[$original_field_id] = $date->getTimestamp();
+      elseif ($field->getType() == 'date') {
+        $date = \DateTime::createFromFormat('Y-m-d\TH:i:s.vP', $metadata[$metadata_key][0]);
+
+        $date_type = $field->getDataDefinition()
+          ->getFieldDefinition()
+          ->getType();
+        if ($date_type == 'datetime') {
+          $datetime_type = $field->getDataDefinition()
+            ->getSettings()['datetime_type'];
+        }
+
+        // Date time fields with date only.
+        if ($date_type == 'datetime' && $datetime_type == 'date') {
+          $values[$original_field_id] = date('Y-m-d', $date->getTimestamp());
+        }
+        // Date time fields with date and time.
+        elseif ($date_type == 'datetime' && $datetime_type == 'datetime') {
+          $values[$original_field_id] = date('Y-m-d\TH:i:s', $date->getTimestamp());
+        }
+        elseif ($date_type == 'daterange_timezone') {
+          $values[$field->getOriginalFieldIdentifier()] = [
+            'value' => date('Y-m-d\TH:i:s', $date->getTimestamp()),
+            'end_value' => date('Y-m-d\TH:i:s', $date->getTimestamp()),
+            'timezone' => $date->getTimezone()->getName(),
+          ];
+        }
+        else {
+          $values[$original_field_id] = $date->getTimestamp();
+        }
       }
     }
 

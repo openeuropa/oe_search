@@ -10,6 +10,10 @@ use Drupal\search_api\Query\QueryInterface;
  * Provides support for string facets for Europa Search.
  *
  * We extend the original query type to have better support for booleans.
+ * String query type is used for boolean comparison but need to convert
+ * original values to properly handle data coming from EuropaSearch as
+ * "true" and "false".
+ * Method code mostly copied over from parent.
  *
  * @FacetsQueryType(
  *   id = "europa_search_api_string",
