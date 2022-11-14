@@ -31,19 +31,19 @@ class EntityMapper {
    *
    * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
-  protected $eventService;
+  protected $eventDispatcher;
 
   /**
    * Constructs an EntityMapper object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_service
-   *   The event service.
+   * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher
+   *   The event dispatcher.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ContainerAwareEventDispatcher $event_service) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ContainerAwareEventDispatcher $event_dispatcher) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->eventService = $event_service;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -89,7 +89,7 @@ class EntityMapper {
       }
 
       $event = new MetadataMappingEvent($query, $metadata, $metadata_key, $field, $entity_values);
-      $this->eventService->dispatch($event);
+      $this->eventDispatcher->dispatch($event, MetadataMappingEvent::class);
       $entity_values = $event->getValues();
     }
 
@@ -103,7 +103,7 @@ class EntityMapper {
       $entity->in_preview = TRUE;
       // Allow event subscribers to alter the created entity.
       $event = new EuropaEntityCreationEvent($entity, $metadata, $query);
-      $this->eventService->dispatch($event);
+      $this->eventDispatcher->dispatch($event);
       $mapped_entity = EntityAdapter::createFromEntity($entity);
     }
     catch (EntityStorageException $e) {
