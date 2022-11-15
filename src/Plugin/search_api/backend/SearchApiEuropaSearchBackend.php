@@ -447,10 +447,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    */
   public function search(QueryInterface $query): void {
     $results = $query->getResults();
-    $page_number = $limit = NULL;
+    $page_number = NULL;
+    $limit = $query->getOptions()['limit'] ?? NULL;
 
     // Set page number.
-    if (!empty($query->getOptions()['offset']) && !empty($query->getOptions()['limit'])) {
+    if (!empty($query->getOptions()['offset']) && !empty($limit)) {
       $offset = $query->getOptions()['offset'];
       $limit = $query->getOptions()['limit'];
       $page_number = ($offset / $limit) + 1;

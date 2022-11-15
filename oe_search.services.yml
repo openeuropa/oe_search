@@ -4,8 +4,8 @@ services:
     arguments: [ '@entity_type.manager' ]
     tags:
       - { name: 'event_subscriber' }
-  oe_search.metadata_mapping_event_subscriber:
-    class: Drupal\oe_search\EventSubscriber\MetadataMappingSubscriber
+  oe_search.europa_entity_creation_subscriber:
+    class: Drupal\oe_search\EventSubscriber\EuropaEntityCreationSubscriber
     arguments: [ '@entity_type.manager' ]
     tags:
       - { name: 'event_subscriber' }

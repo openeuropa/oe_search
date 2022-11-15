@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\oe_search\Event\EuropaEntityCreationEvent;
-use Drupal\oe_search\Event\MetadataMappingEvent;
 use Drupal\search_api\Plugin\search_api\datasource\ContentEntity;
 use Drupal\search_api\Query\QueryInterface;
 
@@ -89,10 +88,6 @@ class EntityMapper {
       }
     }
 
-    $event = new MetadataMappingEvent($query, $metadata, $index_fields, $entity_values);
-    $this->eventDispatcher->dispatch($event, MetadataMappingEvent::class);
-    $entity_values = $event->getValues();
-
     // We want to be able to call getUrl() on the entity, so we set a fake id.
     $entity_values[$entity_id_key] = PHP_INT_MAX;
 
@@ -103,7 +98,7 @@ class EntityMapper {
       $entity->in_preview = TRUE;
       // Allow event subscribers to alter the created entity.
       $event = new EuropaEntityCreationEvent($entity, $metadata, $query);
-      $this->eventDispatcher->dispatch($event);
+      $this->eventDispatcher->dispatch($event, EuropaEntityCreationEvent::EUROPA_ENTITY_CREATED);
       $mapped_entity = EntityAdapter::createFromEntity($entity);
     }
     catch (EntityStorageException $e) {

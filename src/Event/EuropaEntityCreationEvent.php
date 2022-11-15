@@ -38,6 +38,13 @@ class EuropaEntityCreationEvent extends Event {
   protected $query;
 
   /**
+   * The name of the event dispatched when a new europa entity is instatiated.
+   *
+   * Allows subscribers to alter the entity values.
+   */
+  const EUROPA_ENTITY_CREATED = 'oe_search.europa_entity_created';
+
+  /**
    * Constructs a new EuropaEntityCreationEvent object.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
