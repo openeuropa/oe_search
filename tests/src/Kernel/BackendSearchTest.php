@@ -392,6 +392,15 @@ class BackendSearchTest extends KernelTestBase {
     $this->assertEquals('2024-05-03 22:00:00', date('Y-m-d H:i:s', $publication_date->getTimestamp()));
     $this->assertEquals('2024-10-11 00:41:05', date('Y-m-d H:i:s', $cron_time->getTimestamp()));
 
+    // Change limit on first query.
+    $query = $this->index->query();
+    $query->addCondition('TYPE', 'item');
+    $query->setOption('limit', 5);
+    $response = $query->execute();
+    $result_items = $response->getResultItems();
+    $this->assertCount(5, $result_items);
+    $this->assertEquals(12, $response->getResultCount());
+
     // Search by all articles.
     $query = $this->index->query();
     $query->addCondition('TYPE', 'article');

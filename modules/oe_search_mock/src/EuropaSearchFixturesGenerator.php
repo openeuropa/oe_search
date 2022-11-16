@@ -301,6 +301,13 @@ class EuropaSearchFixturesGenerator {
         $json['totalResults'] = 12;
         break;
 
+      // Filter by type item, limit 5 results.
+      case 'a59df15adf1e403a72a2f866109b7cac':
+        $entities = static::filterEntities([1, 2, 3, 4, 5]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 12;
+        break;
+
       // Filter by type item, page 2.
       case '8cf0d00d710f647afb004c0d5fb6c695':
         $entities = static::filterEntities([17, 19]);
