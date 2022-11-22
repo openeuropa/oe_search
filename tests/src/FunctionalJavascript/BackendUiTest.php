@@ -174,6 +174,7 @@ class BackendUiTest extends WebDriverTestBase {
     $page->fillField('Index name', 'Europa search index');
     $assert_session->waitForElementVisible('css', '#edit-id');
     $page->checkField('datasources[entity:user]');
+    $assert_session->assertWaitOnAjaxRequest();
     $assert_session->fieldExists('server')->selectOption('europa_search_server');
     $assert_session->waitForElementVisible('css', '#edit-third-party-settings-oe-search-europa-search-entity-mode-remote');
     $assert_session->fieldExists('third_party_settings[oe_search][europa_search_entity_mode]')->selectOption('remote');
