@@ -31,7 +31,7 @@ class QueryExpressionBuilder {
    */
   public function prepareConditionGroup(ConditionGroup $conditionGroup, Query $query, $exclude_or = FALSE) : array {
     $query_conjunction = $conditionGroup->getConjunction();
-    $conditions = $negated_conditions = $return = [];
+    $conditions = $negated_conditions = $query_conjunctions = [];
     $query_conditions = $conditionGroup->getConditions();
 
     if (empty($query_conjunction)) {

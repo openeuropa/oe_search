@@ -88,7 +88,11 @@ function oe_search_form_search_api_index_form_alter(array &$form, FormStateInter
     '#open' => TRUE,
     '#states' => [
       'visible' => [
-        ':input[name="server"]' => _oe_search_get_europa_servers(),
+        ':input[name="server"]' => [
+          _oe_search_get_europa_servers(),
+          'and',
+          ['filled' => TRUE],
+        ],
       ],
     ],
   ];
@@ -114,6 +118,7 @@ function _oe_search_get_europa_servers() {
   $storage = \Drupal::entityTypeManager()->getStorage('search_api_server');
   /** @var \Drupal\search_api\ServerInterface[] $servers */
   $servers = $storage->loadByProperties(['status' => TRUE]);
+  $europa_servers = [];
   foreach ($servers as $server) {
     if (
       $server->hasValidBackend() &&

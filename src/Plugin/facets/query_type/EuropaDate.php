@@ -7,7 +7,7 @@ namespace Drupal\oe_search\Plugin\facets\query_type;
 use Drupal\oe_list_pages\Plugin\facets\query_type\Date;
 
 /**
- * Extends the original query type to handle date values in miliseconds.
+ * Extends the original query type to handle date values in milliseconds.
  *
  * @FacetsQueryType(
  *   id = "europa_date_query_type",

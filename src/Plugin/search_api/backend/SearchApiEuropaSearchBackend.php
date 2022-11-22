@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
-use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
@@ -34,6 +33,7 @@ use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
 use Psr\Http\Client\ClientInterface as PsrClient;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Europa Search backend for Search API.
@@ -112,9 +112,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   /**
    * The event dispatcher.
    *
-   * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
-  protected $eventService;
+  protected $eventDispatcher;
 
   /**
    * The query expression builder.
@@ -143,18 +143,18 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The HTTP client.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
-   * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_service
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event service.
    * @param \Drupal\oe_search\QueryExpressionBuilder $query_expression_builder
    *   The query expression builder service.
    * @param \Drupal\oe_search\EntityMapper $entity_mapper
    *   The entity mapper service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, ContainerAwareEventDispatcher $event_service, QueryExpressionBuilder $query_expression_builder, EntityMapper $entity_mapper) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, EventDispatcherInterface $event_dispatcher, QueryExpressionBuilder $query_expression_builder, EntityMapper $entity_mapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
-    $this->eventService = $event_service;
+    $this->eventDispatcher = $event_dispatcher;
     $this->queryExpressionBuilder = $query_expression_builder;
     $this->entityMapper = $entity_mapper;
   }
@@ -452,19 +452,22 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
     // Set page number.
     if (!empty($query->getOptions()['offset']) && !empty($limit)) {
-      $offset = $query->getOptions()['offset'];
-      $limit = $query->getOptions()['limit'];
+      $offset = (int) $query->getOptions()['offset'];
+      $limit = (int) $query->getOptions()['limit'];
       $page_number = ($offset / $limit) + 1;
     }
 
     // Get text keys.
     $text = NULL;
-    if (!empty($query->getKeys())) {
-      $keys = $query->getKeys();
+    $keys = $query->getKeys();
+    if (is_array($keys) && !empty($keys)) {
       if (isset($keys['#conjunction'])) {
         unset($keys['#conjunction']);
       }
       $text = "\"" . implode(" ", $keys) . "\"";
+    }
+    elseif (is_string($keys) && !empty($keys)) {
+      $text = "\"" . $keys . "\"";
     }
 
     // Handle sorting.
@@ -514,10 +517,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       }
 
       $datasource = $query->getIndex()->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
-      $item_id = ($entity_load_mode == 'local') ? $metadata['SEARCH_API_ID'][0] : $item->getUrl();
+      $item_id = ($entity_load_mode === 'local') ? $metadata['SEARCH_API_ID'][0] : $item->getUrl();
       $result_item = $this->getFieldsHelper()->createItem($index, $item_id, $datasource);
 
-      if ($entity_load_mode == 'remote' && $mapped_entity = $this->entityMapper->map($metadata, $query)) {
+      if ($entity_load_mode === 'remote' && $mapped_entity = $this->entityMapper->map($metadata, $query)) {
         $result_item->setOriginalObject($mapped_entity);
       }
 
@@ -541,10 +544,10 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  protected function getFacets(QueryInterface $query, array $available_facets = [], string $text = NULL) {
+  protected function getFacets(QueryInterface $query, array $available_facets = [], string $text = NULL): array {
     $facets = $response_facets = $or_response_facets = [];
     $query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
-    // Used for or facets.
+    // Used for OR facets.
     $or_query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query, TRUE);
 
     // Find which facets are OR facets.
@@ -552,7 +555,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     // have active results.
     $or_facets = [];
     foreach ($query->getConditionGroup()->getConditions() as $condition) {
-      if (!$condition instanceof ConditionGroup || $condition->getConjunction() != 'OR') {
+      if (!$condition instanceof ConditionGroup || $condition->getConjunction() !== 'OR') {
         continue;
       }
 
@@ -792,7 +795,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         ->setItem($item)
         ->setEntity($entity);
       // @todo Remove 1st argument when dropping support for Drupal 8.9.
-      $this->eventService->dispatch(DocumentCreationEvent::class, $event);
+      $this->eventDispatcher->dispatch($event, DocumentCreationEvent::class);
 
       if (!$document->getUrl()) {
         $document->setCanBeIngested(FALSE);

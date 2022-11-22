@@ -23,7 +23,7 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
   protected $entityTypeManager;
 
   /**
-   * Constructs a MetadataMappingSubscriber object.
+   * Constructs a EuropaEntityCreationSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
@@ -54,11 +54,11 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
     $metadata = $event->getMetadata();
     $entity = $event->getEntity();
     $query = $event->getQuery();
+    $datasource_id = $metadata[Utility::getEsFieldName('search_api_datasource', $query)][0];
     $datasource = $event->getQuery()
       ->getIndex()
-      ->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
+      ->getDatasource($datasource_id);
 
-    $datasource_id = $metadata[Utility::getEsFieldName('search_api_datasource', $query)][0];
     $index_fields = $query->getIndex()->getFieldsByDatasource($datasource_id);
 
     $entity_type_id = $datasource->getDerivativeId();
@@ -88,15 +88,15 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
         continue;
       }
 
-      if ($metadata_key != Utility::getEsFieldName($entity_bundle_key, $query) && in_array($original_field_type, $entity_reference_types)) {
+      if ($metadata_key !== Utility::getEsFieldName($entity_bundle_key, $query) && in_array($original_field_type, $entity_reference_types)) {
         $entity->get($original_field_id)->removeItem(0);
       }
 
       // Support for booleans.
-      if ($field->getType() == 'boolean') {
+      if ($field->getType() === 'boolean') {
         $entity->set($original_field_id, filter_var($entity->get($original_field_id)->value, FILTER_VALIDATE_BOOLEAN));
       }
-      elseif ($field->getType() == 'date') {
+      elseif ($field->getType() === 'date') {
         $date = \DateTime::createFromFormat('Y-m-d\TH:i:s.vP', $metadata[$metadata_key][0]);
 
         $date_type = $field->getDataDefinition()

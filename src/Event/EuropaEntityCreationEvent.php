@@ -38,7 +38,7 @@ class EuropaEntityCreationEvent extends Event {
   protected $query;
 
   /**
-   * The name of the event dispatched when a new europa entity is instatiated.
+   * The name of the event dispatched when a new europa entity is instantiated.
    *
    * Allows subscribers to alter the entity values.
    */

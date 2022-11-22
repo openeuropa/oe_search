@@ -130,11 +130,17 @@ class BackendUiTest extends WebDriverTestBase {
       'access content',
     ]);
     $this->drupalLogin($admin_user);
-    // Create server.
-    $this->drupalGet('admin/config/search/search-api/add-server');
 
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
+
+    // ES options are not visible by default.
+    $this->drupalGet('admin/config/search/search-api/add-index');
+    $es_options = $page->findField('third_party_settings[oe_search][europa_search_entity_mode]');
+    $this->assertFalse($es_options->isVisible());
+
+    // Create server.
+    $this->drupalGet('admin/config/search/search-api/add-server');
     $page->fillField('Server name', 'Europa search server');
     $assert_session->waitForElementVisible('css', '#edit-id');
 
