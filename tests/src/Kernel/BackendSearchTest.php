@@ -308,8 +308,10 @@ class BackendSearchTest extends KernelTestBase {
     $result_items = $response->getResultItems();
     $this->assertCount(2, $result_items);
     $this->assertEquals(2, $response->getResultCount());
-    $first_result = reset($result_items);
+    $first_result = array_shift($result_items);
     $this->assertEquals('entity:entity_test_mulrev_changed/2:en', $first_result->getId());
+    $second_result = array_shift($result_items);
+    $this->assertEquals('entity:entity_test_mulrev_changed/3:en', $second_result->getId());
 
     // Search with a filter.
     $query = $this->index->query();

@@ -418,7 +418,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
 
     $page = 1;
     while (TRUE) {
-      $result = $this->getClient()->search(NULL, NULL, ['bool' => ['must' => ['term' => ['SEARCH_API_SITE_HASH' => Utility::getSiteHash()]]]], NULL, NULL, $page++);
+      $result = $this->getClient()->search(NULL, NULL, ['term' => ['SEARCH_API_SITE_HASH' => Utility::getSiteHash()]], NULL, NULL, $page++);
       $item_ids = array_map(function (Document $document) use ($index) {
         $destructed_reference = Utility::destructReference($document->getReference());
         $site_hash = $destructed_reference[0] ?? NULL;
