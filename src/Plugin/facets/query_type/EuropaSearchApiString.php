@@ -93,7 +93,9 @@ class EuropaSearchApiString extends SearchApiString {
       return $this->facet;
     }
 
-    // For booleans we need to convert "true", "false" to "0", "1".
+    // For booleans we need to convert "true", "false" to "0", "1" in case the
+    // value comes from the ES index. Otherwise, it can also still be "0" or "1"
+    // if the face is being rebuilt.
     $query_operator = $this->facet->getQueryOperator();
     if (!empty($this->results)) {
       $facet_results = [];
@@ -108,7 +110,12 @@ class EuropaSearchApiString extends SearchApiString {
           }
           $count = $result['count'];
 
-          $result_filter = $result_filter === 'true' ? 1 : 0;
+          if ($result_filter === 'true') {
+            $result_filter = "1";
+          }
+          if ($result_filter === 'false') {
+            $result_filter = "0";
+          }
           $result = new Result($this->facet, $result_filter, $result_filter, $count);
           $result->setMissing($this->facet->isMissing() && $result_filter === '!');
           $facet_results[$result_filter] = $result;
