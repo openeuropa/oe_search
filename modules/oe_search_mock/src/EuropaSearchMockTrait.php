@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search_mock;
 
+use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -61,12 +62,19 @@ trait EuropaSearchMockTrait {
   public function getFiltersFromRequest(RequestInterface $request): array {
     $request->getBody()->rewind();
     $boundary = $this->getRequestBoundary($request);
-    $filters = $sort_parts = [];
+    $filters = $sort_parts = $facet_fields_parts = [];
+    $path = $request->getUri()->getPath();
+
     if (!empty($boundary)) {
       $request_parts = $this->getRequestMultipartStreamResources($request, $boundary);
       $request->getBody()->rewind();
       $search_parts = explode("\r\n", $request_parts[0]);
-      $sort_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
+      if ($path === EuropaSearchMockServerConfigOverrider::ENDPOINT_SEARCH) {
+        $sort_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
+      }
+      elseif ($path === EuropaSearchMockServerConfigOverrider::ENDPOINT_FACET) {
+        $facet_fields_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
+      }
       $query_parameters = json_decode($search_parts[5], TRUE);
       // Single term conversion.
       if (!empty($query_parameters) && empty($query_parameters['bool']) && !empty($query_parameters['term'])) {
@@ -105,6 +113,11 @@ trait EuropaSearchMockTrait {
     if ($sort_parts) {
       $sorts = json_decode($sort_parts[5], TRUE);
       $filters['sort'] = $sorts;
+    }
+
+    if ($facet_fields_parts) {
+      $facet_fields = json_decode($facet_fields_parts[5], TRUE);
+      $filters['display_fields'] = $facet_fields;
     }
 
     $unset = [

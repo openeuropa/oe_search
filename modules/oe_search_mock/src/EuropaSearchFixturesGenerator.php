@@ -211,11 +211,134 @@ class EuropaSearchFixturesGenerator {
     $entity_type = $info['entity_type'];
     $bundle = $info['bundle'] ?? '';
 
-    return static::buildScenario($id, $filters, $entity_type, $bundle);
+    return static::buildSearchScenario($id, $filters, $entity_type, $bundle);
   }
 
   /**
-   * Builds the given scenario.
+   * Returns the JSON response for the facets given the filters.
+   *
+   * @param array $filters
+   *   The filters.
+   *
+   * @return string|null
+   *   The response.
+   */
+  public static function getFacetsJson(array $filters): ?string {
+    $path = static::getFixturesBasePath();
+    if (!$filters) {
+      return file_get_contents($path . '/empty.json');
+    }
+
+    $info = static::getMockInfoFromFilters($filters);
+    if (!$info) {
+      return file_get_contents($path . '/empty.json');
+    }
+
+    $id = $info['id'];
+    return static::buildFacetsScenario($id, $filters);
+  }
+
+  /**
+   * Builds the given facets scenario.
+   *
+   * @param string $scenario_id
+   *   The scenario ID.
+   * @param array $filters
+   *   The filters.
+   *
+   * @return string
+   *   The response json.
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+   * @SuppressWarnings(PHPMD.NPathComplexity)
+   */
+  protected static function buildFacetsScenario(string $scenario_id, array $filters): string {
+    $path = static::getFixturesBasePath();
+    // Get the wrapper that works for all scenarios.
+    $wrapper = file_get_contents($path . '/wrapper_facets.json');
+    $json = json_decode($wrapper, TRUE);
+    // Set the query search terms that work for all scenarios.
+    $json['terms'] = $filters['TEXT'];
+
+    $original_facets = [];
+    $original_facets['site_name'] = static::buildFacet('site_name', [
+      [
+        'value' => 'oe_search_demo',
+        'count' => 2,
+      ],
+      [
+        'value' => 'site_2_demo',
+        'count' => 1,
+      ],
+    ]);
+    $original_facets['type'] = static::buildFacet('type', [
+      [
+        'value' => 'item',
+        'count' => 12,
+      ],
+      [
+        'value' => 'article',
+        'count' => 7,
+      ],
+    ]);
+
+    switch ($scenario_id) {
+      // No facets indicated.
+      // Both facets indicated.
+      case '1cc193e0d8cb8cc5cd1423f032453ea0':
+      case 'd94c3426d230f420da7f79c03715cae0':
+        $json['facets'][] = $original_facets['site_name'];
+        $json['facets'][] = $original_facets['type'];
+        break;
+
+      // Facet for site name.
+      case 'ab13fbbfafd509c5e244f5f1540a9361':
+        $json['facets'][] = $original_facets['site_name'];
+        break;
+    }
+
+    return json_encode($json);
+  }
+
+  /**
+   * Builds a facet with name and values.
+   *
+   * @param string $name
+   *   The facet name.
+   * @param array $values
+   *   The facet values.
+   *
+   * @return array
+   *   The built facet.
+   */
+  protected static function buildFacet(string $name, array $values) : array {
+    $facet = [
+      "apiVersion" => '1.34',
+      "name" => $name,
+      "rawName" => $name,
+      "database" => "EUROPA_SEARCH_DEMO",
+    ];
+
+    $facet['count'] = count($values);
+    if (empty($values)) {
+      return $facet;
+    }
+
+    $facet['values'] = [];
+    foreach ($values as $value) {
+      $facet['values'][] = [
+        "apiVersion" => '1.34',
+        "rawValue" => $value['value'],
+        "value" => $value['value'],
+        "count" => $value['count'],
+      ];
+    }
+
+    return $facet;
+  }
+
+  /**
+   * Builds the given search scenario.
    *
    * @param string $scenario_id
    *   The scenario ID.
@@ -232,7 +355,7 @@ class EuropaSearchFixturesGenerator {
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  protected static function buildScenario(string $scenario_id, array $filters, string $entity_type, string $bundle = ''): string {
+  protected static function buildSearchScenario(string $scenario_id, array $filters, string $entity_type, string $bundle = ''): string {
     $path = static::getFixturesBasePath();
     $language = $filters['LANGUAGE_WITH_FALLBACK'] ?? 'en';
 
