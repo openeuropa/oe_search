@@ -7,3 +7,7 @@ services:
     class: Drupal\oe_search_mock\EventSubscriber\EuropaSearchMockEventSubscriber
     tags:
       - { name: event_subscriber }
+  oe_search_mock.es_mock_response_event_subscriber:
+    class: Drupal\oe_search_mock\EventSubscriber\EuropaSearchMockResponseEventSubscriber
+    tags:
+      - { name: event_subscriber }

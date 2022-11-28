@@ -3,6 +3,7 @@ status: true
 dependencies:
   module:
     - entity_test
+    - oe_search
     - search_api
   config:
     - search_api.server.europa_search_server
@@ -16,22 +17,74 @@ field_settings:
     type: integer
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: id
+    dependencies:
+      module:
+        - entity_test
   name:
     label: Name
     type: text
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: name
     boost: 5.0
+    dependencies:
+      module:
+        - entity_test
   created:
     label: Authored on
     type: date
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: created
+    dependencies:
+      module:
+        - entity_test
   body:
     label: Body
     type: text
     datasource_id: 'entity:entity_test_mulrev_changed'
     property_path: body
+    dependencies:
+      module:
+        - entity_test
+  keywords:
+    label: Keywords
+    type: text
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: keywords
+    dependencies:
+      module:
+        - entity_test
+  publication_date:
+    label: Publication date
+    type: date
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: publication_date
+    dependencies:
+      module:
+        - entity_test
+  cron_time:
+    label: Cron time
+    type: date
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: cron_time
+    dependencies:
+      module:
+        - entity_test
+  highlighted:
+    label: Highlighted
+    type: boolean
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: highlighted
+    dependencies:
+      module:
+        - entity_test
+  type:
+    label: 'Test entity - revisions and data table bundle'
+    datasource_id: 'entity:entity_test_mulrev_changed'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - entity_test
 datasource_settings:
   'entity:entity_test_mulrev_changed': {  }
   'entity:media': { }
@@ -40,6 +93,10 @@ processor_settings:
   aggregated_field: {  }
   language_with_fallback: {  }
   rendered_item: {  }
+  europa_search_uppercase_field_names:
+    weights:
+      preprocess_index: 0
+    all_fields: 1
 tracker_settings:
   default:
     indexing_order: fifo

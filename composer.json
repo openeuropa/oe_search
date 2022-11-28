@@ -6,9 +6,10 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
+        "cweagans/composer-patches": "^1.6",
         "php": ">=7.4",
         "drupal/core": "^9.3",
-        "drupal/search_api": "^1.19",
+        "drupal/search_api": "^1.27",
         "http-interop/http-factory-guzzle": "^1.0",
         "openeuropa/europa-search-client": "^1.0",
         "php-http/guzzle6-adapter": "^2.0"
@@ -22,9 +23,6 @@
         "drupal/http_request_mock": "^1.0",
         "drupal/token": "^1.10",
         "drush/drush": "^10.3",
-        "drupal/core-dev": "^9.2",
-        "drupal/ctools": "^3.7",
-        "drupal/token": "^1.10",
         "openeuropa/oe_multilingual": "^1.10",
         "openeuropa/code-review": "^2.0",
         "openeuropa/task-runner-drupal-project-symlink": "^1.0.0-beta5",
@@ -68,6 +66,12 @@
             "locations": {
                 "web-root": "./build"
             }
+        },
+        "patches": {
+            "openeuropa/europa-search-client": {
+                "latest-master": "https://github.com/openeuropa/europa-search-client/compare/1.0.0-alpha2...EWPP-2630.diff"
+            }
+
         }
     },
     "config": {

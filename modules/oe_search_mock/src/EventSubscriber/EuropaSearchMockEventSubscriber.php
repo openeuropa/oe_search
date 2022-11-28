@@ -36,6 +36,7 @@ class EuropaSearchMockEventSubscriber implements EventSubscriberInterface {
       'simple_search_response_page_2',
       'simple_search_response_page_3',
       'text_ingestion_response',
+      'facets_response',
     ];
     foreach ($responses_json as $response_name) {
       $resources[$response_name] = file_get_contents(drupal_get_path('module', 'oe_search_mock') . '/responses/json/' . $response_name . '.json');
