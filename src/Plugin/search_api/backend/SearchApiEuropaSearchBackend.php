@@ -569,7 +569,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     try {
-      $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression);
+      $displayFields = array_keys($available_facets);
+      $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression, NULL, NULL, $displayFields);
     }
     catch (\Exception $e) {
       $this->getLogger()->error($e->getMessage());

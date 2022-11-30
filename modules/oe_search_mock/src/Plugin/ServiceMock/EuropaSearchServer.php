@@ -126,10 +126,6 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         $response = $this->getDeleteResponse();
         break;
 
-      case EuropaSearchMockServerConfigOverrider::ENDPOINT_FACET:
-        $response = $this->getFacetsResponse();
-        break;
-
       default:
         $response = new Response(200, [], 'Mocking example.com response');
         break;
@@ -216,16 +212,6 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
    */
   protected function getDeleteResponse(): ResponseInterface {
     return new Response(200, [], $this->mockedResponses['delete_document_response'] ?? '{}');
-  }
-
-  /**
-   * Get mocked facets response.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   The mocked response.
-   */
-  protected function getFacetsResponse(): ResponseInterface {
-    return new Response(200, [], $this->mockedResponses['facets_response'] ?? '{}');
   }
 
 }
