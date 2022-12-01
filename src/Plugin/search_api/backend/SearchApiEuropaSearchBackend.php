@@ -569,8 +569,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     try {
-      $displayFields = array_keys($available_facets);
-      $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression, NULL, NULL, $displayFields);
+      $display_fields = array_keys($available_facets);
+      array_walk($display_fields, function (&$field) use ($query) {
+        $field = Utility::getEsFieldName($field, $query);
+      });
+      $europa_response = $this->getClient()->getFacets($text, NULL, NULL, $query_expression, NULL, NULL, $display_fields);
     }
     catch (\Exception $e) {
       $this->getLogger()->error($e->getMessage());
