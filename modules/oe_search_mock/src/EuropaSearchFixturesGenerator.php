@@ -261,7 +261,7 @@ class EuropaSearchFixturesGenerator {
     $json['terms'] = $filters['TEXT'];
 
     $original_facets = [];
-    $original_facets['site_name'] = static::buildFacet('site_name', [
+    $original_facets['site_name'] = static::buildFacet('SITE_NAME', [
       [
         'value' => 'oe_search_demo',
         'count' => 2,
@@ -271,7 +271,7 @@ class EuropaSearchFixturesGenerator {
         'count' => 1,
       ],
     ]);
-    $original_facets['type'] = static::buildFacet('type', [
+    $original_facets['type'] = static::buildFacet('TYPE', [
       [
         'value' => 'item',
         'count' => 12,
@@ -283,16 +283,14 @@ class EuropaSearchFixturesGenerator {
     ]);
 
     switch ($scenario_id) {
-      // No facets indicated.
       // Both facets indicated.
-      case '1cc193e0d8cb8cc5cd1423f032453ea0':
-      case 'd94c3426d230f420da7f79c03715cae0':
+      case '1bcb0601faf614dbd87a2db4bfc8b04c':
         $json['facets'][] = $original_facets['site_name'];
         $json['facets'][] = $original_facets['type'];
         break;
 
       // Facet for site name.
-      case 'ab13fbbfafd509c5e244f5f1540a9361':
+      case '43244d9601170787ead159579fe2378e':
         $json['facets'][] = $original_facets['site_name'];
         break;
     }
