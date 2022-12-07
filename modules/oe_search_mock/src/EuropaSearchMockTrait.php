@@ -73,7 +73,8 @@ trait EuropaSearchMockTrait {
         $sort_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
       }
       elseif ($path === EuropaSearchMockServerConfigOverrider::ENDPOINT_FACET) {
-        $facet_fields_parts = isset($request_parts[1]) ? explode("\r\n", $request_parts[1]) : [];
+        $request_position = count($request_parts) - 1;
+        $facet_fields_parts = isset($request_parts[$request_position]) ? explode("\r\n", $request_parts[$request_position]) : [];
       }
       $query_parameters = json_decode($search_parts[5], TRUE);
       // Single term conversion.
@@ -81,20 +82,18 @@ trait EuropaSearchMockTrait {
         $query_parameters = ['bool' => ['must' => [$query_parameters]]];
       }
 
-      if (!$query_parameters || !isset($query_parameters['bool']['must'])) {
-        return [];
-      }
-
       // Prepare the filters.
-      foreach ($query_parameters['bool']['must'] as $key => $param) {
-        if (isset($param['term'])) {
-          $filters[key($param['term'])] = reset($param['term']);
-        }
-        if (isset($param['terms'])) {
-          $filters += $param['terms'];
-        }
-        if (isset($param['range'])) {
-          $filters[key($param['range'])] = reset($param['range']);
+      if (!empty($query_parameters['bool']['must'])) {
+        foreach ($query_parameters['bool']['must'] as $key => $param) {
+          if (isset($param['term'])) {
+            $filters[key($param['term'])] = reset($param['term']);
+          }
+          if (isset($param['terms'])) {
+            $filters += $param['terms'];
+          }
+          if (isset($param['range'])) {
+            $filters[key($param['range'])] = reset($param['range']);
+          }
         }
       }
     }
@@ -117,7 +116,9 @@ trait EuropaSearchMockTrait {
 
     if ($facet_fields_parts) {
       $facet_fields = json_decode($facet_fields_parts[5], TRUE);
-      $filters['display_fields'] = $facet_fields;
+      if (empty($facet_fields['bool'])) {
+        $filters['display_fields'] = $facet_fields;
+      }
     }
 
     $unset = [
