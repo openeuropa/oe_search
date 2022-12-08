@@ -565,6 +565,40 @@ class BackendSearchTest extends KernelTestBase {
     $second_facet_value = array_shift($facets['type']);
     $this->assertEquals('"article"', $second_facet_value['filter']);
     $this->assertEquals(7, $second_facet_value['count']);
+
+    // Ask again the original facet but with index in remote mode.
+    $this->index->setThirdPartySetting('oe_search', 'europa_search_entity_mode', 'remote');
+    $this->index->save();
+    $query = $this->index->query();
+    $query->setOption('search_api_facets', [
+      'site_name' => [
+        // The Search API field ID of the field to facet on.
+        'field' => 'site_name',
+        // The maximum number of filters to retrieve for the facet.
+        'limit' => 0,
+        // The facet operator: "and" or "or".
+        'operator' => 'and',
+        // The minimum count a filter/value must have to be returned.
+        'min_count' => 0,
+        // Whether to retrieve a facet for "missing" values.
+        'missing' => FALSE,
+      ],
+    ]);
+
+    $response = $query->execute();
+    $facets = $response->getExtraData('search_api_facets');
+    $this->assertNotEmpty($facets['site_name']);
+    $first_facet_value = array_shift($facets['site_name']);
+    $this->assertEquals('"oe_search_demo"', $first_facet_value['filter']);
+    $this->assertEquals(2, $first_facet_value['count']);
+
+    $second_facet_value = array_shift($facets['site_name']);
+    $this->assertEquals('"site_2_demo"', $second_facet_value['filter']);
+    $this->assertEquals(1, $second_facet_value['count']);
+
+    // We have no more facets apart from site_name.
+    array_shift($facets);
+    $this->assertEmpty($facets);
   }
 
   /**
