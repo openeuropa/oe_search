@@ -1,0 +1,20 @@
+{
+    "apiVersion":"2.69",
+    "terms": "",
+    "responseTime":44,
+    "totalResults": 64,
+    "pageNumber":1,
+    "pageSize":50,
+    "sort":"title:ASC",
+    "groupByField":null,
+    "queryLanguage":{
+       "language":"en",
+       "probability":0
+    },
+    "spellingSuggestion":"",
+    "bestBets":[
+
+    ],
+    "results": [],
+    "warnings":[]
+}

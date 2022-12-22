@@ -4,11 +4,14 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search_mock\Plugin\ServiceMock;
 
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Drupal\http_request_mock\ServiceMockPluginInterface;
 use Drupal\oe_search_mock\EuropaSearchMockEvent;
+use Drupal\oe_search_mock\EuropaSearchMockResponseEvent;
+use Drupal\oe_search_mock\EuropaSearchMockTrait;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -26,6 +29,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterface, ContainerFactoryPluginInterface {
 
+  use EuropaSearchMockTrait;
+
   /**
    * The event dispatcher service.
    *
@@ -41,6 +46,13 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
   protected $mockedResponses;
 
   /**
+   * The entity type bundle info service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
    * Constructs a GotoAction object.
    *
    * @param array $configuration
@@ -51,11 +63,13 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
    *   The plugin implementation definition.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    *   The event dispatcher service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity bundle service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $dispatcher) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $dispatcher, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
     $this->eventDispatcher = $dispatcher;
+    $this->entityTypeBundleInfo = $entity_type_bundle_info;
   }
 
   /**
@@ -66,7 +80,8 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('event_dispatcher')
+      $container->get('event_dispatcher'),
+      $container->get('entity_type.bundle.info')
     );
   }
 
@@ -111,18 +126,14 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         $response = $this->getDeleteResponse();
         break;
 
-      case EuropaSearchMockServerConfigOverrider::ENDPOINT_SEARCH:
-        parse_str($request->getUri()->getQuery(), $parameters);
-        $page_number = !empty($parameters['pageNumber']) ? (int) $parameters['pageNumber'] : NULL;
-        $response = $this->getSearchResponse($page_number);
-        break;
-
       default:
         $response = new Response(200, [], 'Mocking example.com response');
         break;
     }
 
-    return $response;
+    $event = new EuropaSearchMockResponseEvent($request, $response);
+    $this->eventDispatcher->dispatch(EuropaSearchMockResponseEvent::EUROPA_SEARCH_MOCK_RESPONSE_EVENT, $event);
+    return $event->getResponse();
   }
 
   /**
@@ -201,23 +212,6 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
    */
   protected function getDeleteResponse(): ResponseInterface {
     return new Response(200, [], $this->mockedResponses['delete_document_response'] ?? '{}');
-  }
-
-  /**
-   * Get mocked search response.
-   *
-   * @param int|null $page_number
-   *   The page number.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   The mocked response.
-   */
-  protected function getSearchResponse(int $page_number = NULL): ResponseInterface {
-    $response = $this->mockedResponses['simple_search_response'];
-    if ($page_number) {
-      $response = $this->mockedResponses['simple_search_response_page_' . $page_number] ?? NULL;
-    }
-    return new Response(200, [], $response ?? '{}');
   }
 
 }

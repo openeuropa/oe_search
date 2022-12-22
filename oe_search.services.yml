@@ -4,3 +4,13 @@ services:
     arguments: [ '@entity_type.manager' ]
     tags:
       - { name: 'event_subscriber' }
+  oe_search.europa_entity_creation_subscriber:
+    class: Drupal\oe_search\EventSubscriber\EuropaEntityCreationSubscriber
+    arguments: [ '@entity_type.manager' ]
+    tags:
+      - { name: 'event_subscriber' }
+  oe_search.query_expression_builder:
+    class: Drupal\oe_search\QueryExpressionBuilder
+  oe_search.entity_mapper:
+    class: Drupal\oe_search\EntityMapper
+    arguments: [ '@entity_type.manager', '@event_dispatcher']

@@ -6,5 +6,7 @@ type: module
 core_version_requirement: ^9.3
 
 dependencies:
+  - drupal:entity_test
+  - drupal:media
   - oe_search:oe_search
   - oe_search:oe_search_mock
