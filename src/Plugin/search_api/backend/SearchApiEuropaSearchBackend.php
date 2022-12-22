@@ -512,11 +512,17 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     foreach ($europa_response->getResults() as $item) {
       $metadata = $item->getMetadata();
 
-      if (empty($metadata['SEARCH_API_DATASOURCE'][0])) {
+      $datasource_id = $metadata['SEARCH_API_DATASOURCE'][0];
+      if (empty($datasource_id)) {
         continue;
       }
 
-      $datasource = $query->getIndex()->getDatasource($metadata['SEARCH_API_DATASOURCE'][0]);
+      $datasource_ids = $query->getIndex()->getDatasourceIds();
+      if (!in_array($datasource_id, $datasource_ids)) {
+        continue;
+      }
+
+      $datasource = $query->getIndex()->getDatasource($datasource_id);
       $item_id = ($entity_load_mode === 'local') ? $metadata['SEARCH_API_ID'][0] : $item->getUrl();
       $result_item = $this->getFieldsHelper()->createItem($index, $item_id, $datasource);
 
