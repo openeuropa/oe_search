@@ -11,7 +11,7 @@
         "drupal/core": "^9.3",
         "drupal/search_api": "^1.27",
         "http-interop/http-factory-guzzle": "^1.0",
-        "openeuropa/europa-search-client": "^1.0",
+        "openeuropa/europa-search-client": "^1.0.0-alpha3",
         "php-http/guzzle6-adapter": "^2.0"
     },
     "require-dev": {
@@ -66,12 +66,6 @@
             "locations": {
                 "web-root": "./build"
             }
-        },
-        "patches": {
-            "openeuropa/europa-search-client": {
-                "latest-master": "https://github.com/openeuropa/europa-search-client/compare/1.0.0-alpha2...1.x.diff"
-            }
-
         }
     },
     "config": {

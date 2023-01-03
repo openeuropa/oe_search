@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0-beta1](https://github.com/openeuropa/oe_search/tree/2.0.0-beta1) (2023-01-03)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha4...2.0.0-beta1)
+
+**Merged pull requests:**
+
+- EWPP-2628: Updating the Europa search client patch. [\#85](https://github.com/openeuropa/oe_search/pull/85) ([upchuk](https://github.com/upchuk))
+- EWPP-2924: Fix failures on converting results for non-existing dataso… [\#84](https://github.com/openeuropa/oe_search/pull/84) ([hernani](https://github.com/hernani))
+- EWPP-2819: Refactor facets mock [\#83](https://github.com/openeuropa/oe_search/pull/83) ([hernani](https://github.com/hernani))
+- EPIC-EWPP-2628: Europa Search [\#82](https://github.com/openeuropa/oe_search/pull/82) ([hernani](https://github.com/hernani))
+- EWPP-2631: Coverage for facets. [\#81](https://github.com/openeuropa/oe_search/pull/81) ([hernani](https://github.com/hernani))
+- EWPP-2631: Coverage for facets. [\#80](https://github.com/openeuropa/oe_search/pull/80) ([hernani](https://github.com/hernani))
+- EWPP-2630: Search support for europa search api backend [\#77](https://github.com/openeuropa/oe_search/pull/77) ([hernani](https://github.com/hernani))
+
 ## [2.0.0-alpha4](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha4) (2022-11-04)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha3...2.0.0-alpha4)
