@@ -525,8 +525,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $datasource = $query->getIndex()->getDatasource($datasource_id);
       $item_id = ($entity_load_mode === 'local') ? $metadata['SEARCH_API_ID'][0] : $item->getUrl();
       $result_item = $this->getFieldsHelper()->createItem($index, $item_id, $datasource);
-
-      if ($entity_load_mode === 'remote' && $mapped_entity = $this->entityMapper->map($metadata, $query)) {
+      // Used to allow queries to disable entity mapping.
+      $transform_entity_set = $query->getOption('europa_search_transform_results', TRUE);
+      if ($entity_load_mode === 'remote' && $transform_entity_set && $mapped_entity = $this->entityMapper->map($metadata, $query)) {
         $result_item->setOriginalObject($mapped_entity);
       }
 
