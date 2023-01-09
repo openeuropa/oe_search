@@ -63,7 +63,6 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
 
     $entity_type_id = $datasource->getDerivativeId();
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-    $entity_bundle_key = $entity_type->getKey('bundle');
 
     foreach ($index_fields as $field) {
       $metadata_key = Utility::getEsFieldName($field->getFieldIdentifier(), $query);
@@ -73,23 +72,10 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
       if (!$data_definition instanceof FieldItemDataDefinitionInterface) {
         continue;
       }
-      $original_field_type = $data_definition
-        ->getFieldDefinition()
-        ->getType();
-
-      // Drop entity references, unless they are the bundle key.
-      $entity_reference_types = [
-        'entity_reference',
-        'entity_reference_revisions',
-      ];
 
       // We only alter values present in metadata.
       if (empty($metadata[$metadata_key][0])) {
         continue;
-      }
-
-      if ($metadata_key !== Utility::getEsFieldName($entity_bundle_key, $query) && in_array($original_field_type, $entity_reference_types)) {
-        $entity->get($original_field_id)->removeItem(0);
       }
 
       // Support for booleans.
