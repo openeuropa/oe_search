@@ -74,11 +74,26 @@ class EntityMapper {
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $entity_id_key = $entity_type->getKey('id');
     $entity_values = [];
+    $entity_bundle_key = $entity_type->getKey('bundle');
+
     foreach ($index_fields as $field) {
       $metadata_key = Utility::getEsFieldName($field->getFieldIdentifier(), $query);
+      $data_definition = $field->getDataDefinition();
 
       // We don't have the original field.
-      if (!$field->getDataDefinition() instanceof FieldItemDataDefinition) {
+      if (!$data_definition instanceof FieldItemDataDefinition) {
+        continue;
+      }
+
+      $original_field_type = $data_definition
+        ->getFieldDefinition()
+        ->getType();
+      $entity_reference_types = [
+        'entity_reference',
+        'entity_reference_revisions',
+      ];
+
+      if (in_array($original_field_type, $entity_reference_types) && $metadata_key !== Utility::getEsFieldName($entity_bundle_key, $query)) {
         continue;
       }
 
