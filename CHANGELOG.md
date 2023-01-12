@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.0-beta2](https://github.com/openeuropa/oe_search/tree/2.0.0-beta2) (2023-01-12)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta1...2.0.0-beta2)
+
+**Merged pull requests:**
+
+- EWPP-2943: Bypass entity reference fields in entitymapper. [\#88](https://github.com/openeuropa/oe_search/pull/88) ([hernani](https://github.com/hernani))
+
 ## [2.0.0-beta1](https://github.com/openeuropa/oe_search/tree/2.0.0-beta1) (2023-01-03)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha4...2.0.0-beta1)
 
