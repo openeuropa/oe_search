@@ -12,7 +12,7 @@
         "drupal/search_api": "^1.27",
         "http-interop/http-factory-guzzle": "^1.0",
         "openeuropa/europa-search-client": "1.x-dev",
-        "php-http/guzzle7-adapter": "^1.0"
+        "php-http/guzzle6-adapter": "^2.0"
     },
     "require-dev": {
         "behat/mink-selenium2-driver": "^1.5",
@@ -67,6 +67,11 @@
             "build/profiles/contrib/{$name}": ["type:drupal-profile"],
             "build/modules/contrib/{$name}": ["type:drupal-module"],
             "build/themes/contrib/{$name}": ["type:drupal-theme"]
+        },
+        "patches": {
+            "guzzlehttp/guzzle": {
+                "https://www.drupal.org/project/drupal/issues/3225966": "https://www.drupal.org/files/issues/2022-11-18/suppress-deprecation-using-php-8.patch"
+            }
         },
         "drupal-scaffold": {
             "locations": {
