@@ -69,7 +69,7 @@
             "drupal/core-composer-scaffold": true,
             "phpro/grumphp": true,
             "php-http/discovery": false,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": false
         }
     }
 }
