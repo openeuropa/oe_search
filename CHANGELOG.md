@@ -1,17 +1,29 @@
 # Changelog
 
+## [2.0.0-beta3](https://github.com/openeuropa/oe_search/tree/2.0.0-beta3) (2023-03-21)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta2...2.0.0-beta3)
+
+**Merged pull requests:**
+
+- EWPP-2916: Update to PHP 8.1 and D9.4. [\#90](https://github.com/openeuropa/oe_search/pull/90) ([22Alexandra](https://github.com/22Alexandra))
+
 ## [2.0.0-beta2](https://github.com/openeuropa/oe_search/tree/2.0.0-beta2) (2023-01-12)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta1...2.0.0-beta2)
 
 **Merged pull requests:**
 
+- EWPP-0000: Prepare for 2.0.0-beta2. [\#89](https://github.com/openeuropa/oe_search/pull/89) ([hernani](https://github.com/hernani))
 - EWPP-2943: Bypass entity reference fields in entitymapper. [\#88](https://github.com/openeuropa/oe_search/pull/88) ([hernani](https://github.com/hernani))
 
 ## [2.0.0-beta1](https://github.com/openeuropa/oe_search/tree/2.0.0-beta1) (2023-01-03)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha4...2.0.0-beta1)
 
 **Merged pull requests:**
 
+- EWPP-0000: Prepare for 2.0.0-beta1 release. [\#86](https://github.com/openeuropa/oe_search/pull/86) ([hernani](https://github.com/hernani))
 - EWPP-2628: Updating the Europa search client patch. [\#85](https://github.com/openeuropa/oe_search/pull/85) ([upchuk](https://github.com/upchuk))
 - EWPP-2924: Fix failures on converting results for non-existing dataso… [\#84](https://github.com/openeuropa/oe_search/pull/84) ([hernani](https://github.com/hernani))
 - EWPP-2819: Refactor facets mock [\#83](https://github.com/openeuropa/oe_search/pull/83) ([hernani](https://github.com/hernani))
@@ -26,6 +38,7 @@
 
 **Merged pull requests:**
 
+- Prepare release 2.0.0-alpha4. [\#79](https://github.com/openeuropa/oe_search/pull/79) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-2437: Ensure search api backend pages won't crash. [\#78](https://github.com/openeuropa/oe_search/pull/78) ([nagyad](https://github.com/nagyad))
 
 ## [2.0.0-alpha3](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha3) (2022-08-02)
