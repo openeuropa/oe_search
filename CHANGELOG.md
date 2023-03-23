@@ -1,11 +1,20 @@
 # Changelog
 
+## [2.0.0-beta4](https://github.com/openeuropa/oe_search/tree/2.0.0-beta4) (2023-03-23)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta3...2.0.0-beta4)
+
+**Merged pull requests:**
+
+- EWPP-3120: Do not use dev branch as dependency for ES client. [\#95](https://github.com/openeuropa/oe_search/pull/95) ([imanoleguskiza](https://github.com/imanoleguskiza))
+
 ## [2.0.0-beta3](https://github.com/openeuropa/oe_search/tree/2.0.0-beta3) (2023-03-21)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta2...2.0.0-beta3)
 
 **Merged pull requests:**
 
+- Release-2.0.0-beta3: Update changelog. [\#94](https://github.com/openeuropa/oe_search/pull/94) ([nagyad](https://github.com/nagyad))
 - EWPP-2916: Update to PHP 8.1 and D9.4. [\#90](https://github.com/openeuropa/oe_search/pull/90) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [2.0.0-beta2](https://github.com/openeuropa/oe_search/tree/2.0.0-beta2) (2023-01-12)
@@ -18,7 +27,6 @@
 - EWPP-2943: Bypass entity reference fields in entitymapper. [\#88](https://github.com/openeuropa/oe_search/pull/88) ([hernani](https://github.com/hernani))
 
 ## [2.0.0-beta1](https://github.com/openeuropa/oe_search/tree/2.0.0-beta1) (2023-01-03)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha4...2.0.0-beta1)
 
 **Merged pull requests:**
