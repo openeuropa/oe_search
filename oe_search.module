@@ -17,7 +17,7 @@ use Drupal\search_api\Utility\Utility;
  * Implements hook_locale_translation_projects_alter().
  */
 function oe_search_locale_translation_projects_alter(&$projects) {
-  $projects['oe_search']['info']['interface translation server pattern'] = drupal_get_path('module', 'oe_search') . '/translations/%project-%language.po';
+  $projects['oe_search']['info']['interface translation server pattern'] = \Drupal::service('extension.list.module')->getPath('oe_search') . '/translations/%project-%language.po';
 }
 
 /**

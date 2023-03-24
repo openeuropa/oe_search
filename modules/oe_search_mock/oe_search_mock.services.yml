@@ -5,6 +5,7 @@ services:
       - {name: config.factory.override}
   oe_search_mock.es_mock_event_subscriber:
     class: Drupal\oe_search_mock\EventSubscriber\EuropaSearchMockEventSubscriber
+    arguments: ['@extension.list.module']
     tags:
       - { name: event_subscriber }
   oe_search_mock.es_mock_response_event_subscriber:

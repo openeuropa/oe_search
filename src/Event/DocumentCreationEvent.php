@@ -7,7 +7,7 @@ namespace Drupal\oe_search\Event;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\oe_search\IngestionDocument;
 use Drupal\search_api\Item\ItemInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event for managing document values.

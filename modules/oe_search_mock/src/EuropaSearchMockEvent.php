@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search_mock;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event used to collect the mocking JSON data.
