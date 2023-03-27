@@ -10,7 +10,7 @@
         "drupal/core": "^9.4 || ^10",
         "drupal/search_api": "^1.28",
         "guzzlehttp/guzzle": "^7",
-        "http-interop/http-factory-guzzle": "^1.0",
+        "laminas/laminas-diactoros": "^2.14",
         "openeuropa/europa-search-client": "dev-EWPP-2993"
     },
     "require-dev": {
