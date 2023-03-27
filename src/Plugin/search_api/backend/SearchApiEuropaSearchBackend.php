@@ -24,14 +24,12 @@ use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\ConditionGroup;
 use Drupal\search_api\Query\QueryInterface;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
-use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use Http\Factory\Guzzle\RequestFactory;
 use Http\Factory\Guzzle\StreamFactory;
 use Http\Factory\Guzzle\UriFactory;
 use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Model\Document;
-use Psr\Http\Client\ClientInterface as PsrClient;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -672,10 +670,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected function getClient(): ClientInterface {
     if (!isset($this->client)) {
       $configuration = $this->getConfigurationForClient();
-      // The client uses PSR standards.
-      if (!$this->httpClient instanceof PsrClient) {
-        $this->httpClient = new GuzzleAdapter($this->httpClient);
-      }
+
       // @todo Refactor this instantiation to a new plugin type in OEL-152.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-152
       // @todo Replace \Http\Factory\Guzzle with factories provided by
