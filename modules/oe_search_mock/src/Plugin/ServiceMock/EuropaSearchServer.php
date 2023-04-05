@@ -102,7 +102,7 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
     $this->collectRequests($path, $request);
 
     $event = new EuropaSearchMockEvent();
-    $this->eventDispatcher->dispatch(EuropaSearchMockEvent::EUROPA_SEARCH_MOCK_EVENT, $event);
+    $this->eventDispatcher->dispatch($event, EuropaSearchMockEvent::EUROPA_SEARCH_MOCK_EVENT);
     $this->mockedResponses = $event->getResources();
 
     switch ($path) {
@@ -132,7 +132,7 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
     }
 
     $event = new EuropaSearchMockResponseEvent($request, $response);
-    $this->eventDispatcher->dispatch(EuropaSearchMockResponseEvent::EUROPA_SEARCH_MOCK_RESPONSE_EVENT, $event);
+    $this->eventDispatcher->dispatch($event, EuropaSearchMockResponseEvent::EUROPA_SEARCH_MOCK_RESPONSE_EVENT);
     return $event->getResponse();
   }
 

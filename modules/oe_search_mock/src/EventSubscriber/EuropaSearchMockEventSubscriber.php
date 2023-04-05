@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\oe_search_mock\EventSubscriber;
 
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\oe_search_mock\EuropaSearchMockEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -11,6 +12,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Listens to Drupal\oe_search_mock\EuropaSearchMockEvent event.
  */
 class EuropaSearchMockEventSubscriber implements EventSubscriberInterface {
+
+  /**
+   * The module extension list.
+   *
+   * @var \Drupal\Core\Extension\ModuleExtensionList
+   */
+  protected ModuleExtensionList $moduleExtensionList;
+
+  /**
+   * Instantiates the class.
+   *
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
+   */
+  public function __construct(ModuleExtensionList $moduleExtensionList) {
+    $this->moduleExtensionList = $moduleExtensionList;
+  }
 
   /**
    * {@inheritdoc}
@@ -39,7 +57,7 @@ class EuropaSearchMockEventSubscriber implements EventSubscriberInterface {
       'facets_response',
     ];
     foreach ($responses_json as $response_name) {
-      $resources[$response_name] = file_get_contents(drupal_get_path('module', 'oe_search_mock') . '/responses/json/' . $response_name . '.json');
+      $resources[$response_name] = file_get_contents($this->moduleExtensionList->getPath('oe_search_mock') . '/responses/json/' . $response_name . '.json');
     }
 
     $event->setResources($resources);
