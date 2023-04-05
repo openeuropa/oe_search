@@ -1,15 +1,21 @@
-# Changelog
+# Change Log
+
+## [2.0.0-beta5](https://github.com/openeuropa/oe_search/tree/2.0.0-beta5) (2023-04-05)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta4...2.0.0-beta5)
+
+**Merged pull requests:**
+
+- EWPP-2993: Drupal 10 compatibility. [\#97](https://github.com/openeuropa/oe_search/pull/97) ([brummbar](https://github.com/brummbar))
 
 ## [2.0.0-beta4](https://github.com/openeuropa/oe_search/tree/2.0.0-beta4) (2023-03-23)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta3...2.0.0-beta4)
 
 **Merged pull requests:**
 
+- Release-2.0.0-beta4: Update changelog. [\#96](https://github.com/openeuropa/oe_search/pull/96) ([nagyad](https://github.com/nagyad))
 - EWPP-3120: Do not use dev branch as dependency for ES client. [\#95](https://github.com/openeuropa/oe_search/pull/95) ([imanoleguskiza](https://github.com/imanoleguskiza))
 
 ## [2.0.0-beta3](https://github.com/openeuropa/oe_search/tree/2.0.0-beta3) (2023-03-21)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta2...2.0.0-beta3)
 
 **Merged pull requests:**
