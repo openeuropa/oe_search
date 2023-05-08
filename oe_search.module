@@ -143,5 +143,6 @@ function oe_search_facets_search_api_query_type_mapping_alter($backend_plugin_id
   if ($backend_plugin_id == 'search_api_europa_search') {
     $query_types['string'] = 'europa_search_api_string';
     $query_types['date_comparison'] = 'europa_date_query_type';
+    $query_types['oe_list_pages_date_status_comparison'] = 'oe_list_pages_europa_date_status_query_type';
   }
 }
