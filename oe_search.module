@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend;
-use Drupal\search_api\Plugin\search_api\datasource\ContentEntity;
 use Drupal\search_api\Entity\Server;
+use Drupal\search_api\Plugin\search_api\datasource\ContentEntity;
 use Drupal\search_api\Utility\Utility;
 
 /**

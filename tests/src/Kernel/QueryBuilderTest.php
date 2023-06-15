@@ -5,10 +5,10 @@ declare(strict_types = 1);
 namespace Drupal\Tests\oe_search\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\search_api\Query\ConditionGroup;
-use Drupal\search_api\Query\Query;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
+use Drupal\search_api\Query\ConditionGroup;
+use Drupal\search_api\Query\Query;
 
 /**
  * Tests Europa Search query expression builder.
