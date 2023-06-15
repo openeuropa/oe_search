@@ -84,17 +84,7 @@ trait EuropaSearchMockTrait {
 
       // Prepare the filters.
       if (!empty($query_parameters['bool']['must'])) {
-        foreach ($query_parameters['bool']['must'] as $key => $param) {
-          if (isset($param['term'])) {
-            $filters[key($param['term'])] = reset($param['term']);
-          }
-          if (isset($param['terms'])) {
-            $filters += $param['terms'];
-          }
-          if (isset($param['range'])) {
-            $filters[key($param['range'])] = reset($param['range']);
-          }
-        }
+        $filters = $this->prepareFilters($query_parameters['bool']['must'], $filters);
       }
     }
 
@@ -133,6 +123,37 @@ trait EuropaSearchMockTrait {
     }
 
     asort($filters);
+
+    return $filters;
+  }
+
+  /**
+   * Prepare filters.
+   *
+   * @param array $parameters
+   *   The parameters.
+   * @param array $filters
+   *   Filters.
+   *
+   * @return array
+   *   The prepared filters.
+   */
+  protected function prepareFilters(array $parameters, array $filters = []): array {
+    foreach ($parameters as $param) {
+      if (!empty($param['bool']['must'])) {
+        $filters = $this->prepareFilters($param['bool']['must'], $filters);
+      }
+
+      if (isset($param['term'])) {
+        $filters[key($param['term'])] = reset($param['term']);
+      }
+      if (isset($param['terms'])) {
+        $filters += $param['terms'];
+      }
+      if (isset($param['range'])) {
+        $filters[key($param['range'])] = reset($param['range']);
+      }
+    }
 
     return $filters;
   }

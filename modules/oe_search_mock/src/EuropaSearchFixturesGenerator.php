@@ -211,6 +211,12 @@ class EuropaSearchFixturesGenerator {
     $entity_type = $info['entity_type'];
     $bundle = $info['bundle'] ?? '';
 
+    $bundle = is_array($bundle) ? $bundle[0] : $bundle;
+
+    if (!empty($filters['LANGUAGE_WITH_FALLBACK'])) {
+      $filters['LANGUAGE_WITH_FALLBACK'] = is_array($filters['LANGUAGE_WITH_FALLBACK']) ? $filters['LANGUAGE_WITH_FALLBACK'][0] : $filters['LANGUAGE_WITH_FALLBACK'];
+    }
+
     return static::buildSearchScenario($id, $filters, $entity_type, $bundle);
   }
 
