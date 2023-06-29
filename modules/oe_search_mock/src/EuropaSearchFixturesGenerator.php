@@ -211,7 +211,11 @@ class EuropaSearchFixturesGenerator {
     $entity_type = $info['entity_type'];
     $bundle = $info['bundle'] ?? '';
 
-    $bundle = is_array($bundle) ? $bundle[0] : $bundle;
+    // If we have multiple bundles (to limit allowed content types) we should
+    // not restrict bundles in mock (to let limit in filters only).
+    if (is_array($bundle)) {
+      $bundle = count($bundle) > 1 ? '' : $bundle[0];
+    }
 
     if (!empty($filters['LANGUAGE_WITH_FALLBACK'])) {
       $filters['LANGUAGE_WITH_FALLBACK'] = is_array($filters['LANGUAGE_WITH_FALLBACK']) ? $filters['LANGUAGE_WITH_FALLBACK'][0] : $filters['LANGUAGE_WITH_FALLBACK'];
