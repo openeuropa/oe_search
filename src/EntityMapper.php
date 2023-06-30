@@ -99,7 +99,8 @@ class EntityMapper {
 
       // By default set the direct mapping.
       if (!empty($metadata[$metadata_key][0])) {
-        $entity_values[$field->getOriginalFieldIdentifier()] = $metadata[$metadata_key][0];
+        // We have to support multiple value fields if applicable.
+        $entity_values[$field->getOriginalFieldIdentifier()] = count($metadata[$metadata_key]) > 1 && $data_definition->getFieldDefinition()->getFieldStorageDefinition()->isMultiple() ? $metadata[$metadata_key] : $metadata[$metadata_key][0];
       }
     }
 
