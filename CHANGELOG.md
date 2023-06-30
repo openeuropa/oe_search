@@ -1,13 +1,25 @@
-# Change Log
+# Changelog
+
+## [2.0.0-beta6](https://github.com/openeuropa/oe_search/tree/2.0.0-beta6) (2023-06-30)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta5...2.0.0-beta6)
+
+**Merged pull requests:**
+
+- EWPP-3224: Adapt europa search mock. [\#99](https://github.com/openeuropa/oe_search/pull/99) ([sergepavle](https://github.com/sergepavle))
+- EWPP-2957: Handling date/status for Europa queries. [\#92](https://github.com/openeuropa/oe_search/pull/92) ([upchuk](https://github.com/upchuk))
 
 ## [2.0.0-beta5](https://github.com/openeuropa/oe_search/tree/2.0.0-beta5) (2023-04-05)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta4...2.0.0-beta5)
 
 **Merged pull requests:**
 
+- Prepare changelog for release 2.0.0-beta5. [\#98](https://github.com/openeuropa/oe_search/pull/98) ([brummbar](https://github.com/brummbar))
 - EWPP-2993: Drupal 10 compatibility. [\#97](https://github.com/openeuropa/oe_search/pull/97) ([brummbar](https://github.com/brummbar))
 
 ## [2.0.0-beta4](https://github.com/openeuropa/oe_search/tree/2.0.0-beta4) (2023-03-23)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta3...2.0.0-beta4)
 
 **Merged pull requests:**
@@ -16,6 +28,7 @@
 - EWPP-3120: Do not use dev branch as dependency for ES client. [\#95](https://github.com/openeuropa/oe_search/pull/95) ([imanoleguskiza](https://github.com/imanoleguskiza))
 
 ## [2.0.0-beta3](https://github.com/openeuropa/oe_search/tree/2.0.0-beta3) (2023-03-21)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta2...2.0.0-beta3)
 
 **Merged pull requests:**
@@ -33,6 +46,7 @@
 - EWPP-2943: Bypass entity reference fields in entitymapper. [\#88](https://github.com/openeuropa/oe_search/pull/88) ([hernani](https://github.com/hernani))
 
 ## [2.0.0-beta1](https://github.com/openeuropa/oe_search/tree/2.0.0-beta1) (2023-01-03)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha4...2.0.0-beta1)
 
 **Merged pull requests:**
@@ -80,15 +94,22 @@
 
 **Merged pull requests:**
 
-- EWPP-2125: Add translation for ru language. [\#67](https://github.com/openeuropa/oe_search/pull/67) ([sergepavle](https://github.com/sergepavle))
-- EWPP-2101: Add translation for chinese and ukrainian languages. [\#66](https://github.com/openeuropa/oe_search/pull/66) ([sergepavle](https://github.com/sergepavle))
+- EWPP-0000: Prepare for 2.0.0-alpha1\] release. [\#70](https://github.com/openeuropa/oe_search/pull/70) ([hernani](https://github.com/hernani))
+- 2.x update [\#68](https://github.com/openeuropa/oe_search/pull/68) ([hernani](https://github.com/hernani))
 - EWPP-2100: Allow to add search api item. [\#65](https://github.com/openeuropa/oe_search/pull/65) ([hernani](https://github.com/hernani))
-- EWPP-1683: Create index to ingest nodes. [\#57](https://github.com/openeuropa/oe_search/pull/57) ([sergepavle](https://github.com/sergepavle))
-- EWPP-1687: Allow to ingest files. [\#56](https://github.com/openeuropa/oe_search/pull/56) ([sergepavle](https://github.com/sergepavle))
+- Update epic europa search [\#63](https://github.com/openeuropa/oe_search/pull/63) ([hernani](https://github.com/hernani))
+- EWPP-0000: Update EuropaSearch Epic with 2.x. [\#62](https://github.com/openeuropa/oe_search/pull/62) ([hernani](https://github.com/hernani))
+- EWPP-0000: Add dealerdirect/phpcodesniffer-composer-installer to allo… [\#61](https://github.com/openeuropa/oe_search/pull/61) ([hernani](https://github.com/hernani))
+- EWPP-1909: Update to PHP7.4/8.0. [\#59](https://github.com/openeuropa/oe_search/pull/59) ([hernani](https://github.com/hernani))
+- EWPP-1926: Capitalized special fields. [\#58](https://github.com/openeuropa/oe_search/pull/58) ([hernani](https://github.com/hernani))
+- \[EWPP-1678\] EWPP-1683: Create index to ingest nodes. [\#57](https://github.com/openeuropa/oe_search/pull/57) ([sergepavle](https://github.com/sergepavle))
+- \[EWPP-1678\] EWPP-1687: Allow to ingest files. [\#56](https://github.com/openeuropa/oe_search/pull/56) ([sergepavle](https://github.com/sergepavle))
+- Update 2.x with 1.x. [\#55](https://github.com/openeuropa/oe_search/pull/55) ([nagyad](https://github.com/nagyad))
+- EWPP-1679: Fix typos and namings. [\#54](https://github.com/openeuropa/oe_search/pull/54) ([nagyad](https://github.com/nagyad))
+- Epic europa search [\#43](https://github.com/openeuropa/oe_search/pull/43) ([drishu](https://github.com/drishu))
 - OEL-219: Allow arbitrary URLs for entities w/o canonical URL [\#42](https://github.com/openeuropa/oe_search/pull/42) ([claudiu-cristea](https://github.com/claudiu-cristea))
 - OEL-217: Filter items by site hash. [\#41](https://github.com/openeuropa/oe_search/pull/41) ([drishu](https://github.com/drishu))
 - OEL-204: README improvements [\#40](https://github.com/openeuropa/oe_search/pull/40) ([claudiu-cristea](https://github.com/claudiu-cristea))
-- OEL-167: Add test for backend config form. [\#39](https://github.com/openeuropa/oe_search/pull/39) ([drishu](https://github.com/drishu))
 - OEL-193: Use epic branch for europa search client. [\#38](https://github.com/openeuropa/oe_search/pull/38) ([drishu](https://github.com/drishu))
 - OEL-193: Add http-factory-guzzle usage. [\#36](https://github.com/openeuropa/oe_search/pull/36) ([drishu](https://github.com/drishu))
 - OEL-167: Add plugin tests [\#35](https://github.com/openeuropa/oe_search/pull/35) ([claudiu-cristea](https://github.com/claudiu-cristea))
@@ -99,17 +120,8 @@
 - OEL-117: Update PHP \>= 7.3 [\#28](https://github.com/openeuropa/oe_search/pull/28) ([saidatom](https://github.com/saidatom))
 
 ## [1.9.0](https://github.com/openeuropa/oe_search/tree/1.9.0) (2022-02-10)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.8.0...1.9.0)
-
-**Merged pull requests:**
-
-- Update epic europa search [\#63](https://github.com/openeuropa/oe_search/pull/63) ([hernani](https://github.com/hernani))
-- EWPP-0000: Update EuropaSearch Epic with 2.x. [\#62](https://github.com/openeuropa/oe_search/pull/62) ([hernani](https://github.com/hernani))
-- EWPP-0000: Add dealerdirect/phpcodesniffer-composer-installer to allo… [\#61](https://github.com/openeuropa/oe_search/pull/61) ([hernani](https://github.com/hernani))
-- EWPP-1909: Update to PHP7.4/8.0. [\#59](https://github.com/openeuropa/oe_search/pull/59) ([hernani](https://github.com/hernani))
-- EWPP-1926: Capitalized special fields. [\#58](https://github.com/openeuropa/oe_search/pull/58) ([hernani](https://github.com/hernani))
-- Update 2.x with 1.x. [\#55](https://github.com/openeuropa/oe_search/pull/55) ([nagyad](https://github.com/nagyad))
-- EWPP-1679: Fix typos and namings. [\#54](https://github.com/openeuropa/oe_search/pull/54) ([nagyad](https://github.com/nagyad))
 
 ## [1.8.0](https://github.com/openeuropa/oe_search/tree/1.8.0) (2021-11-08)
 
@@ -117,6 +129,7 @@
 
 **Merged pull requests:**
 
+- Prepare release 1.8.0. [\#53](https://github.com/openeuropa/oe_search/pull/53) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-1706: Fixing test page navigation in other languages. [\#52](https://github.com/openeuropa/oe_search/pull/52) ([upchuk](https://github.com/upchuk))
 - EWPP-1577: Update to D9 and convert behat tests to phpunit [\#51](https://github.com/openeuropa/oe_search/pull/51) ([brummbar](https://github.com/brummbar))
 
