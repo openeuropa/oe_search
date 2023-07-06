@@ -11,7 +11,7 @@
         "drupal/search_api": "^1.28",
         "guzzlehttp/guzzle": "^7",
         "laminas/laminas-diactoros": "^2.11.1",
-        "openeuropa/europa-search-client": "^1.0.0-alpha5"
+        "openeuropa/europa-search-client": "1.x-dev"
     },
     "require-dev": {
         "composer/installers": "^1.5",
