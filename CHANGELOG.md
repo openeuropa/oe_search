@@ -1,11 +1,20 @@
 # Changelog
 
+## [2.0.0](https://github.com/openeuropa/oe_search/tree/2.0.0) (2023-09-14)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta6...2.0.0)
+
+**Merged pull requests:**
+
+- EWPP-3244: Update lowest allowed version of search\_api to avoid patching. [\#103](https://github.com/openeuropa/oe_search/pull/103) ([22Alexandra](https://github.com/22Alexandra))
+
 ## [2.0.0-beta6](https://github.com/openeuropa/oe_search/tree/2.0.0-beta6) (2023-06-30)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta5...2.0.0-beta6)
 
 **Merged pull requests:**
 
+- Prepare release 2.0.0-beta6 [\#101](https://github.com/openeuropa/oe_search/pull/101) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-3224: Adapt europa search mock. [\#99](https://github.com/openeuropa/oe_search/pull/99) ([sergepavle](https://github.com/sergepavle))
 - EWPP-2957: Handling date/status for Europa queries. [\#92](https://github.com/openeuropa/oe_search/pull/92) ([upchuk](https://github.com/upchuk))
 
