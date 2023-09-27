@@ -419,7 +419,7 @@ class EuropaSearchFixturesGenerator {
         break;
 
       // Filter by text = barista.
-      case '8d57bb64c43dfec6266ae3b5f58fae5c':
+      case 'a21bae8353e47a64d0bddf52dc30872c':
         $entities = static::filterEntities([2, 3]);
         $json['results'] = $entities;
         $json['totalResults'] = 2;
