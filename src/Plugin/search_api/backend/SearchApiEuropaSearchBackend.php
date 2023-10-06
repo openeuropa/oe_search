@@ -462,10 +462,20 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       if (isset($keys['#conjunction'])) {
         unset($keys['#conjunction']);
       }
-      $text = "\"" . implode(" ", $keys) . "\"";
+
+      $text = implode(" ", $keys);
+
+      // Only add "" in case of an expression composed of several words.
+      if (str_word_count($text) > 1) {
+        $text = "\"" . $text . "\"";
+      }
     }
-    elseif (is_string($keys) && !empty($keys)) {
+    elseif (is_string($keys) && !empty($keys) && str_word_count($keys) > 1) {
+      // Only add "" in case of an expression composed of several words.
       $text = "\"" . $keys . "\"";
+    }
+    else {
+      $text = $keys;
     }
 
     // Handle sorting.
