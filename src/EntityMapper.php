@@ -75,6 +75,7 @@ class EntityMapper {
     $entity_id_key = $entity_type->getKey('id');
     $entity_values = [];
     $entity_bundle_key = $entity_type->getKey('bundle');
+    $entity_bundle_metadata_key = Utility::getEsFieldName($entity_bundle_key, $query);
 
     foreach ($index_fields as $field) {
       $metadata_key = Utility::getEsFieldName($field->getFieldIdentifier(), $query);
@@ -93,7 +94,7 @@ class EntityMapper {
         'entity_reference_revisions',
       ];
 
-      if (in_array($original_field_type, $entity_reference_types) && $metadata_key !== Utility::getEsFieldName($entity_bundle_key, $query)) {
+      if (in_array($original_field_type, $entity_reference_types) && $entity_bundle_metadata_key) {
         continue;
       }
 
@@ -104,12 +105,32 @@ class EntityMapper {
       }
     }
 
+    if (!isset($entity_values[$entity_bundle_key])) {
+      // If we haven't found the bundle value based on the bundle key name
+      // in the metadata fields, iterate again through the index fields and
+      // see if any of them maps to the actual entity bundle key.
+      foreach ($index_fields as $field) {
+        if ($field->getPropertyPath() === $entity_bundle_key) {
+          $metadata_key = Utility::getEsFieldName($field->getFieldIdentifier(), $query);
+          $entity_values[$entity_bundle_key] = $metadata[$metadata_key][0];
+          break;
+        }
+      }
+    }
+
     // We want to be able to call getUrl() on the entity, so we set a fake id.
     $entity_values[$entity_id_key] = PHP_INT_MAX;
 
     // Create entity from array of values.
     try {
-      $entity = $this->entityTypeManager->getStorage($entity_type_id)->create($entity_values);
+      $entity = $this->entityTypeManager->getStorage($entity_type_id)->create([
+        $entity_bundle_key => $entity_values[$entity_bundle_key],
+      ]);
+      foreach ($entity_values as $field_name => $value) {
+        if ($entity->hasField($field_name)) {
+          $entity->set($field_name, $value);
+        }
+      }
       // Needed to avoid loading entity in translations.
       $entity->in_preview = TRUE;
       // Allow event subscribers to alter the created entity.

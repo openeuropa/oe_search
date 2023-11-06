@@ -55,14 +55,8 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
     $entity = $event->getEntity();
     $query = $event->getQuery();
     $datasource_id = $metadata[Utility::getEsFieldName('search_api_datasource', $query)][0];
-    $datasource = $event->getQuery()
-      ->getIndex()
-      ->getDatasource($datasource_id);
 
     $index_fields = $query->getIndex()->getFieldsByDatasource($datasource_id);
-
-    $entity_type_id = $datasource->getDerivativeId();
-    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
     foreach ($index_fields as $field) {
       $metadata_key = Utility::getEsFieldName($field->getFieldIdentifier(), $query);
@@ -75,6 +69,10 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
 
       // We only alter values present in metadata.
       if (empty($metadata[$metadata_key][0])) {
+        continue;
+      }
+
+      if (!$entity->hasField($original_field_id)) {
         continue;
       }
 
