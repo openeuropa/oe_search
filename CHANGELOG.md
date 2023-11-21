@@ -1,11 +1,21 @@
 # Changelog
 
-## [2.0.0](https://github.com/openeuropa/oe_search/tree/2.0.0) (2023-09-14)
+## [2.1.0](https://github.com/openeuropa/oe_search/tree/2.1.0) (2023-11-21)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0...2.1.0)
+
+**Merged pull requests:**
+
+- EWPP-3280: Prevent entity mapper failure for missing or different fields. [\#106](https://github.com/openeuropa/oe_search/pull/106) ([upchuk](https://github.com/upchuk))
+- EWPP-3425: Only add quotes for fulltext search on composed strings. [\#105](https://github.com/openeuropa/oe_search/pull/105) ([hernani](https://github.com/hernani))
+
+## [2.0.0](https://github.com/openeuropa/oe_search/tree/2.0.0) (2023-09-18)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta6...2.0.0)
 
 **Merged pull requests:**
 
+- Prepare release 2.0.0. [\#104](https://github.com/openeuropa/oe_search/pull/104) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-3244: Update lowest allowed version of search\_api to avoid patching. [\#103](https://github.com/openeuropa/oe_search/pull/103) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [2.0.0-beta6](https://github.com/openeuropa/oe_search/tree/2.0.0-beta6) (2023-06-30)
