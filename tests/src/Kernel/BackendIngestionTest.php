@@ -14,6 +14,7 @@ use Drupal\oe_search\Utility;
 use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
+use Drupal\search_api\SearchApiException;
 use Drupal\search_api\Utility\Utility as SearchApiUtility;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\search_api\Functional\ExampleContentTrait;
@@ -109,6 +110,20 @@ class BackendIngestionTest extends KernelTestBase {
   protected $mediaType;
 
   /**
+   * The search api task manager.
+   *
+   * @var \Drupal\search_api\Task\TaskManager
+   */
+  protected $taskManager;
+
+  /**
+   * The search api server.
+   *
+   * @var \Drupal\search_api\Entity\Server
+   */
+  protected $server;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
@@ -156,7 +171,10 @@ class BackendIngestionTest extends KernelTestBase {
     new Settings($settings);
 
     $datasource_manager = $this->container->get('plugin.manager.search_api.datasource');
-    $this->backend = Server::load('europa_search_server')->getBackend();
+    $this->taskManager = $this->container->get('search_api.task_manager');
+
+    $this->server = Server::load('europa_search_server');
+    $this->backend = $this->server->getBackend();
     $this->index = Index::load($this->indexId);
     $this->datasource = $datasource_manager->createInstance('entity:entity_test_mulrev_changed');
     $this->datasource->setIndex($this->index);
@@ -260,7 +278,7 @@ class BackendIngestionTest extends KernelTestBase {
    */
   public function testDeleteItems(): void {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
-    $this->backend->deleteItems($this->index, $this->itemIds);
+    $this->server->deleteItems($this->index, $this->itemIds);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 5, 5);
     // Compare sent data with received data.
     $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
@@ -270,6 +288,13 @@ class BackendIngestionTest extends KernelTestBase {
     $this->assertDeletedItem($requests[2], 3);
     $this->assertDeletedItem($requests[3], 4);
     $this->assertDeletedItem($requests[4], 5);
+
+    // The last item should have failed.
+    // It should have a retry task in search_api_tasks.
+    $this->assertEquals(1, $this->taskManager->getTasksCount());
+    $tasks = $this->taskManager->loadTasks();
+    $last_task = reset($tasks);
+    $this->assertEquals('deleteItems', $last_task->getType());
   }
 
   /**
@@ -277,6 +302,7 @@ class BackendIngestionTest extends KernelTestBase {
    */
   public function testDeleteAllIndexItems(): void {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
+    $this->expectException(SearchApiException::class);
     $this->backend->deleteAllIndexItems($this->index);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 15, 15);
     // Compare sent data with received data.

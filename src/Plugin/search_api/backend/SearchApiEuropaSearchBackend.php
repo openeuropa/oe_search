@@ -23,6 +23,7 @@ use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Plugin\PluginFormTrait;
 use Drupal\search_api\Query\ConditionGroup;
 use Drupal\search_api\Query\QueryInterface;
+use Drupal\search_api\SearchApiException;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Laminas\Diactoros\RequestFactory;
 use Laminas\Diactoros\StreamFactory;
@@ -402,6 +403,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       }
       catch (\Exception $e) {
         $this->getLogger()->warning($e->getMessage());
+        throw new SearchApiException($e->getMessage(), $e->getCode(), $e);
       }
     }
   }

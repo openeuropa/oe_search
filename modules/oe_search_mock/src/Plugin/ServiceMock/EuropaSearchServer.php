@@ -123,7 +123,15 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         break;
 
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE:
-        $response = $this->getDeleteResponse();
+        $params = urldecode($request->getUri()->getQuery());
+        // Make it fail on the 5th entity.
+        if (str_contains($params, 'entity_test_mulrev_changed/5')) {
+          $response = $this->getFailedDeleteResponse();
+        }
+        else {
+          $response = $this->getDeleteResponse();
+        }
+
         break;
 
       default:
@@ -212,6 +220,16 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
    */
   protected function getDeleteResponse(): ResponseInterface {
     return new Response(200, [], $this->mockedResponses['delete_document_response'] ?? '{}');
+  }
+
+  /**
+   * Get mocked failed delete response.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The mocked response.
+   */
+  protected function getFailedDeleteResponse(): ResponseInterface {
+    return new Response(500, [], $this->mockedResponses['delete_document_response'] ?? '{}');
   }
 
 }
