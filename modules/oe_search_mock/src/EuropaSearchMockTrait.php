@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\oe_search_mock;
 
@@ -134,21 +134,26 @@ trait EuropaSearchMockTrait {
    *   The parameters.
    * @param array $filters
    *   Filters.
+   * @param string|null $operator
+   *   The operator to use in this field group.
    *
    * @return array
    *   The prepared filters.
    */
-  protected function prepareFilters(array $parameters, array $filters = []): array {
+  protected function prepareFilters(array $parameters, array $filters = [], string $operator = NULL): array {
     foreach ($parameters as $param) {
       if (!empty($param['bool']['must'])) {
-        $filters = $this->prepareFilters($param['bool']['must'], $filters);
+        $operator_key = key($param['bool']) == 'must' ? 'all' : 'any';
+        $filters = $this->prepareFilters($param['bool'][$operator_key], $filters, $operator_key);
       }
 
       if (isset($param['term'])) {
         $filters[key($param['term'])] = reset($param['term']);
       }
       if (isset($param['terms'])) {
-        $filters += $param['terms'];
+        $filter_id = key($param['terms']);
+        $filters[$filter_id]['operator'] = $operator;
+        $filters[$filter_id]['values'][] = reset($param['terms'][$filter_id]);
       }
       if (isset($param['range'])) {
         $filters[key($param['range'])] = reset($param['range']);
