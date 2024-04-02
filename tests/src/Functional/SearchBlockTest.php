@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\oe_search\Functional;
 
@@ -33,7 +33,7 @@ class SearchBlockTest extends BrowserTestBase {
     parent::setUp();
 
     $this->drupalPlaceBlock('oe_search', [
-      'id' => 'oe-search',
+      'id' => 'oe_search',
     ]);
 
     ConfigurableLanguage::createFromLangcode('fr')->save();
