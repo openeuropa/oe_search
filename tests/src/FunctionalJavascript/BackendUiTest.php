@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\oe_search\FunctionalJavascript;
 
@@ -179,8 +179,7 @@ class BackendUiTest extends WebDriverTestBase {
     $assert_session->waitForElementVisible('css', '#edit-third-party-settings-oe-search-europa-search-entity-mode-remote');
     $assert_session->fieldExists('third_party_settings[oe_search][europa_search_entity_mode]')->selectOption('remote');
     $page->pressButton('Save');
-    $this->assertSession()->assertWaitOnAjaxRequest();
-    $assert_session->pageTextContains('The index was successfully saved.');
+    $assert_session->waitForText('The index was successfully saved.');
 
     // Was Correctly saved?
     $this->drupalGet("admin/config/search/search-api/index/europa_search_index/edit");
@@ -189,7 +188,6 @@ class BackendUiTest extends WebDriverTestBase {
     // Change to local.
     $assert_session->fieldExists('third_party_settings[oe_search][europa_search_entity_mode]')->selectOption('remote');
     $page->pressButton('Save');
-    $this->assertSession()->assertWaitOnAjaxRequest();
     $assert_session->pageTextContains('The index was successfully saved.');
 
     // Was Correctly saved?

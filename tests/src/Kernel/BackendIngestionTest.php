@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\oe_search\Kernel;
 
@@ -124,6 +124,13 @@ class BackendIngestionTest extends KernelTestBase {
   protected $server;
 
   /**
+   * The datasource attached to the media index.
+   *
+   * @var \Drupal\search_api\Datasource\DatasourceInterface
+   */
+  protected $datasourceMedia;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
@@ -201,11 +208,11 @@ class BackendIngestionTest extends KernelTestBase {
       $this->mediaEntities[$media->id()] = $media;
     }
 
-    $this->datasource_media = $datasource_manager->createInstance('entity:media');
-    $this->datasource_media->setIndex($this->index);
+    $this->datasourceMedia = $datasource_manager->createInstance('entity:media');
+    $this->datasourceMedia->setIndex($this->index);
 
     $this->mediaItemIds = array_map(function (MediaInterface $entity): string {
-      return SearchApiUtility::createCombinedId($this->datasource_media->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
+      return SearchApiUtility::createCombinedId($this->datasourceMedia->getPluginId(), "{$entity->id()}:{$entity->language()->getId()}");
     }, $this->mediaEntities);
   }
 
@@ -257,7 +264,7 @@ class BackendIngestionTest extends KernelTestBase {
     /** @var \Drupal\search_api\Item\ItemInterface[] $items */
     $items = [];
     foreach ($this->mediaItemIds as $item_id) {
-      $items[$item_id] = $field_helper->createItem($this->index, $item_id, $this->datasource_media);
+      $items[$item_id] = $field_helper->createItem($this->index, $item_id, $this->datasourceMedia);
     }
 
     $this->backend->indexItems($this->index, $items);
