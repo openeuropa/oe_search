@@ -1,11 +1,20 @@
 # Changelog
 
+## [2.2.0](https://github.com/openeuropa/oe_search/tree/2.2.0) (2024-04-03)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.1.1...2.2.0)
+
+**Merged pull requests:**
+
+- EWPP-4230: Support D10.2 and drop D9. [\#111](https://github.com/openeuropa/oe_search/pull/111) ([hernani](https://github.com/hernani))
+
 ## [2.1.1](https://github.com/openeuropa/oe_search/tree/2.1.1) (2024-01-15)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.1.0...2.1.1)
 
 **Merged pull requests:**
 
+- Prepare release 2.1.1 [\#109](https://github.com/openeuropa/oe_search/pull/109) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-3842: Throw exception on deletion failure. [\#108](https://github.com/openeuropa/oe_search/pull/108) ([hernani](https://github.com/hernani))
 
 ## [2.1.0](https://github.com/openeuropa/oe_search/tree/2.1.0) (2023-11-21)
