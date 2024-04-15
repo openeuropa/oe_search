@@ -140,22 +140,51 @@ trait EuropaSearchMockTrait {
    */
   protected function prepareFilters(array $parameters, array $filters = []): array {
     foreach ($parameters as $param) {
+      // Filter group.
       if (!empty($param['bool']['must'])) {
         $filters = $this->prepareFilters($param['bool']['must'], $filters);
       }
 
       if (isset($param['term'])) {
-        $filters[key($param['term'])] = reset($param['term']);
+        $this->addToFilters(key($param['term']), reset($param['term']), $filters);
       }
       if (isset($param['terms'])) {
-        $filters += $param['terms'];
+        $key = key($param['terms']);
+        $this->addToFilters($key, reset($param['terms']), $filters);
       }
       if (isset($param['range'])) {
-        $filters[key($param['range'])] = reset($param['range']);
+        $this->addToFilters(key($param['range']), reset($param['range']), $filters);
       }
     }
 
     return $filters;
+  }
+
+  /**
+   * Adds a new filter to the list of filters.
+   *
+   * In case the filter already exists it is added
+   * with an array setting the AND operator.
+   *
+   * @param string $key
+   *   The filter key.
+   * @param mixed $value
+   *   The value.
+   * @param array $filters
+   *   The existing filters.
+   */
+  protected function addToFilters(string $key, $value, array &$filters): void {
+    if (empty($filters[$key])) {
+      $filters[$key] = $value;
+      return;
+    }
+    $existing_value = empty($filters[$key]['values']) ? $filters[$key] : $filters[$key]['values'];
+    $existing_value = is_array($existing_value) ? $existing_value : [$existing_value];
+    $existing_value[] = (is_array($value) && count($value)) == 1 ? reset($value) : $value;
+    $filters[$key] = [
+      'op' => 'AND',
+      'values' => $existing_value,
+    ];
   }
 
   /**
