@@ -1,11 +1,20 @@
 # Changelog
 
+## [2.3.0](https://github.com/openeuropa/oe_search/tree/2.3.0) (2024-04-16)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.2.0...2.3.0)
+
+**Merged pull requests:**
+
+- EWPP-4205: Support for operators conditions groups in the mock. [\#110](https://github.com/openeuropa/oe_search/pull/110) ([hernani](https://github.com/hernani))
+
 ## [2.2.0](https://github.com/openeuropa/oe_search/tree/2.2.0) (2024-04-03)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.1.1...2.2.0)
 
 **Merged pull requests:**
 
+- Release-2.2.0: Update changelog. [\#112](https://github.com/openeuropa/oe_search/pull/112) ([nagyad](https://github.com/nagyad))
 - EWPP-4230: Support D10.2 and drop D9. [\#111](https://github.com/openeuropa/oe_search/pull/111) ([hernani](https://github.com/hernani))
 
 ## [2.1.1](https://github.com/openeuropa/oe_search/tree/2.1.1) (2024-01-15)
