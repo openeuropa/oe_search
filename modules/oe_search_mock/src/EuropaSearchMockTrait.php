@@ -48,6 +48,36 @@ trait EuropaSearchMockTrait {
   }
 
   /**
+   * Returns the query expression.
+   *
+   * @param \Psr\Http\Message\RequestInterface $request
+   *   The request.
+   *
+   * @return array
+   *   The query.
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+   * @SuppressWarnings(PHPMD.NPathComplexity)
+   */
+  public function getQueryExpressionFromRequest(RequestInterface $request): array {
+    $request->getBody()->rewind();
+    $boundary = $this->getRequestBoundary($request);
+    if (empty($boundary)) {
+      return [];
+    }
+    $request_parts = $this->getRequestMultipartStreamResources($request, $boundary);
+    $request->getBody()->rewind();
+    $search_parts = explode("\r\n", $request_parts[0]);
+    $query_expression = json_decode($search_parts[5], TRUE);
+    // Single term conversion.
+    if (!empty($query_expression) && empty($query_expression['bool']) && !empty($query_expression['term'])) {
+      $query_expression = ['bool' => ['must' => [$query_expression]]];
+    }
+
+    return $query_expression;
+  }
+
+  /**
    * Returns the request filters.
    *
    * @param \Psr\Http\Message\RequestInterface $request

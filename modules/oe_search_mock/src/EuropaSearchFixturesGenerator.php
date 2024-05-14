@@ -190,13 +190,15 @@ class EuropaSearchFixturesGenerator {
   /**
    * Returns the JSON response for the search given the filters.
    *
+   * @param array $query_expression
+   *   The original query expression.
    * @param array $filters
    *   The filters.
    *
    * @return string|null
    *   The response.
    */
-  public static function getSearchJson(array $filters): ?string {
+  public static function getSearchJson(array $query_expression, array $filters): ?string {
     $path = static::getFixturesBasePath();
     if (!$filters) {
       return file_get_contents($path . '/empty.json');
@@ -221,7 +223,7 @@ class EuropaSearchFixturesGenerator {
       $filters['LANGUAGE_WITH_FALLBACK'] = is_array($filters['LANGUAGE_WITH_FALLBACK']) ? $filters['LANGUAGE_WITH_FALLBACK'][0] : $filters['LANGUAGE_WITH_FALLBACK'];
     }
 
-    return static::buildSearchScenario($id, $filters, $entity_type, $bundle);
+    return static::buildSearchScenario($query_expression, $id, $filters, $entity_type, $bundle);
   }
 
   /**
@@ -348,6 +350,8 @@ class EuropaSearchFixturesGenerator {
   /**
    * Builds the given search scenario.
    *
+   * @param array $query_expression
+   *   The original query_expression.
    * @param string $scenario_id
    *   The scenario ID.
    * @param array $filters
@@ -363,7 +367,7 @@ class EuropaSearchFixturesGenerator {
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  protected static function buildSearchScenario(string $scenario_id, array $filters, string $entity_type, string $bundle = ''): string {
+  protected static function buildSearchScenario(array $query_expression, string $scenario_id, array $filters, string $entity_type, string $bundle = ''): string {
     $path = static::getFixturesBasePath();
     $language = $filters['LANGUAGE_WITH_FALLBACK'] ?? 'en';
 
