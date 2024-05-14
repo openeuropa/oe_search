@@ -110,6 +110,8 @@ class QueryExpressionBuilder {
    *
    * @return array
    *   The array with resulting condition.
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    */
   protected function prepareCondition(Condition $condition, Query $query) {
     $field = Utility::getEsFieldName($condition->getField(), $query);
@@ -137,6 +139,9 @@ class QueryExpressionBuilder {
     }
     elseif ($condition->getOperator() == 'IN') {
       return ['terms' => [$field => array_values($condition->getValue())]];
+    }
+    elseif ($condition->getOperator() == 'NOT IN') {
+      return ['must_not' => ['terms' => [$field => array_values($condition->getValue())]]];
     }
     elseif ($condition->getOperator() == '<>') {
       return ['must_not' => ['term' => [$field => $condition->getValue()]]];
