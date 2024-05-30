@@ -362,7 +362,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         elseif ($document->isFileIngestion()) {
           $result = $this->getClient()->ingestFile(
             $document->getUrl(),
-            $document->getContent(),
+            NULL,
             [$document->getLanguage()],
             $document->getMetadata(),
             $document->getReference()

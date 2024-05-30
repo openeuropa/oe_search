@@ -392,7 +392,6 @@ class BackendIngestionTest extends KernelTestBase {
     ]);
 
     $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
-    $this->assertMultipartStreamResource($parts[1], 'text/plain', 'file', strlen($entity->label()), $entity->label());
   }
 
   /**
