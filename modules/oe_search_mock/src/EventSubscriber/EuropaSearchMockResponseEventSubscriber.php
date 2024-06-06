@@ -45,10 +45,11 @@ class EuropaSearchMockResponseEventSubscriber implements EventSubscriberInterfac
     }
 
     $filters = $this->getFiltersFromRequest($request);
+    $query_expression = $this->getQueryExpressionFromRequest($request);
 
     switch ($path) {
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_SEARCH:
-        $json = EuropaSearchFixturesGenerator::getSearchJson($filters);
+        $json = EuropaSearchFixturesGenerator::getSearchJson($query_expression, $filters);
         break;
 
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_FACET:
