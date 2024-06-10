@@ -1,11 +1,21 @@
 # Changelog
 
+## [2.4.0](https://github.com/openeuropa/oe_search/tree/2.4.0) (2024-06-10)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.3.0...2.4.0)
+
+**Merged pull requests:**
+
+- EWPP-4387: Fix file ingestion to not include file parameter. [\#115](https://github.com/openeuropa/oe_search/pull/115) ([hernani](https://github.com/hernani))
+- EWPP-4307: Support for NOT IN operator in QueryExpressionBuilder. [\#114](https://github.com/openeuropa/oe_search/pull/114) ([hernani](https://github.com/hernani))
+
 ## [2.3.0](https://github.com/openeuropa/oe_search/tree/2.3.0) (2024-04-16)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.2.0...2.3.0)
 
 **Merged pull requests:**
 
+- Release-2.3.0: Update changelog. [\#113](https://github.com/openeuropa/oe_search/pull/113) ([nagyad](https://github.com/nagyad))
 - EWPP-4205: Support for operators conditions groups in the mock. [\#110](https://github.com/openeuropa/oe_search/pull/110) ([hernani](https://github.com/hernani))
 
 ## [2.2.0](https://github.com/openeuropa/oe_search/tree/2.2.0) (2024-04-03)
