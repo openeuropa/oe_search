@@ -67,7 +67,8 @@ class Utility {
   /**
    * Get original field name for ES.
    *
-   * Uppercase the field name in case uppercase processor is added.
+   * Uppercase the field name in case uppercase processor is added except fields
+   * like 'url'.
    *
    * @param string $field
    *   The original field name.
@@ -79,7 +80,7 @@ class Utility {
    */
   public static function getEsFieldName(string $field, Query $query): string {
     $processors = $query->getIndex()->getProcessorsByStage(ProcessorInterface::STAGE_PREPROCESS_INDEX);
-    if (!empty($processors['europa_search_uppercase_field_names'])) {
+    if (!empty($processors['europa_search_uppercase_field_names']) && !in_array($field, ['url'])) {
       $field = strtoupper($field);
     }
     return $field;
