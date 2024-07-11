@@ -65,6 +65,12 @@ class DocumentCreationSubscriber implements EventSubscriberInterface {
 
     if ($entity instanceof FileInterface) {
       $document->setUrl($entity->createFileUrl(FALSE));
+      // If the file exists in disk, the url is enough for the
+      // file to be fetched. The content needs to be NULL in
+      // this case.
+      if (file_exists($entity->getFileUri())) {
+        $document->setContent(NULL);
+      }
     }
   }
 
