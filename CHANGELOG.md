@@ -1,11 +1,21 @@
 # Changelog
 
-## [2.4.0](https://github.com/openeuropa/oe_search/tree/2.4.0) (2024-06-10)
+## [2.5.0](https://github.com/openeuropa/oe_search/tree/2.5.0) (2024-07-11)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.4.0...2.5.0)
+
+**Merged pull requests:**
+
+- EWPP-4525: Maintain file label in ingestion in case file does not exist. [\#119](https://github.com/openeuropa/oe_search/pull/119) ([hernani](https://github.com/hernani))
+- OEL-3036: Update to Drupal 10.3 [\#118](https://github.com/openeuropa/oe_search/pull/118) ([AaronGilMartinez](https://github.com/AaronGilMartinez))
+
+## [2.4.0](https://github.com/openeuropa/oe_search/tree/2.4.0) (2024-06-11)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.3.0...2.4.0)
 
 **Merged pull requests:**
 
+- Prepare release 2.4.0. [\#116](https://github.com/openeuropa/oe_search/pull/116) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-4387: Fix file ingestion to not include file parameter. [\#115](https://github.com/openeuropa/oe_search/pull/115) ([hernani](https://github.com/hernani))
 - EWPP-4307: Support for NOT IN operator in QueryExpressionBuilder. [\#114](https://github.com/openeuropa/oe_search/pull/114) ([hernani](https://github.com/hernani))
 
