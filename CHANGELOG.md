@@ -1,11 +1,20 @@
 # Changelog
 
+## [2.6.0](https://github.com/openeuropa/oe_search/tree/2.6.0) (2024-08-28)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.5.0...2.6.0)
+
+**Merged pull requests:**
+
+- EWPP-4526: Add Japanese translation. [\#121](https://github.com/openeuropa/oe_search/pull/121) ([22Alexandra](https://github.com/22Alexandra))
+
 ## [2.5.0](https://github.com/openeuropa/oe_search/tree/2.5.0) (2024-07-11)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.4.0...2.5.0)
 
 **Merged pull requests:**
 
+- Prepare release 2.5.0. [\#120](https://github.com/openeuropa/oe_search/pull/120) ([sergepavle](https://github.com/sergepavle))
 - EWPP-4525: Maintain file label in ingestion in case file does not exist. [\#119](https://github.com/openeuropa/oe_search/pull/119) ([hernani](https://github.com/hernani))
 - OEL-3036: Update to Drupal 10.3 [\#118](https://github.com/openeuropa/oe_search/pull/118) ([AaronGilMartinez](https://github.com/AaronGilMartinez))
 
