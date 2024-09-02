@@ -1,11 +1,20 @@
 # Changelog
 
-## [2.6.0](https://github.com/openeuropa/oe_search/tree/2.6.0) (2024-08-28)
+## [2.7.0](https://github.com/openeuropa/oe_search/tree/2.7.0) (2024-09-02)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.6.0...2.7.0)
+
+**Merged pull requests:**
+
+- EWPP-0000: Fix EuropaSearchMockTrait due to change in https://github.… [\#123](https://github.com/openeuropa/oe_search/pull/123) ([hernani](https://github.com/hernani))
+
+## [2.6.0](https://github.com/openeuropa/oe_search/tree/2.6.0) (2024-08-29)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.5.0...2.6.0)
 
 **Merged pull requests:**
 
+- Release-2.6.0: Update changelog. [\#122](https://github.com/openeuropa/oe_search/pull/122) ([nagyad](https://github.com/nagyad))
 - EWPP-4526: Add Japanese translation. [\#121](https://github.com/openeuropa/oe_search/pull/121) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [2.5.0](https://github.com/openeuropa/oe_search/tree/2.5.0) (2024-07-11)
