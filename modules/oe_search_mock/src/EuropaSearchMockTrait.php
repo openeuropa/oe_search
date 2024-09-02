@@ -68,7 +68,7 @@ trait EuropaSearchMockTrait {
     $request_parts = $this->getRequestMultipartStreamResources($request, $boundary);
     $request->getBody()->rewind();
     $search_parts = explode("\r\n", $request_parts[0]);
-    $query_expression = json_decode($search_parts[5], TRUE);
+    $query_expression = json_decode($search_parts[4], TRUE);
     // Single term conversion.
     if (!empty($query_expression) && empty($query_expression['bool']) && !empty($query_expression['term'])) {
       $query_expression = ['bool' => ['must' => [$query_expression]]];
@@ -106,7 +106,7 @@ trait EuropaSearchMockTrait {
         $request_position = count($request_parts) - 1;
         $facet_fields_parts = isset($request_parts[$request_position]) ? explode("\r\n", $request_parts[$request_position]) : [];
       }
-      $query_parameters = json_decode($search_parts[5], TRUE);
+      $query_parameters = json_decode($search_parts[4], TRUE);
       // Single term conversion.
       if (!empty($query_parameters) && empty($query_parameters['bool']) && !empty($query_parameters['term'])) {
         $query_parameters = ['bool' => ['must' => [$query_parameters]]];
@@ -130,12 +130,12 @@ trait EuropaSearchMockTrait {
     }
 
     if ($sort_parts) {
-      $sorts = json_decode($sort_parts[5], TRUE);
+      $sorts = json_decode($sort_parts[4], TRUE);
       $filters['sort'] = $sorts;
     }
 
     if ($facet_fields_parts) {
-      $facet_fields = json_decode($facet_fields_parts[5], TRUE);
+      $facet_fields = json_decode($facet_fields_parts[4], TRUE);
       if (empty($facet_fields['bool'])) {
         $filters['display_fields'] = $facet_fields;
       }
