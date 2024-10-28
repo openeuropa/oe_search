@@ -561,7 +561,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  protected function getFacets(QueryInterface $query, array $available_facets = [], string $text = NULL): array {
+  protected function getFacets(QueryInterface $query, array $available_facets = [], ?string $text = NULL): array {
     $facets = $response_facets = $or_response_facets = [];
     $query_expression = $this->queryExpressionBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
     // Used for OR facets.
@@ -830,7 +830,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   /**
    * {@inheritdoc}
    */
-  protected function getSpecialFields(IndexInterface $index, ItemInterface $item = NULL): array {
+  protected function getSpecialFields(IndexInterface $index, ?ItemInterface $item = NULL): array {
     $fields = parent::getSpecialFields($index, $item);
 
     $field_info = [

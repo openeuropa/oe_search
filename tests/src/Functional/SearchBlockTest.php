@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\oe_search\Functional;
 
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Tests the search block.
