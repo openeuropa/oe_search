@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\oe_search\Kernel;
 
 use Drupal\Core\Site\Settings;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\TestFileCreationTrait;
+use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use Drupal\Tests\search_api\Functional\ExampleContentTrait;
 use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\file\Entity\File;
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\Media;
 use Drupal\media\MediaInterface;
 use Drupal\oe_search\Utility;
@@ -16,9 +19,6 @@ use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
 use Drupal\search_api\SearchApiException;
 use Drupal\search_api\Utility\Utility as SearchApiUtility;
-use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
-use Drupal\Tests\search_api\Functional\ExampleContentTrait;
-use Drupal\Tests\TestFileCreationTrait;
 use OpenEuropa\Tests\EuropaSearchClient\Traits\AssertTestRequestTrait;
 use Psr\Http\Message\RequestInterface;
 
