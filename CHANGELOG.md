@@ -1,11 +1,21 @@
 # Changelog
 
+## [2.8.0](https://github.com/openeuropa/oe_search/tree/2.8.0) (2024-10-28)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.7.0...2.8.0)
+
+**Merged pull requests:**
+
+- Release-2.8.0: Fix phpcs issues. [\#126](https://github.com/openeuropa/oe_search/pull/126) ([nagyad](https://github.com/nagyad))
+- EWPP-4335: Add support of CONTAINS operator. [\#117](https://github.com/openeuropa/oe_search/pull/117) ([sergepavle](https://github.com/sergepavle))
+
 ## [2.7.0](https://github.com/openeuropa/oe_search/tree/2.7.0) (2024-09-02)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.6.0...2.7.0)
 
 **Merged pull requests:**
 
+- EWPP-0000: Prepare for release 2.7.0. [\#124](https://github.com/openeuropa/oe_search/pull/124) ([hernani](https://github.com/hernani))
 - EWPP-0000: Fix EuropaSearchMockTrait due to change in https://github.… [\#123](https://github.com/openeuropa/oe_search/pull/123) ([hernani](https://github.com/hernani))
 
 ## [2.6.0](https://github.com/openeuropa/oe_search/tree/2.6.0) (2024-08-29)
