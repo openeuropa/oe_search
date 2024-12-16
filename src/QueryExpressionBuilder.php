@@ -75,7 +75,7 @@ class QueryExpressionBuilder {
     }
 
     // We don't need a condition group for a single condition.
-    if (count($conditions) == 1) {
+    if (count($conditions) == 1 && empty($negated_conditions)) {
       return $conditions[0];
     }
 

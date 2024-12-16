@@ -116,6 +116,9 @@ trait EuropaSearchMockTrait {
       if (!empty($query_parameters['bool']['must'])) {
         $filters = $this->prepareFilters($query_parameters['bool']['must'], $filters);
       }
+      if (!empty($query_parameters['bool']['must_not'])) {
+        $filters = $this->prepareFilters($query_parameters['bool']['must_not'], $filters, TRUE);
+      }
     }
 
     parse_str($request->getUri()->getQuery(), $url_query_parameters);
@@ -164,19 +167,25 @@ trait EuropaSearchMockTrait {
    *   The parameters.
    * @param array $filters
    *   Filters.
+   * @param bool $negative
+   *   If the filter is negative.
    *
    * @return array
    *   The prepared filters.
    */
-  protected function prepareFilters(array $parameters, array $filters = []): array {
+  protected function prepareFilters(array $parameters, array $filters = [], bool $negative = FALSE): array {
     foreach ($parameters as $param) {
       // Filter group.
       if (!empty($param['bool']['must'])) {
         $filters = $this->prepareFilters($param['bool']['must'], $filters);
       }
 
+      if (!empty($param['bool']['must_not'])) {
+        $filters = $this->prepareFilters($param['bool']['must_not'], $filters, $negative);
+      }
+
       if (isset($param['term'])) {
-        $this->addToFilters(key($param['term']), reset($param['term']), $filters);
+        $this->addToFilters(key($param['term']), reset($param['term']), $filters, $negative);
       }
       if (isset($param['terms'])) {
         $key = key($param['terms']);
@@ -202,9 +211,18 @@ trait EuropaSearchMockTrait {
    *   The value.
    * @param array $filters
    *   The existing filters.
+   * @param bool $nagative
+   *   If the filter is negative.
    */
-  protected function addToFilters(string $key, $value, array &$filters): void {
+  protected function addToFilters(string $key, $value, array &$filters, bool $nagative = FALSE): void {
     if (empty($filters[$key])) {
+      if ($nagative) {
+        $filters[$key] = [
+          'value' => $value,
+          'negative' => TRUE,
+        ];
+        return;
+      }
       $filters[$key] = $value;
       return;
     }
