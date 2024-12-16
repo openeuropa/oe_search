@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.9.0](https://github.com/openeuropa/oe_search/tree/2.9.0) (2024-12-16)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.8.0...2.9.0)
+
+**Merged pull requests:**
+
+- EWPP-4737: Fix negative conditions for query builder. [\#130](https://github.com/openeuropa/oe_search/pull/130) ([sergepavle](https://github.com/sergepavle))
+
 ## [2.8.0](https://github.com/openeuropa/oe_search/tree/2.8.0) (2024-10-28)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.7.0...2.8.0)
@@ -7,6 +15,7 @@
 **Merged pull requests:**
 
 - Release-2.8.0: Fix phpcs issues. [\#126](https://github.com/openeuropa/oe_search/pull/126) ([nagyad](https://github.com/nagyad))
+- Release-2.8.0: Update changelog. [\#125](https://github.com/openeuropa/oe_search/pull/125) ([nagyad](https://github.com/nagyad))
 - EWPP-4335: Add support of CONTAINS operator. [\#117](https://github.com/openeuropa/oe_search/pull/117) ([sergepavle](https://github.com/sergepavle))
 
 ## [2.7.0](https://github.com/openeuropa/oe_search/tree/2.7.0) (2024-09-02)
