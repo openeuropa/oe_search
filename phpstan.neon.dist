@@ -1,2 +1,7 @@
 includes:
   - ./vendor/openeuropa/code-review-drupal/dist/phpstan.drupal.neon
+parameters:
+  excludePaths:
+    analyseAndScan:
+    # Ignore the following paths from analysis and scanning as they depend on packages that are not installed and are not used without them.
+      - src/Plugin/facets/query_type
