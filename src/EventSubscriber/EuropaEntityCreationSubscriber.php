@@ -62,6 +62,7 @@ class EuropaEntityCreationSubscriber implements EventSubscriberInterface {
       $metadata_key = Utility::getEsFieldName($field->getFieldIdentifier(), $query);
       $original_field_id = $field->getOriginalFieldIdentifier();
       $data_definition = $field->getDataDefinition();
+      $datetime_type = NULL;
 
       if (!$data_definition instanceof FieldItemDataDefinitionInterface) {
         continue;
