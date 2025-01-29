@@ -1,15 +1,21 @@
-# Changelog
+# Change Log
+
+## [2.10.0](https://github.com/openeuropa/oe_search/tree/2.10.0) (2025-01-29)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.9.0...2.10.0)
+
+**Merged pull requests:**
+
+- EWPP-4991: Ensure PHP8.3 compatibility. [\#133](https://github.com/openeuropa/oe_search/pull/133) ([nagyad](https://github.com/nagyad))
 
 ## [2.9.0](https://github.com/openeuropa/oe_search/tree/2.9.0) (2024-12-16)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.8.0...2.9.0)
 
 **Merged pull requests:**
 
+- EWPP-5064: Prepare for release 2.9.0. [\#131](https://github.com/openeuropa/oe_search/pull/131) ([hernani](https://github.com/hernani))
 - EWPP-4737: Fix negative conditions for query builder. [\#130](https://github.com/openeuropa/oe_search/pull/130) ([sergepavle](https://github.com/sergepavle))
 
 ## [2.8.0](https://github.com/openeuropa/oe_search/tree/2.8.0) (2024-10-28)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.7.0...2.8.0)
 
 **Merged pull requests:**
@@ -19,7 +25,6 @@
 - EWPP-4335: Add support of CONTAINS operator. [\#117](https://github.com/openeuropa/oe_search/pull/117) ([sergepavle](https://github.com/sergepavle))
 
 ## [2.7.0](https://github.com/openeuropa/oe_search/tree/2.7.0) (2024-09-02)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.6.0...2.7.0)
 
 **Merged pull requests:**
@@ -28,7 +33,6 @@
 - EWPP-0000: Fix EuropaSearchMockTrait due to change in https://github.… [\#123](https://github.com/openeuropa/oe_search/pull/123) ([hernani](https://github.com/hernani))
 
 ## [2.6.0](https://github.com/openeuropa/oe_search/tree/2.6.0) (2024-08-29)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.5.0...2.6.0)
 
 **Merged pull requests:**
@@ -37,7 +41,6 @@
 - EWPP-4526: Add Japanese translation. [\#121](https://github.com/openeuropa/oe_search/pull/121) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [2.5.0](https://github.com/openeuropa/oe_search/tree/2.5.0) (2024-07-11)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.4.0...2.5.0)
 
 **Merged pull requests:**
@@ -47,7 +50,6 @@
 - OEL-3036: Update to Drupal 10.3 [\#118](https://github.com/openeuropa/oe_search/pull/118) ([AaronGilMartinez](https://github.com/AaronGilMartinez))
 
 ## [2.4.0](https://github.com/openeuropa/oe_search/tree/2.4.0) (2024-06-11)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.3.0...2.4.0)
 
 **Merged pull requests:**
@@ -57,7 +59,6 @@
 - EWPP-4307: Support for NOT IN operator in QueryExpressionBuilder. [\#114](https://github.com/openeuropa/oe_search/pull/114) ([hernani](https://github.com/hernani))
 
 ## [2.3.0](https://github.com/openeuropa/oe_search/tree/2.3.0) (2024-04-16)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.2.0...2.3.0)
 
 **Merged pull requests:**
@@ -66,7 +67,6 @@
 - EWPP-4205: Support for operators conditions groups in the mock. [\#110](https://github.com/openeuropa/oe_search/pull/110) ([hernani](https://github.com/hernani))
 
 ## [2.2.0](https://github.com/openeuropa/oe_search/tree/2.2.0) (2024-04-03)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.1.1...2.2.0)
 
 **Merged pull requests:**
@@ -75,7 +75,6 @@
 - EWPP-4230: Support D10.2 and drop D9. [\#111](https://github.com/openeuropa/oe_search/pull/111) ([hernani](https://github.com/hernani))
 
 ## [2.1.1](https://github.com/openeuropa/oe_search/tree/2.1.1) (2024-01-15)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.1.0...2.1.1)
 
 **Merged pull requests:**
@@ -84,7 +83,6 @@
 - EWPP-3842: Throw exception on deletion failure. [\#108](https://github.com/openeuropa/oe_search/pull/108) ([hernani](https://github.com/hernani))
 
 ## [2.1.0](https://github.com/openeuropa/oe_search/tree/2.1.0) (2023-11-21)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0...2.1.0)
 
 **Merged pull requests:**
@@ -94,7 +92,6 @@
 - EWPP-3425: Only add quotes for fulltext search on composed strings. [\#105](https://github.com/openeuropa/oe_search/pull/105) ([hernani](https://github.com/hernani))
 
 ## [2.0.0](https://github.com/openeuropa/oe_search/tree/2.0.0) (2023-09-18)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta6...2.0.0)
 
 **Merged pull requests:**
@@ -103,7 +100,6 @@
 - EWPP-3244: Update lowest allowed version of search\_api to avoid patching. [\#103](https://github.com/openeuropa/oe_search/pull/103) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [2.0.0-beta6](https://github.com/openeuropa/oe_search/tree/2.0.0-beta6) (2023-06-30)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta5...2.0.0-beta6)
 
 **Merged pull requests:**
@@ -113,7 +109,6 @@
 - EWPP-2957: Handling date/status for Europa queries. [\#92](https://github.com/openeuropa/oe_search/pull/92) ([upchuk](https://github.com/upchuk))
 
 ## [2.0.0-beta5](https://github.com/openeuropa/oe_search/tree/2.0.0-beta5) (2023-04-05)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta4...2.0.0-beta5)
 
 **Merged pull requests:**
@@ -122,7 +117,6 @@
 - EWPP-2993: Drupal 10 compatibility. [\#97](https://github.com/openeuropa/oe_search/pull/97) ([brummbar](https://github.com/brummbar))
 
 ## [2.0.0-beta4](https://github.com/openeuropa/oe_search/tree/2.0.0-beta4) (2023-03-23)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta3...2.0.0-beta4)
 
 **Merged pull requests:**
@@ -131,7 +125,6 @@
 - EWPP-3120: Do not use dev branch as dependency for ES client. [\#95](https://github.com/openeuropa/oe_search/pull/95) ([imanoleguskiza](https://github.com/imanoleguskiza))
 
 ## [2.0.0-beta3](https://github.com/openeuropa/oe_search/tree/2.0.0-beta3) (2023-03-21)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta2...2.0.0-beta3)
 
 **Merged pull requests:**
@@ -140,7 +133,6 @@
 - EWPP-2916: Update to PHP 8.1 and D9.4. [\#90](https://github.com/openeuropa/oe_search/pull/90) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [2.0.0-beta2](https://github.com/openeuropa/oe_search/tree/2.0.0-beta2) (2023-01-12)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-beta1...2.0.0-beta2)
 
 **Merged pull requests:**
@@ -149,7 +141,6 @@
 - EWPP-2943: Bypass entity reference fields in entitymapper. [\#88](https://github.com/openeuropa/oe_search/pull/88) ([hernani](https://github.com/hernani))
 
 ## [2.0.0-beta1](https://github.com/openeuropa/oe_search/tree/2.0.0-beta1) (2023-01-03)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha4...2.0.0-beta1)
 
 **Merged pull requests:**
@@ -164,7 +155,6 @@
 - EWPP-2630: Search support for europa search api backend [\#77](https://github.com/openeuropa/oe_search/pull/77) ([hernani](https://github.com/hernani))
 
 ## [2.0.0-alpha4](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha4) (2022-11-04)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha3...2.0.0-alpha4)
 
 **Merged pull requests:**
@@ -173,7 +163,6 @@
 - EWPP-2437: Ensure search api backend pages won't crash. [\#78](https://github.com/openeuropa/oe_search/pull/78) ([nagyad](https://github.com/nagyad))
 
 ## [2.0.0-alpha3](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha3) (2022-08-02)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha2...2.0.0-alpha3)
 
 **Merged pull requests:**
@@ -183,7 +172,6 @@
 - EWPP-2358: Drupal 9.4 support for branch 2.x [\#74](https://github.com/openeuropa/oe_search/pull/74) ([yenyasinn](https://github.com/yenyasinn))
 
 ## [2.0.0-alpha2](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha2) (2022-06-22)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.0.0-alpha1...2.0.0-alpha2)
 
 **Merged pull requests:**
@@ -192,7 +180,6 @@
 - EWPP-2077: Remove delete item limit in deleteAllIndexItems. [\#71](https://github.com/openeuropa/oe_search/pull/71) ([sergepavle](https://github.com/sergepavle))
 
 ## [2.0.0-alpha1](https://github.com/openeuropa/oe_search/tree/2.0.0-alpha1) (2022-04-11)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.9.0...2.0.0-alpha1)
 
 **Merged pull requests:**
@@ -223,11 +210,9 @@
 - OEL-117: Update PHP \>= 7.3 [\#28](https://github.com/openeuropa/oe_search/pull/28) ([saidatom](https://github.com/saidatom))
 
 ## [1.9.0](https://github.com/openeuropa/oe_search/tree/1.9.0) (2022-02-10)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.8.0...1.9.0)
 
 ## [1.8.0](https://github.com/openeuropa/oe_search/tree/1.8.0) (2021-11-08)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.7.0...1.8.0)
 
 **Merged pull requests:**
@@ -237,7 +222,6 @@
 - EWPP-1577: Update to D9 and convert behat tests to phpunit [\#51](https://github.com/openeuropa/oe_search/pull/51) ([brummbar](https://github.com/brummbar))
 
 ## [1.7.0](https://github.com/openeuropa/oe_search/tree/1.7.0) (2021-09-27)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.6.0...1.7.0)
 
 **Merged pull requests:**
@@ -248,7 +232,6 @@
 - Fix release branch for 1.6.0 changelog generation. [\#47](https://github.com/openeuropa/oe_search/pull/47) ([brummbar](https://github.com/brummbar))
 
 ## [1.6.0](https://github.com/openeuropa/oe_search/tree/1.6.0) (2021-08-16)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.5.0...1.6.0)
 
 **Merged pull requests:**
@@ -260,7 +243,6 @@
 - EWPP-516: Update docker images. [\#24](https://github.com/openeuropa/oe_search/pull/24) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [1.5.0](https://github.com/openeuropa/oe_search/tree/1.5.0) (2020-06-19)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.4.0...1.5.0)
 
 **Merged pull requests:**
@@ -269,7 +251,6 @@
 - OPENEUROPA-3286: Translation of word Search in Lithuanian and Latvian are swapped [\#22](https://github.com/openeuropa/oe_search/pull/22) ([brummbar](https://github.com/brummbar))
 
 ## [1.4.0](https://github.com/openeuropa/oe_search/tree/1.4.0) (2020-04-08)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.3.0...1.4.0)
 
 **Merged pull requests:**
@@ -284,7 +265,6 @@
 - OPENEUROPA-2258: Use PHP 7.2 in drone and docker image. [\#13](https://github.com/openeuropa/oe_search/pull/13) ([dxvargas](https://github.com/dxvargas))
 
 ## [1.3.0](https://github.com/openeuropa/oe_search/tree/1.3.0) (2019-09-24)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.2.0...1.3.0)
 
 **Merged pull requests:**
@@ -293,7 +273,6 @@
 - OPENEUROPA-2286: Check redirect headers instead of waiting for an external resource. [\#12](https://github.com/openeuropa/oe_search/pull/12) ([imanoleguskiza](https://github.com/imanoleguskiza))
 
 ## [1.2.0](https://github.com/openeuropa/oe_search/tree/1.2.0) (2019-07-11)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.1.0...1.2.0)
 
 **Merged pull requests:**
@@ -303,7 +282,6 @@
 - OPENEUROPA-1897: Use ci image. [\#8](https://github.com/openeuropa/oe_search/pull/8) ([imanoleguskiza](https://github.com/imanoleguskiza))
 
 ## [1.1.0](https://github.com/openeuropa/oe_search/tree/1.1.0) (2019-05-07)
-
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/1.0.0...1.1.0)
 
 **Merged pull requests:**
