@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.11.0](https://github.com/openeuropa/oe_search/tree/2.11.0) (2025-02-19)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.10.0...2.11.0)
+
+**Merged pull requests:**
+
+- EWPP-5289: Avoid fatal error on search in case of empty client settings. [\#137](https://github.com/openeuropa/oe_search/pull/137) ([hernani](https://github.com/hernani))
+
 ## [2.10.0](https://github.com/openeuropa/oe_search/tree/2.10.0) (2025-01-29)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.9.0...2.10.0)
 
