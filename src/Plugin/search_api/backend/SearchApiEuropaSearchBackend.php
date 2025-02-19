@@ -446,6 +446,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
   public function search(QueryInterface $query): void {
+    if (empty($this->getConfigurationForClient())) {
+      return;
+    }
     $results = $query->getResults();
     $page_number = NULL;
     $limit = $query->getOptions()['limit'] ?? NULL;
