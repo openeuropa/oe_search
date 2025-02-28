@@ -137,7 +137,7 @@ class IngestionDocument extends DocumentBase {
       case 'date':
         // This will always be a timestamp, we just transform to milliseconds.
         // @see \Drupal\search_api\Plugin\search_api\data_type\DateDataType::getValue()
-        $value = $value * 1000;
+        $value *= 1000;
         break;
 
       case 'boolean':
