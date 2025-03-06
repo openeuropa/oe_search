@@ -7,20 +7,20 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.1",
-        "drupal/core": "^10",
-        "drupal/search_api": "^1.29",
+        "drupal/core": "^10 || ^11",
+        "drupal/search_api": "^1.37",
         "guzzlehttp/guzzle": "^7",
         "laminas/laminas-diactoros": "^2.11.1",
-        "openeuropa/europa-search-client": "^1.0.0-alpha5"
+        "openeuropa/europa-search-client": "^1.0@alpha"
     },
     "require-dev": {
         "composer/installers": "^1.5",
-        "drupal/core-composer-scaffold": "^10",
-        "drupal/core-dev": "^10",
-        "drupal/http_request_mock": "^1.0",
-        "drush/drush": "^12.4",
+        "drupal/core-composer-scaffold": "^10 || ^11",
+        "drupal/core-dev": "^10 || ^11",
+        "drupal/http_request_mock": "^1.2",
+        "drush/drush": "^12.4 || ^13",
         "openeuropa/code-review-drupal": "^1.0.0-alpha",
-        "openeuropa/oe_multilingual": "^1.13",
+        "openeuropa/oe_multilingual": "^1.20",
         "openeuropa/task-runner-drupal-project-symlink": "^1.0",
         "phpspec/prophecy-phpunit": "^2"
     },
