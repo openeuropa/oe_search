@@ -1,11 +1,18 @@
 # Change Log
 
-## [2.11.0](https://github.com/openeuropa/oe_search/tree/2.11.0) (2025-02-19)
+## [2.12.0](https://github.com/openeuropa/oe_search/tree/2.12.0) (2025-03-14)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.11.0...2.12.0)
 
+**Merged pull requests:**
+
+- EWPP-4632: D11 Update. [\#136](https://github.com/openeuropa/oe_search/pull/136) ([gorsky87](https://github.com/gorsky87))
+
+## [2.11.0](https://github.com/openeuropa/oe_search/tree/2.11.0) (2025-02-19)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.10.0...2.11.0)
 
 **Merged pull requests:**
 
+- Release-2.11.0: Update changelog. [\#138](https://github.com/openeuropa/oe_search/pull/138) ([hernani](https://github.com/hernani))
 - EWPP-5289: Avoid fatal error on search in case of empty client settings. [\#137](https://github.com/openeuropa/oe_search/pull/137) ([hernani](https://github.com/hernani))
 
 ## [2.10.0](https://github.com/openeuropa/oe_search/tree/2.10.0) (2025-01-29)
@@ -13,6 +20,7 @@
 
 **Merged pull requests:**
 
+- Release-2.10.0: Update changelog. [\#135](https://github.com/openeuropa/oe_search/pull/135) ([nagyad](https://github.com/nagyad))
 - EWPP-4991: Ensure PHP8.3 compatibility. [\#133](https://github.com/openeuropa/oe_search/pull/133) ([nagyad](https://github.com/nagyad))
 
 ## [2.9.0](https://github.com/openeuropa/oe_search/tree/2.9.0) (2024-12-16)
