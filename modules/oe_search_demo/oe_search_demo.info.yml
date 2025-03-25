@@ -1,0 +1,8 @@
+name: 'OpenEuropa Search Demo'
+description: 'Demo module for Europa Search.'
+package: EWCMS
+type: module
+core_version_requirement: ^10 || ^11
+
+dependencies:
+  - oe_search:oe_search
