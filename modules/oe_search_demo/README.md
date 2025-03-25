@@ -2,14 +2,13 @@
 
 ---
 
-This demo module is used to showcase the configuration
-needed for Europa Search to retrieve and index content.
+This demo module is used to showcase the configuration required for the Europa Search to retrieve and index the content.
 
 It brings a configured SearchAPI Server, SearchAPI Index and a view that shows basic information.
 
 After enabling the module, configuration should be altered to contain the correct endpoints and credentials.
 
-It is recommended to do it altering the configuration directly in Settings.php
+It is recommended to do it by altering the configuration directly in Settings.php
 
 ```
 if (getenv('EUROPA_SEARCH_ENABLED')) {
@@ -32,8 +31,7 @@ if (getenv('EUROPA_SEARCH_ENABLED')) {
 }
 ```
 
-The values can now be controlled using environment variables. You can get the the correct values for each of the following values,
-during the onboard process with corporate search.
+The values can now be controlled using environment variables. You can get the correct values for each of the following, during the onboarding process with Corporate Search.
 
 ```
       EUROPA_SEARCH_ENABLED: 1
