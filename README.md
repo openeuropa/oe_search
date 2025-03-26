@@ -6,11 +6,27 @@ The OpenEuropa Search module integrates [Europa Search Client](https://github.co
 
 Europa Search is the corporate search engine for the European Commission.
 
-### Future developments planned
+## Features provided
+- Search
+- Ingestion (Content and Files)
+- Multilingual support
+- Facet support
 
-- File ingestion
-- Search: simple, advanced, faceted
-- Integration with translation
+## Usage
+Before using Corporate Search, API Key, Consumer Key and Consumer Secret are needed. All this information can be provided together with the correct endpoints by Corporate Search Team during the onboarding process.
+
+Please note that for any Corporate Search application to work with the SearchAPI, the following fields must exist in the related index. These fields should be added when the application is created in Corporate Search. The Search API will not work without them.
+```
+    SEARCH_API_ID
+    SEARCH_API_DATASOURCE
+    SEARCH_API_LANGUAGE
+    SEARCH_API_SITE_HASH
+    SEARCH_API_INDEX_ID
+```
+
+It is recommended to explore the functionality by first installing and configuring the Demo module.
+Please refer to the demo documentation to understand how to configure the different endpoints and credentials.
+When configured correctly the number of documents in the Search API index should show the total number of documents in the Europa Search database.
 
 ## Limitations
 

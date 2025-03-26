@@ -1,0 +1,94 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - search_api.server.europa_search_server
+  module:
+    - node
+    - oe_search
+third_party_settings:
+  oe_search:
+    europa_search_entity_mode: remote
+id: europa_nodes
+name: 'Europa nodes'
+description: ''
+read_only: false
+field_settings:
+  body:
+    label: Body
+    datasource_id: 'entity:node'
+    property_path: body
+    type: text
+    dependencies:
+      config:
+        - field.storage.node.body
+  changed:
+    label: Changed
+    datasource_id: 'entity:node'
+    property_path: changed
+    type: date
+    dependencies:
+      module:
+        - node
+  created:
+    label: 'Authored on'
+    datasource_id: 'entity:node'
+    property_path: created
+    type: date
+    dependencies:
+      module:
+        - node
+  nid:
+    label: ID
+    datasource_id: 'entity:node'
+    property_path: nid
+    type: integer
+    dependencies:
+      module:
+        - node
+  title:
+    label: Title
+    datasource_id: 'entity:node'
+    property_path: title
+    type: string
+    dependencies:
+      module:
+        - node
+  type:
+    label: 'Content type'
+    datasource_id: 'entity:node'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - node
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: true
+      selected: {  }
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  custom_value: {  }
+  entity_type: {  }
+  europa_search_uppercase_field_names:
+    weights:
+      preprocess_index: 0
+    all_fields: 0
+    fields: {  }
+  language_with_fallback: {  }
+  rendered_item: {  }
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  cron_limit: 50
+  delete_on_fail: true
+  index_directly: true
+  track_changes_in_references: true
+server: europa_search_server
