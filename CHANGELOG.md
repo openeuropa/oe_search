@@ -1,10 +1,18 @@
 # Change Log
 
-## [2.12.0](https://github.com/openeuropa/oe_search/tree/2.12.0) (2025-03-14)
+## [2.13.0](https://github.com/openeuropa/oe_search/tree/2.13.0) (2025-03-26)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.12.0...2.13.0)
+
+**Merged pull requests:**
+
+- EWPP-5307: Improve documentation and provide demo module. [\#140](https://github.com/openeuropa/oe_search/pull/140) ([hernani](https://github.com/hernani))
+
+## [2.12.0](https://github.com/openeuropa/oe_search/tree/2.12.0) (2025-03-17)
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.11.0...2.12.0)
 
 **Merged pull requests:**
 
+- Release-2.12.0: Update changelog. [\#139](https://github.com/openeuropa/oe_search/pull/139) ([nagyad](https://github.com/nagyad))
 - EWPP-4632: D11 Update. [\#136](https://github.com/openeuropa/oe_search/pull/136) ([gorsky87](https://github.com/gorsky87))
 
 ## [2.11.0](https://github.com/openeuropa/oe_search/tree/2.11.0) (2025-02-19)
