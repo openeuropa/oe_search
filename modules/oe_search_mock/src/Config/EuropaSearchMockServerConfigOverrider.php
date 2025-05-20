@@ -7,6 +7,7 @@ namespace Drupal\oe_search_mock\Config;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\State\StateInterface;
 
 /**
  * Overrides the Europa Search config to use the endpoint of the ES mock server.
@@ -74,10 +75,30 @@ class EuropaSearchMockServerConfigOverrider implements ConfigFactoryOverrideInte
   const ENDPOINT_INGESTION_DELETE = '/ingestion-api/acc/rest/document';
 
   /**
+   * The state service.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected StateInterface $state;
+
+  /**
+   * Constructs an EuropaSearchMockServerConfigOverrider.
+   *
+   * @param \Drupal\Core\State\StateInterface $state
+   *   The state service.
+   */
+  public function __construct(StateInterface $state) {
+    $this->state = $state;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
     $overrides = [];
+    if ($this->state->get('oe_search_mock.config_override_disabled')) {
+      return $overrides;
+    }
     if (in_array('search_api.server.europa_search_server', $names)) {
       $mock_domain = 'http://' . self::ENDPOINT_DOMAIN;
       $overrides = [
