@@ -136,6 +136,7 @@ class QueryBuilderTest extends KernelTestBase {
     $query->addCondition('ID', 10, '<=');
     $query->addCondition('ID', [10, 100], 'IN');
     $query->addCondition('ID', [20, 200], 'NOT IN');
+    $query->addCondition('BODY', NULL, 'IS NULL');
 
     $query_expression = $this->queryBuilder->prepareConditionGroup($query->getConditionGroup(), $query);
     $expected = [
@@ -195,6 +196,11 @@ class QueryBuilderTest extends KernelTestBase {
               [
                 'terms' => [
                   'ID' => [20, 200],
+                ],
+              ],
+              [
+                'exists' => [
+                  'field' => 'BODY',
                 ],
               ],
             ],
