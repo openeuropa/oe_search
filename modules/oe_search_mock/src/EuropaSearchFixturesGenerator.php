@@ -510,7 +510,7 @@ class EuropaSearchFixturesGenerator {
       $language = $result['language'];
       $entity = new \stdClass();
       $entity->apiVersion = "2.91";
-      $entity->reference = Utility::getSiteHash() . "-europa_search_index-entity:entity_test_mulrev_changed" . "/" . $id . ':en';
+      $entity->reference = Utility::getSiteHash() . "-europa_search_index-entity:entity_test_mulrev_changed/" . $id . ':en';
       $entity->url = "https://demo.ec.europa.eu/entity-" . $id;
       $entity->title = $result['name'];
       $entity->contentType = "text/plain";
@@ -528,7 +528,7 @@ class EuropaSearchFixturesGenerator {
         'HIGHLIGHTED' => [$result['highlighted'] ?? ''],
         'PUBLICATION_DATE' => [$result['publication_date'] ?? ''],
         'CRON_TIME' => [$result['cron_time'] ?? ''],
-        'SEARCH_API_ID' => ['entity:entity_test_mulrev_changed' . '/' . $id . ':' . $language],
+        'SEARCH_API_ID' => ['entity:entity_test_mulrev_changed/' . $id . ':' . $language],
         'SEARCH_API_DATASOURCE' => ['entity:entity_test_mulrev_changed'],
         'SEARCH_API_LANGUAGE' => [$language],
       ];
