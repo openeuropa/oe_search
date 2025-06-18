@@ -1,6 +1,16 @@
-# Change Log
+# Changelog
+
+## [2.14.0](https://github.com/openeuropa/oe_search/tree/2.14.0) (2025-06-18)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.13.0...2.14.0)
+
+**Merged pull requests:**
+
+- EWPP-5460: Add support for IS NULL operator. [\#143](https://github.com/openeuropa/oe_search/pull/143) ([hernani](https://github.com/hernani))
+- EWPP-5549: Allow to disable Mock Config overrider through state varia… [\#142](https://github.com/openeuropa/oe_search/pull/142) ([hernani](https://github.com/hernani))
 
 ## [2.13.0](https://github.com/openeuropa/oe_search/tree/2.13.0) (2025-03-26)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.12.0...2.13.0)
 
 **Merged pull requests:**
