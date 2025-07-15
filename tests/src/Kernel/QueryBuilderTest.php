@@ -385,4 +385,102 @@ class QueryBuilderTest extends KernelTestBase {
     $this->assertEquals($expected, $query_expression);
   }
 
+  /**
+   * Tests several combined conditions.
+   */
+  public function testLanguageCondition() {
+    $query = new Query($this->index);
+
+    $query->setLanguages(['fr']);
+    $andConditionGroup = new ConditionGroup('AND');
+    $andConditionGroup->addCondition('id', 10, '<>');
+
+    $orConditionGroup = new ConditionGroup('OR');
+    $orConditionGroup->addCondition('body', 'Node body', '=');
+    $orConditionGroup->addCondition('created', '1664883852', '>');
+
+    // First test AND, OR.
+    $conditionGroup = new ConditionGroup('AND');
+    $conditionGroup->addConditionGroup($andConditionGroup);
+    $conditionGroup->addConditionGroup($orConditionGroup);
+    $query->addConditionGroup($conditionGroup);
+
+    $query_expression = $this->queryBuilder->prepareConditionGroup(
+      $query->getConditionGroup(),
+      $query
+    );
+
+    $expected = [
+      'bool' =>
+        [
+          'must' =>
+            [
+              0 =>
+                [
+                  'bool' =>
+                    [
+                      'must' =>
+                        [
+                          0 =>
+                            [
+                              'bool' =>
+                                [
+                                  'must_not' =>
+                                    [
+                                      0 =>
+                                        [
+                                          'term' =>
+                                            [
+                                              'ID' => 10,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                          1 =>
+                            [
+                              'bool' =>
+                                [
+                                  'should' =>
+                                    [
+                                      0 =>
+                                        [
+                                          'term' =>
+                                            [
+                                              'BODY' => 'Node body',
+                                            ],
+                                        ],
+                                      1 =>
+                                        [
+                                          'range' =>
+                                            [
+                                              'CREATED' =>
+                                                [
+                                                  'gt' => '1664883852',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+              1 =>
+                [
+                  'terms' =>
+                    [
+                      'SEARCH_API_LANGUAGE' =>
+                        [
+                          0 => 'fr',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $this->assertEquals($expected, $query_expression);
+  }
+
 }
