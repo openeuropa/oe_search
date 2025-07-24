@@ -17,7 +17,6 @@ use Drupal\oe_search\Utility;
 use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
-use Drupal\search_api\SearchApiException;
 use Drupal\search_api\Utility\Utility as SearchApiUtility;
 use OpenEuropa\Tests\EuropaSearchClient\Traits\AssertTestRequestTrait;
 use Psr\Http\Message\RequestInterface;
@@ -314,18 +313,13 @@ class BackendIngestionTest extends KernelTestBase {
    * @covers ::deleteAllIndexItems
    */
   public function testDeleteAllIndexItems(): void {
-    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
-    $this->expectException(SearchApiException::class);
     $this->backend->deleteAllIndexItems($this->index);
     // Only one token request as it gets cached after first request.
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_TOKEN, 1, 1, FALSE);
-    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 15, 15);
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE_BY_QUERY, 1, 1);
     // Compare sent data with received data.
-    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
-    $this->assertCount(15, $requests);
-    for ($i = 1; $i <= 5; $i++) {
-      $this->assertDeletedItem($requests[$i - 1], $i);
-    }
+    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE_BY_QUERY);
+    $this->assertCount(1, $requests);
   }
 
   /**
