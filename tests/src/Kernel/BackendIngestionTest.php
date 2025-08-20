@@ -241,6 +241,8 @@ class BackendIngestionTest extends KernelTestBase {
     // @see \Drupal\oe_search_mock\EventSubscriber\OeSearchTestSubscriber::indexEntityTestMulRevChanged()
     $this->container->get('state')->set('oe_search_test.enable_document_alter', TRUE);
     $this->backend->indexItems($this->index, $items);
+    // Only one token request as it gets cached after first request.
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_TOKEN, 1, 1, FALSE);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT, 5, 5);
 
     // Check that the data sent is correct.
@@ -268,6 +270,8 @@ class BackendIngestionTest extends KernelTestBase {
     }
 
     $this->backend->indexItems($this->index, $items);
+    // Only one token request as it gets cached after first request.
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_TOKEN, 1, 1, FALSE);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE, 5, 5);
 
     // Compare the sent files with received data.
@@ -286,6 +290,8 @@ class BackendIngestionTest extends KernelTestBase {
   public function testDeleteItems(): void {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
     $this->server->deleteItems($this->index, $this->itemIds);
+    // Only one token request as it gets cached after first request.
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_TOKEN, 1, 1, FALSE);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 5, 5);
     // Compare sent data with received data.
     $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
@@ -311,6 +317,8 @@ class BackendIngestionTest extends KernelTestBase {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 0, 0);
     $this->expectException(SearchApiException::class);
     $this->backend->deleteAllIndexItems($this->index);
+    // Only one token request as it gets cached after first request.
+    $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_TOKEN, 1, 1, FALSE);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 15, 15);
     // Compare sent data with received data.
     $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
@@ -417,8 +425,12 @@ class BackendIngestionTest extends KernelTestBase {
    *   Received requests count.
    * @param int $get_response_calls
    *   Count of replies from mocked server.
+   * @param bool $clean
+   *   Whether the requests should be clean for future assertions.
+   *
+   * @throws \Exception
    */
-  protected function assertServiceMockCalls(string $path, int $applies_calls, int $get_response_calls): void {
+  protected function assertServiceMockCalls(string $path, int $applies_calls, int $get_response_calls, bool $clean = TRUE): void {
     $state = $this->container->get('state');
     $calls = $state->get('oe_search_mock.service_mock_calls', []);
 
@@ -433,7 +445,9 @@ class BackendIngestionTest extends KernelTestBase {
     $this->assertSame($get_response_calls, $calls[$path]['getResponse']);
 
     // Leave the place clean for future assertions.
-    $state->delete('oe_search_mock.service_mock_calls');
+    if ($clean) {
+      $state->delete('oe_search_mock.service_mock_calls');
+    }
   }
 
   /**
