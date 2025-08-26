@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\oe_search\Plugin\search_api\backend;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -12,6 +13,7 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Error;
+use Drupal\oe_search\CacheableClient;
 use Drupal\oe_search\EntityMapper;
 use Drupal\oe_search\Event\DocumentCreationEvent;
 use Drupal\oe_search\IngestionDocument;
@@ -28,8 +30,8 @@ use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Laminas\Diactoros\RequestFactory;
 use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UriFactory;
-use OpenEuropa\EuropaSearchClient\Client;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
+use OpenEuropa\EuropaSearchClient\Exception\InvalidStatusCodeException;
 use OpenEuropa\EuropaSearchClient\Model\Document;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -130,6 +132,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
   protected $entityMapper;
 
   /**
+   * The cached backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
    * Constructs a new plugin instance.
    *
    * @param array $configuration
@@ -148,14 +157,17 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
    *   The query expression builder service.
    * @param \Drupal\oe_search\EntityMapper $entity_mapper
    *   The entity mapper service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   The cache backend.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, EventDispatcherInterface $event_dispatcher, QueryExpressionBuilder $query_expression_builder, EntityMapper $entity_mapper) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, HttpClientInterface $http_client, Settings $settings, EventDispatcherInterface $event_dispatcher, QueryExpressionBuilder $query_expression_builder, EntityMapper $entity_mapper, CacheBackendInterface $cache_backend) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->settings = $settings;
     $this->eventDispatcher = $event_dispatcher;
     $this->queryExpressionBuilder = $query_expression_builder;
     $this->entityMapper = $entity_mapper;
+    $this->cacheBackend = $cache_backend;
   }
 
   /**
@@ -170,7 +182,8 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       $container->get('settings'),
       $container->get('event_dispatcher'),
       $container->get('oe_search.query_expression_builder'),
-      $container->get('oe_search.entity_mapper')
+      $container->get('oe_search.entity_mapper'),
+      $container->get('cache.default')
     );
   }
 
@@ -373,6 +386,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
           $indexed[] = $item_id;
         }
       }
+      catch (InvalidStatusCodeException $e) {
+        // Maybe somehow the token is not valid anymore, remove it from cache
+        // for next attempts.
+        $this->cacheBackend->delete('oe_search_auth_cached');
+        $this->getLogger()->warning($e->getMessage());
+      }
       catch (\Exception $e) {
         $this->getLogger()->warning($e->getMessage());
       }
@@ -400,6 +419,13 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     foreach ($references as $reference) {
       try {
         $client->deleteDocument($reference);
+      }
+      catch (InvalidStatusCodeException $e) {
+        // Maybe somehow the token is not valid anymore, remove it from cache
+        // for next attempts.
+        $this->cacheBackend->delete('oe_search_auth_cached');
+        $this->getLogger()->warning($e->getMessage());
+        throw new SearchApiException($e->getMessage(), $e->getCode(), $e);
       }
       catch (\Exception $e) {
         $this->getLogger()->warning($e->getMessage());
@@ -691,7 +717,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       // @todo Replace \Http\Factory\Guzzle factories with the one provided by
       //   guzzlehttp/psr7:^2 when support for D9 is dropped.
       // @see https://citnet.tech.ec.europa.eu/CITnet/jira/browse/OEL-194
-      $this->client = new Client($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
+      $this->client = new CacheableClient($this->httpClient, new RequestFactory(), new StreamFactory(), new UriFactory(), $configuration);
     }
     return $this->client;
   }
