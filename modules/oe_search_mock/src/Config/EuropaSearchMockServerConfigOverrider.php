@@ -75,6 +75,13 @@ class EuropaSearchMockServerConfigOverrider implements ConfigFactoryOverrideInte
   const ENDPOINT_INGESTION_DELETE = '/ingestion-api/acc/rest/document';
 
   /**
+   * Europa Search ingestion delete by query endpoint.
+   *
+   * @var string
+   */
+  const ENDPOINT_INGESTION_DELETE_BY_QUERY = '/ingestion-api/acc/rest/document/bulk';
+
+  /**
    * The state service.
    *
    * @var \Drupal\Core\State\StateInterface

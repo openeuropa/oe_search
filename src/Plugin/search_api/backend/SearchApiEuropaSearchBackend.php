@@ -32,7 +32,6 @@ use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UriFactory;
 use OpenEuropa\EuropaSearchClient\Contract\ClientInterface;
 use OpenEuropa\EuropaSearchClient\Exception\InvalidStatusCodeException;
-use OpenEuropa\EuropaSearchClient\Model\Document;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -442,26 +441,12 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       return;
     }
 
-    $page = 1;
-    while (TRUE) {
-      $result = $this->getClient()->search(NULL, NULL, ['term' => ['SEARCH_API_SITE_HASH' => Utility::getSiteHash()]], NULL, NULL, $page++);
-      $item_ids = array_map(function (Document $document) use ($index) {
-        $destructed_reference = Utility::destructReference($document->getReference());
-        $site_hash = $destructed_reference[0] ?? NULL;
-        $index_id = $destructed_reference[1] ?? NULL;
-        $item_id = $destructed_reference[2] ?? NULL;
-        if (empty($site_hash) || empty($index_id) || empty($item_id) || $site_hash !== Utility::getSiteHash() || $index_id !== $index->id()) {
-          return FALSE;
-        }
-        return $item_id;
-      }, $result->getResults());
-      $item_ids = array_filter($item_ids);
-
-      if (empty($item_ids)) {
-        break;
-      }
-
-      $this->deleteItems($index, $item_ids);
+    try {
+      $this->getClient()->deleteByQuery(NULL, NULL, ['term' => ['SEARCH_API_SITE_HASH' => Utility::getSiteHash()]], NULL, NULL);
+    }
+    catch (\Exception $e) {
+      $this->getLogger()->error($e->getMessage());
+      return;
     }
   }
 
