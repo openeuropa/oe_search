@@ -1,4 +1,13 @@
-# Changelog
+# Change Log
+
+## [2.15.0](https://github.com/openeuropa/oe_search/tree/2.15.0) (2025-09-09)
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.14.0...2.15.0)
+
+**Merged pull requests:**
+
+- EWPP-5914: Implement cacheable token service. [\#149](https://github.com/openeuropa/oe_search/pull/149) ([hernani](https://github.com/hernani))
+- EWPP-5839: Refactor deleteAllIndexItems to use ES delete by query. [\#147](https://github.com/openeuropa/oe_search/pull/147) ([hernani](https://github.com/hernani))
+- EWPP-5768: Update to Drupal 10.5. [\#146](https://github.com/openeuropa/oe_search/pull/146) ([intelektron](https://github.com/intelektron))
 
 ## [2.14.0](https://github.com/openeuropa/oe_search/tree/2.14.0) (2025-06-18)
 
@@ -6,6 +15,7 @@
 
 **Merged pull requests:**
 
+- Release-2.14.0: Update changelog and docker PHP images. [\#144](https://github.com/openeuropa/oe_search/pull/144) ([nagyad](https://github.com/nagyad))
 - EWPP-5460: Add support for IS NULL operator. [\#143](https://github.com/openeuropa/oe_search/pull/143) ([hernani](https://github.com/hernani))
 - EWPP-5549: Allow to disable Mock Config overrider through state varia… [\#142](https://github.com/openeuropa/oe_search/pull/142) ([hernani](https://github.com/hernani))
 
