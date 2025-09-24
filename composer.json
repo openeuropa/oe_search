@@ -20,9 +20,9 @@
         "drupal/core-dev": "^10 || ^11",
         "drupal/http_request_mock": "^1.2",
         "drush/drush": "^12.4 || ^13",
+        "ec-europa/toolkit": "~10.23",
         "openeuropa/code-review-drupal": "^1.0.0-alpha",
         "openeuropa/oe_multilingual": "^1.20",
-        "openeuropa/task-runner-drupal-project-symlink": "^1.0",
         "phpspec/prophecy-phpunit": "^2"
     },
     "scripts": {
@@ -77,6 +77,7 @@
             "cweagans/composer-patches": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "drupal/core-composer-scaffold": true,
+            "ec-europa/toolkit-composer-plugin": true,
             "php-http/discovery": true,
             "phpro/grumphp-shim": true,
             "phpstan/extension-installer": true,
