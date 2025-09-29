@@ -6,7 +6,9 @@ namespace Drupal\oe_search;
 
 use Drupal\search_api\Query\Condition;
 use Drupal\search_api\Query\ConditionGroup;
+use Drupal\search_api\Query\ConditionGroupInterface;
 use Drupal\search_api\Query\Query;
+use Drupal\search_api\Query\QueryInterface;
 
 /**
  * Service that prepares Europa Search Query Expressions.
@@ -22,6 +24,8 @@ class QueryExpressionBuilder {
    *   The original query.
    * @param bool $exclude_or
    *   Whether to exclude or conditions (used for facets).
+   * @param bool $add_languages
+   *   Whether the langauge conditions should be added.
    *
    * @return array
    *   The condition group to be used in ES.
@@ -29,8 +33,12 @@ class QueryExpressionBuilder {
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    * @SuppressWarnings(PHPMD.NPathComplexity)
    */
-  public function prepareConditionGroup(ConditionGroup $conditionGroup, Query $query, $exclude_or = FALSE) : array {
+  public function prepareConditionGroup(ConditionGroup $conditionGroup, Query $query, $exclude_or = FALSE, bool $add_languages = TRUE) : array {
     $query_conjunction = $conditionGroup->getConjunction();
+    if ($add_languages) {
+      $this->addLanguageConditions($conditionGroup, $query);
+    }
+
     $conditions = $negated_conditions = $query_conjunctions = [];
     $query_conditions = $conditionGroup->getConditions();
 
@@ -67,7 +75,7 @@ class QueryExpressionBuilder {
       }
       // Recursively handle condition.
       elseif ($condition instanceof ConditionGroup) {
-        $prepared_condition = $this->prepareConditionGroup($condition, $query, $exclude_or);
+        $prepared_condition = $this->prepareConditionGroup($condition, $query, $exclude_or, FALSE);
         if (!empty($prepared_condition)) {
           $conditions[] = $prepared_condition;
         }
@@ -98,6 +106,23 @@ class QueryExpressionBuilder {
     return [
       'bool' => $query_conjunctions,
     ];
+  }
+
+  /**
+   * Adds item language conditions to the condition group, if applicable.
+   *
+   * @param \Drupal\search_api\Query\ConditionGroupInterface $condition_group
+   *   The condition group on which to set conditions.
+   * @param \Drupal\search_api\Query\QueryInterface $query
+   *   The query to inspect for language settings.
+   *
+   * @see \Drupal\search_api\Query\QueryInterface::getLanguages()
+   */
+  protected function addLanguageConditions(ConditionGroupInterface $condition_group, QueryInterface $query) {
+    $languages = $query->getLanguages();
+    if ($languages !== NULL) {
+      $condition_group->addCondition('search_api_language', $languages, 'IN');
+    }
   }
 
   /**

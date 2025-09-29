@@ -184,6 +184,28 @@ class EuropaSearchFixturesGenerator {
       'cron_time' => '2024-10-10T15:41:05.000+0200',
     ];
 
+    $entities[20] = [
+      'name' => 'French article',
+      'body' => 'french article. remote barista.',
+      'type' => 'article',
+      'language' => 'fr',
+      'keywords' => ['apple', 'grape'],
+      'highlighted' => 'false',
+      'publication_date' => '2024-01-03T13:00:00.000+0100',
+      'cron_time' => '2034-10-10T15:41:05.000+0200',
+    ];
+
+    $entities[21] = [
+      'name' => 'French article 2',
+      'body' => 'french article 2. remote barista.',
+      'type' => 'article',
+      'language' => 'fr',
+      'keywords' => ['apple', 'grape'],
+      'highlighted' => 'false',
+      'publication_date' => '2024-01-03T13:00:00.000+0100',
+      'cron_time' => '2034-10-10T15:41:05.000+0200',
+    ];
+
     return $entities;
   }
 
@@ -379,6 +401,20 @@ class EuropaSearchFixturesGenerator {
     $json['terms'] = $filters['TEXT'];
 
     switch ($scenario_id) {
+
+      // Multilingual en.
+      case 'c82bce3fcc3e54bdef2dffdc33c14ceb':
+        $entities = static::filterEntities([11, 12, 13, 14, 15]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 5;
+        break;
+
+      // Multilingual fr.
+      case '35b126c2dd30f70e54b56e5d884a17b0':
+        $entities = static::filterEntities([20, 21]);
+        $json['results'] = $entities;
+        $json['totalResults'] = 2;
+        break;
 
       /*
        * Queries items, no filters.

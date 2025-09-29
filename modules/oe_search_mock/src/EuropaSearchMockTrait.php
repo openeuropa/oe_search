@@ -111,7 +111,9 @@ trait EuropaSearchMockTrait {
       if (!empty($query_parameters) && empty($query_parameters['bool']) && !empty($query_parameters['term'])) {
         $query_parameters = ['bool' => ['must' => [$query_parameters]]];
       }
-
+      if (!empty($query_parameters) && empty($query_parameters['bool']) && !empty($query_parameters['terms'])) {
+        $query_parameters = ['bool' => ['must' => [$query_parameters]]];
+      }
       // Prepare the filters.
       if (!empty($query_parameters['bool']['must'])) {
         $filters = $this->prepareFilters($query_parameters['bool']['must'], $filters);
