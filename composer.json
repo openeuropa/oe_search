@@ -15,7 +15,7 @@
         "openeuropa/europa-search-client": "^1.0@alpha"
     },
     "require-dev": {
-        "composer/installers": "^1.5",
+        "composer/installers": "^2.3",
         "drupal/core-composer-scaffold": "^10 || ^11",
         "drupal/core-dev": "^10 || ^11",
         "drupal/http_request_mock": "^1.2",
@@ -33,14 +33,6 @@
         {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/openeuropa/DrupalDriver.git"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/openeuropa/code-review-drupal.git"
         }
     ],
     "autoload": {
