@@ -178,7 +178,11 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
   protected function collectRequests(string $path, RequestInterface $request): void {
     $state = \Drupal::state();
     $requests = $state->get('oe_search_mock.service_mock_requests', []);
-    $requests[$path][] = $request;
+    $requests[$path][] = [
+      'body' => $request->getBody()->getContents(),
+      'headers' => $request->getHeaders(),
+      'uri' => $request->getUri()
+    ];
     $state->set('oe_search_mock.service_mock_requests', $requests);
   }
 
