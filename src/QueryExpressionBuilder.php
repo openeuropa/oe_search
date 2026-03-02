@@ -172,10 +172,10 @@ class QueryExpressionBuilder {
       return ['must_not' => ['term' => [$field => $condition->getValue()]]];
     }
     elseif ($condition->getOperator() == 'IS NULL' && $condition->getValue() === NULL) {
-      return ['must_not' => ['exists' => ['field' => $condition->getField()]]];
+      return ['must_not' => ['exists' => ['field' => $field]]];
     }
     elseif ($condition->getValue() === NULL) {
-      return ['exists' => ['field' => $condition->getField()]];
+      return ['exists' => ['field' => $field]];
     }
     else {
       return ['term' => [$field => $condition->getValue()]];
