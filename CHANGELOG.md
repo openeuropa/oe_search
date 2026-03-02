@@ -1,13 +1,28 @@
-# Change Log
+# Changelog
+
+## [2.16.1](https://github.com/openeuropa/oe_search/tree/2.16.1) (2026-03-02)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.16.0...2.16.1)
+
+**Merged pull requests:**
+
+- EWPP-6400: Update testing matrix. [\#158](https://github.com/openeuropa/oe_search/pull/158) ([nagyad](https://github.com/nagyad))
+- EWPP-6261: Bump composer/installers to 2.x. [\#156](https://github.com/openeuropa/oe_search/pull/156) ([nagyad](https://github.com/nagyad))
+- EWPP-6068: Upgrade to Drupal 11.2. [\#154](https://github.com/openeuropa/oe_search/pull/154) ([sergepavle](https://github.com/sergepavle))
+- EWPP-6045: Move CI to Gitlab CI. [\#152](https://github.com/openeuropa/oe_search/pull/152) ([sergepavle](https://github.com/sergepavle))
+- EWPP-5581: Fix language filter in search backend. [\#145](https://github.com/openeuropa/oe_search/pull/145) ([hernani](https://github.com/hernani))
 
 ## [2.16.0](https://github.com/openeuropa/oe_search/tree/2.16.0) (2025-09-25)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.15.0...2.16.0)
 
 **Merged pull requests:**
 
+- Release-2.16.0: Update changelog. [\#153](https://github.com/openeuropa/oe_search/pull/153) ([nagyad](https://github.com/nagyad))
 - EWPP-5805: Allow composer-patches v2. [\#151](https://github.com/openeuropa/oe_search/pull/151) ([nagyad](https://github.com/nagyad))
 
 ## [2.15.0](https://github.com/openeuropa/oe_search/tree/2.15.0) (2025-09-09)
+
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.14.0...2.15.0)
 
 **Merged pull requests:**
