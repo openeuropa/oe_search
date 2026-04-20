@@ -1,11 +1,20 @@
 # Changelog
 
+## [2.16.2](https://github.com/openeuropa/oe_search/tree/2.16.2) (2026-04-20)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.16.1...2.16.2)
+
+**Merged pull requests:**
+
+- EWPP-5976: Fix ES field name with using uppercase version. [\#160](https://github.com/openeuropa/oe_search/pull/160) ([sergepavle](https://github.com/sergepavle))
+
 ## [2.16.1](https://github.com/openeuropa/oe_search/tree/2.16.1) (2026-03-02)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.16.0...2.16.1)
 
 **Merged pull requests:**
 
+- Release-2.16.1: Update changelog. [\#159](https://github.com/openeuropa/oe_search/pull/159) ([nagyad](https://github.com/nagyad))
 - EWPP-6400: Update testing matrix. [\#158](https://github.com/openeuropa/oe_search/pull/158) ([nagyad](https://github.com/nagyad))
 - EWPP-6261: Bump composer/installers to 2.x. [\#156](https://github.com/openeuropa/oe_search/pull/156) ([nagyad](https://github.com/nagyad))
 - EWPP-6068: Upgrade to Drupal 11.2. [\#154](https://github.com/openeuropa/oe_search/pull/154) ([sergepavle](https://github.com/sergepavle))
