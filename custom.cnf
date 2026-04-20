@@ -1,0 +1,3 @@
+[mysqld]
+# Set the temporary directory to your custom path
+datadir=/tmp
