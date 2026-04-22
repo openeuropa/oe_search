@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\http_request_mock\ServiceMockPluginInterface;
 use Drupal\oe_search_mock\Config\EuropaSearchMockServerConfigOverrider;
 use Drupal\oe_search_mock\EuropaSearchMockEvent;
+use Drupal\oe_search_mock\EuropaSearchMockRequestCollector;
 use Drupal\oe_search_mock\EuropaSearchMockResponseEvent;
 use Drupal\oe_search_mock\EuropaSearchMockTrait;
 use GuzzleHttp\Psr7\Response;
@@ -99,7 +100,7 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
   public function getResponse(RequestInterface $request, array $options): ResponseInterface {
     $path = $request->getUri()->getPath();
     $this->collectCalledMethods($path, __FUNCTION__);
-    $this->collectRequests($path, $request);
+    EuropaSearchMockRequestCollector::collectRequests($path, $request);
 
     $event = new EuropaSearchMockEvent();
     $this->eventDispatcher->dispatch($event, EuropaSearchMockEvent::EUROPA_SEARCH_MOCK_EVENT);
@@ -165,21 +166,6 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
 
     $calls[$path][$method]++;
     $state->set('oe_search_mock.service_mock_calls', $calls);
-  }
-
-  /**
-   * Collects the requests received.
-   *
-   * @param string $path
-   *   The request path.
-   * @param \Psr\Http\Message\RequestInterface $request
-   *   The received request.
-   */
-  protected function collectRequests(string $path, RequestInterface $request): void {
-    $state = \Drupal::state();
-    $requests = $state->get('oe_search_mock.service_mock_requests', []);
-    $requests[$path][] = $request;
-    $state->set('oe_search_mock.service_mock_requests', $requests);
   }
 
   /**

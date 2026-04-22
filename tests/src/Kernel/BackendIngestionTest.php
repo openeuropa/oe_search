@@ -6,6 +6,7 @@ namespace Drupal\Tests\oe_search\Kernel;
 
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\oe_search_mock\EuropaSearchMockRequestCollector;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\search_api\Functional\ExampleContentTrait;
@@ -245,7 +246,7 @@ class BackendIngestionTest extends KernelTestBase {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT, 5, 5);
 
     // Check that the data sent is correct.
-    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT);
+    $requests = EuropaSearchMockRequestCollector::getCollectedRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT);
     $this->assertCount(5, $requests);
     $this->assertIngestedItem($requests[0], $items, 1);
     $this->assertIngestedItem($requests[1], $items, 2);
@@ -274,7 +275,7 @@ class BackendIngestionTest extends KernelTestBase {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE, 5, 5);
 
     // Compare the sent files with received data.
-    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE);
+    $requests = EuropaSearchMockRequestCollector::getCollectedRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE);
     $this->assertCount(5, $requests);
     $this->assertIngestedFileItem($requests[0], $items, 1);
     $this->assertIngestedFileItem($requests[1], $items, 2);
@@ -293,7 +294,7 @@ class BackendIngestionTest extends KernelTestBase {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_TOKEN, 1, 1, FALSE);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE, 5, 5);
     // Compare sent data with received data.
-    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
+    $requests = EuropaSearchMockRequestCollector::getCollectedRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE);
     $this->assertCount(5, $requests);
     $this->assertDeletedItem($requests[0], 1);
     $this->assertDeletedItem($requests[1], 2);
@@ -318,7 +319,7 @@ class BackendIngestionTest extends KernelTestBase {
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_TOKEN, 1, 1, FALSE);
     $this->assertServiceMockCalls(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE_BY_QUERY, 1, 1);
     // Compare sent data with received data.
-    $requests = $this->getServiceMockRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE_BY_QUERY);
+    $requests = EuropaSearchMockRequestCollector::getCollectedRequests(EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE_BY_QUERY);
     $this->assertCount(1, $requests);
   }
 
@@ -442,22 +443,6 @@ class BackendIngestionTest extends KernelTestBase {
     if ($clean) {
       $state->delete('oe_search_mock.service_mock_calls');
     }
-  }
-
-  /**
-   * Gets the received request by the mock server.
-   *
-   * @param string $path
-   *   Path to filter list by.
-   *
-   * @return array
-   *   List or requests.
-   */
-  protected function getServiceMockRequests(string $path): array {
-    $state = $this->container->get('state');
-    $requests = $state->get('oe_search_mock.service_mock_requests', []);
-
-    return $requests[$path];
   }
 
 }
