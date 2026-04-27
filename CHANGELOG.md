@@ -1,11 +1,21 @@
 # Changelog
 
+## [2.17.0](https://github.com/openeuropa/oe_search/tree/2.17.0) (2026-04-27)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.16.2...2.17.0)
+
+**Merged pull requests:**
+
+- EWPP-6586: Change handling of request serialization. [\#162](https://github.com/openeuropa/oe_search/pull/162) ([intelektron](https://github.com/intelektron))
+- EWPP-6514: Support D11.3. [\#161](https://github.com/openeuropa/oe_search/pull/161) ([nagyad](https://github.com/nagyad))
+
 ## [2.16.2](https://github.com/openeuropa/oe_search/tree/2.16.2) (2026-04-20)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.16.1...2.16.2)
 
 **Merged pull requests:**
 
+- Release-2.16.2: Update changelog. [\#163](https://github.com/openeuropa/oe_search/pull/163) ([nagyad](https://github.com/nagyad))
 - EWPP-5976: Fix ES field name with using uppercase version. [\#160](https://github.com/openeuropa/oe_search/pull/160) ([sergepavle](https://github.com/sergepavle))
 
 ## [2.16.1](https://github.com/openeuropa/oe_search/tree/2.16.1) (2026-03-02)
