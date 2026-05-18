@@ -66,8 +66,12 @@ class QueryExpressionBuilder {
         }
         $europa_condition = $this->prepareCondition($condition, $query);
         // This is a negated condition.
-        if (key($europa_condition) == 'must_not') {
+        if ($query_conjunction == 'AND' && key($europa_condition) == 'must_not') {
           $negated_conditions[] = reset($europa_condition);
+        }
+        // This is a negated condition but for OR operator.
+        elseif ($query_conjunction == 'OR' && key($europa_condition) == 'must_not') {
+          $conditions[] = ['bool' => $europa_condition];
         }
         else {
           $conditions[] = $europa_condition;
@@ -168,14 +172,14 @@ class QueryExpressionBuilder {
     elseif ($condition->getOperator() == 'NOT IN') {
       return ['must_not' => ['terms' => [$field => array_values($condition->getValue())]]];
     }
+    elseif (in_array($condition->getOperator(), ['<>', 'IS NOT NULL']) && $condition->getValue() === NULL) {
+      return ['exists' => ['field' => $field]];
+    }
     elseif ($condition->getOperator() == '<>') {
       return ['must_not' => ['term' => [$field => $condition->getValue()]]];
     }
-    elseif ($condition->getOperator() == 'IS NULL' && $condition->getValue() === NULL) {
-      return ['must_not' => ['exists' => ['field' => $field]]];
-    }
     elseif ($condition->getValue() === NULL) {
-      return ['exists' => ['field' => $field]];
+      return ['must_not' => ['exists' => ['field' => $field]]];
     }
     else {
       return ['term' => [$field => $condition->getValue()]];
