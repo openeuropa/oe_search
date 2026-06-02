@@ -1,11 +1,20 @@
 # Changelog
 
+## [2.17.1](https://github.com/openeuropa/oe_search/tree/2.17.1) (2026-06-02)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.17.0...2.17.1)
+
+**Merged pull requests:**
+
+- EWPP-6865: Fix is null operator in OR condition groups. [\#166](https://github.com/openeuropa/oe_search/pull/166) ([hernani](https://github.com/hernani))
+
 ## [2.17.0](https://github.com/openeuropa/oe_search/tree/2.17.0) (2026-04-27)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.16.2...2.17.0)
 
 **Merged pull requests:**
 
+- Release-2.17.0: Update changelog. [\#165](https://github.com/openeuropa/oe_search/pull/165) ([nagyad](https://github.com/nagyad))
 - EWPP-6586: Change handling of request serialization. [\#162](https://github.com/openeuropa/oe_search/pull/162) ([intelektron](https://github.com/intelektron))
 - EWPP-6514: Support D11.3. [\#161](https://github.com/openeuropa/oe_search/pull/161) ([nagyad](https://github.com/nagyad))
 
