@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\oe_search\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\oe_search\Traits\TestIndexFieldCreationTrait;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
 use Drupal\search_api\Query\ConditionGroup;
@@ -17,6 +18,8 @@ use Drupal\search_api\Query\Query;
  * @group oe_search
  */
 class QueryBuilderTest extends KernelTestBase {
+
+  use TestIndexFieldCreationTrait;
 
   /**
    * A Search API index ID.
@@ -62,6 +65,8 @@ class QueryBuilderTest extends KernelTestBase {
     'image',
     'file',
     'views',
+    'text',
+    'datetime',
   ];
 
   /**
@@ -82,9 +87,16 @@ class QueryBuilderTest extends KernelTestBase {
       'search_api',
       'system',
       'oe_search',
-      'oe_search_test',
       'views',
     ]);
+
+    // Create the bundles and fields referenced by the test search index before
+    // installing the index/view config. On Drupal 11.4+ installing that config
+    // eagerly resolves the data definition of every indexed field, which would
+    // otherwise fail because these fields do not exist yet.
+    $this->createTestIndexFields();
+
+    $this->installConfig(['oe_search_test']);
 
     $this->queryBuilder = $this->container->get('oe_search.query_expression_builder');
     $this->backend = Server::load('europa_search_server')->getBackend();

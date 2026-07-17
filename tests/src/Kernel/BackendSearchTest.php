@@ -8,9 +8,8 @@ use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use Drupal\Tests\oe_search\Traits\TestIndexFieldCreationTrait;
 use Drupal\Tests\search_api\Functional\ExampleContentTrait;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
 use Drupal\search_api\Utility\Utility as SearchApiUtility;
@@ -30,6 +29,7 @@ class BackendSearchTest extends KernelTestBase {
   use AssertTestRequestTrait;
   use MediaTypeCreationTrait;
   use TestFileCreationTrait;
+  use TestIndexFieldCreationTrait;
 
   /**
    * A Search API index ID.
@@ -127,7 +127,6 @@ class BackendSearchTest extends KernelTestBase {
       'image',
       'search_api',
       'oe_search',
-      'oe_search_test',
       'user',
       'views',
     ]);
@@ -156,95 +155,15 @@ class BackendSearchTest extends KernelTestBase {
     ] + Settings::getAll();
     new Settings($settings);
 
-    $this->backend = Server::load('europa_search_server')->getBackend();
+    $this->createTestIndexFields();
+
+    // Install the test module config (search index + view) only after all the
+    // indexed fields exist. On Drupal 11.4+ installing the index/view config
+    // eagerly resolves the data definition of every indexed field, which would
+    // otherwise fail for the fields created programmatically above.
+    $this->installConfig(['oe_search_test']);
     $this->index = Index::load($this->indexId);
-    $this->createTestBundle('item', NULL, 'entity_test_mulrev_changed');
-    $this->createTestBundle('article', NULL, 'entity_test_mulrev_changed');
-
-    // Body.
-    FieldStorageConfig::create([
-      'field_name' => 'body',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'type' => 'text',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'body',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'item',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'body',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'article',
-    ])->save();
-
-    // Keywords.
-    FieldStorageConfig::create([
-      'field_name' => 'keywords',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'type' => 'text',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'keywords',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'item',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'keywords',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'article',
-    ])->save();
-
-    // Boolean.
-    FieldStorageConfig::create([
-      'field_name' => 'highlighted',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'type' => 'boolean',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'highlighted',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'item',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'highlighted',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'article',
-    ])->save();
-
-    // Date.
-    FieldStorageConfig::create([
-      'field_name' => 'publication_date',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'type' => 'datetime',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'publication_date',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'item',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'publication_date',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'article',
-    ])->save();
-
-    // Datetime.
-    FieldStorageConfig::create([
-      'field_name' => 'cron_time',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'type' => 'datetime',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'cron_time',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'item',
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'cron_time',
-      'entity_type' => 'entity_test_mulrev_changed',
-      'bundle' => 'article',
-    ])->save();
+    $this->backend = Server::load('europa_search_server')->getBackend();
   }
 
   /**
@@ -679,31 +598,6 @@ class BackendSearchTest extends KernelTestBase {
     $this->assertEquals('entity_test_mulrev_changed', $view->result[0]->_entity->getEntityTypeId());
     $this->assertEquals(11, $view->result[0]->_entity->id());
     $this->assertEquals('article 1', $view->result[0]->_entity->label());
-  }
-
-  /**
-   * Creates a new bundle for entity_test entities.
-   *
-   * @param string $bundle
-   *   The machine-readable name of the bundle.
-   * @param string|null $text
-   *   (optional) The human-readable name of the bundle. If none is provided,
-   *   the machine name will be used.
-   * @param string $entity_type
-   *   (optional) The entity type for which the bundle is created. Defaults to
-   *   'entity_test'.
-   *
-   * @todo Remove after drupal:12.0.0. Use
-   *    \Drupal\entity_test\EntityTestHelper::createBundle() instead.
-   *
-   * @see \Drupal\entity_test\Hook\EntityTestHooks::entityBundleInfo()
-   * /
-   */
-  protected function createTestBundle(string $bundle, ?string $text = NULL, string $entity_type = 'entity_test'): void {
-    $bundles = \Drupal::state()->get($entity_type . '.bundles', [$entity_type => ['label' => 'Entity Test Bundle']]);
-    $bundles += [$bundle => ['label' => $text ?: $bundle]];
-    \Drupal::state()->set($entity_type . '.bundles', $bundles);
-    \Drupal::service('entity_bundle.listener')->onBundleCreate($bundle, $entity_type);
   }
 
 }
