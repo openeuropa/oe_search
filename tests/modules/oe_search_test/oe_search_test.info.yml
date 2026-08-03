@@ -10,3 +10,4 @@ dependencies:
   - drupal:media
   - oe_search:oe_search
   - oe_search:oe_search_mock
+  - search_api:search_api_test_example_content

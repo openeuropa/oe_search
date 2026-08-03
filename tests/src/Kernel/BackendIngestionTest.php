@@ -346,7 +346,7 @@ class BackendIngestionTest extends KernelTestBase {
     $boundary = $this->getRequestBoundary($request);
     $this->assertBoundary($request, $boundary);
     $parts = $this->getRequestMultipartStreamResources($request, $boundary);
-    $expected_meta = json_encode([
+    $expected_meta = [
       'SEARCH_API_ID' => [$item_id],
       'SEARCH_API_DATASOURCE' => ['entity:entity_test_mulrev_changed'],
       'SEARCH_API_LANGUAGE' => ['en'],
@@ -356,9 +356,9 @@ class BackendIngestionTest extends KernelTestBase {
       'name' => [$entity->label()],
       'created' => [$item->getField('created')->getValues()['0'] * 1000],
       'type' => [$entity->bundle()],
-    ]);
+    ];
 
-    $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
+    $this->assertIngestedItemMetadata($parts[0], $expected_meta);
     $this->assertMultipartStreamResource($parts[1], 'text/plain', 'text', strlen($entity->label()), $entity->label());
   }
 
@@ -386,15 +386,35 @@ class BackendIngestionTest extends KernelTestBase {
     $boundary = $this->getRequestBoundary($request);
     $this->assertBoundary($request, $boundary);
     $parts = $this->getRequestMultipartStreamResources($request, $boundary);
-    $expected_meta = json_encode([
+    $expected_meta = [
       'SEARCH_API_ID' => [$item_id],
       'SEARCH_API_DATASOURCE' => ['entity:media'],
       'SEARCH_API_LANGUAGE' => ['en'],
       'SEARCH_API_SITE_HASH' => [Utility::getSiteHash()],
       'SEARCH_API_INDEX_ID' => [$this->indexId],
-    ]);
+    ];
 
-    $this->assertMultipartStreamResource($parts[0], 'application/json', 'metadata', strlen($expected_meta), $expected_meta);
+    $this->assertIngestedItemMetadata($parts[0], $expected_meta);
+  }
+
+  /**
+   * Asserts the JSON metadata part of an ingestion request.
+   *
+   * The order of the metadata fields depends on the order of the index field
+   * settings, which varies across Drupal core and Search API versions, so the
+   * decoded metadata is compared instead of the raw JSON string.
+   *
+   * @param string $part
+   *   The multipart stream resource.
+   * @param array $expected
+   *   The expected metadata values, keyed by field name.
+   */
+  protected function assertIngestedItemMetadata(string $part, array $expected): void {
+    [$headers, $content] = explode("\r\n\r\n", $part);
+    $headers = explode("\r\n", $headers);
+    $this->assertContains('Content-Type: application/json', $headers);
+    $this->assertContains('Content-Disposition: form-data; name="metadata"; filename="metadata"', $headers);
+    $this->assertEquals($expected, json_decode($content, TRUE));
   }
 
   /**
