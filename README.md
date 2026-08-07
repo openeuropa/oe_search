@@ -201,3 +201,4 @@ class AlterIndexedDocSubscriber implements EventSubscriberInterface {
 
 }
 ```
+
