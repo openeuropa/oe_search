@@ -102,6 +102,7 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
     $this->collectCalledMethods($path, __FUNCTION__);
     EuropaSearchMockRequestCollector::collectRequests($path, $request);
 
+    parse_str($request->getUri()->getQuery(), $parameters);
     $event = new EuropaSearchMockEvent();
     $this->eventDispatcher->dispatch($event, EuropaSearchMockEvent::EUROPA_SEARCH_MOCK_EVENT);
     $this->mockedResponses = $event->getResources();
@@ -116,11 +117,11 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         break;
 
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TEXT:
-        $response = $this->getIngestTextResponse();
+        $response = $this->getIngestTextResponse($parameters['reference']);
         break;
 
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_FILE:
-        $response = $this->getIngestTextResponse();
+        $response = $this->getIngestTextResponse($parameters['reference']);
         break;
 
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE:
@@ -191,11 +192,26 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
   /**
    * Get mocked ingest text response.
    *
+   * @param string $reference
+   *   The reference.
+   *
    * @return \Psr\Http\Message\ResponseInterface
    *   The mocked response.
    */
-  protected function getIngestTextResponse(): ResponseInterface {
-    return new Response(200, [], $this->mockedResponses['text_ingestion_response'] ?? '{}');
+  protected function getIngestTextResponse(string $reference): ResponseInterface {
+    $response = $this->mockedResponses['text_ingestion_response'];
+
+    if (empty($response)) {
+      return new Response(200, [], '{}');
+    }
+    $json = json_decode($response);
+    if (empty($json)) {
+      return new Response(200, [], '{}');
+    }
+
+    $json->reference = $reference;
+    $json->trackingId = \Drupal::service('uuid')->generate();
+    return new Response(200, [], json_encode($json) ?? '{}');
   }
 
   /**

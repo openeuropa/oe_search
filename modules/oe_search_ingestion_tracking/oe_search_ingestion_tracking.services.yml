@@ -1,0 +1,5 @@
+services:
+  oe_search.europa_items_indexed_tracking_subscriber:
+    class: Drupal\oe_search_ingestion_tracking\EventSubscriber\EuropaItemsIndexedTrackingSubscriber
+    tags:
+      - { name: 'event_subscriber' }
