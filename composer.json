@@ -61,7 +61,11 @@
                 "web-root": "./build"
             }
         },
-        "patches": {}
+        "patches": {
+            "openeuropa/europa-search-client": {
+                "EWPP-7178": "https://github.com/openeuropa/europa-search-client/compare/1.x...EWPP-7178.diff"
+            }
+        }
     },
     "config": {
         "sort-packages": true,
