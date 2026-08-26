@@ -13,7 +13,7 @@
         "drupal/search_api": "^1.37",
         "guzzlehttp/guzzle": "^7",
         "laminas/laminas-diactoros": "^2.11.1",
-        "openeuropa/europa-search-client": "^1.0@alpha"
+        "openeuropa/europa-search-client": "dev-EWPP-7178"
     },
     "require-dev": {
         "composer/installers": "^2.3",
@@ -59,11 +59,6 @@
         "drupal-scaffold": {
             "locations": {
                 "web-root": "./build"
-            }
-        },
-        "patches": {
-            "openeuropa/europa-search-client": {
-                "EWPP-7178": "https://github.com/openeuropa/europa-search-client/compare/1.x...EWPP-7178.diff"
             }
         }
     },

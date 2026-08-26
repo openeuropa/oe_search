@@ -87,6 +87,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     'textIngestionApiEndpoint' => ['ingestion', 'endpoint', 'text'],
     'fileIngestionApiEndpoint' => ['ingestion', 'endpoint', 'file'],
     'deleteApiEndpoint' => ['ingestion', 'endpoint', 'delete'],
+    'ingestionTrackingEndpoint' => ['ingestion', 'endpoint', 'tracking'],
   ];
 
   /**
@@ -208,6 +209,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
           'text' => NULL,
           'file' => NULL,
           'delete' => NULL,
+          'tracking' => NULL,
         ],
       ],
     ] + parent::defaultConfiguration();
@@ -346,6 +348,16 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
       '#states' => $states,
     ];
 
+    $form['ingestion']['endpoint']['tracking'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Tracking status API endpoint'),
+      '#description' => $this->t('Used to check the ingestion status of previously submitted documents.'),
+      '#default_value' => $configuration['ingestion']['endpoint']['tracking'],
+      '#states' => [
+        'enabled' => [':input[name="backend_config[ingestion][enabled]"]' => ['checked' => TRUE]],
+      ],
+    ];
+
     return $form;
   }
 
@@ -385,6 +397,7 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         if ($result && $result->getReference()) {
           $europa_search_ingestion_event = new EuropaItemsIndexedEvent();
           $europa_search_ingestion_event->setIngestion($result);
+          $europa_search_ingestion_event->setIndex($index);
           $this->eventDispatcher->dispatch($europa_search_ingestion_event, EuropaItemsIndexedEvent::EUROPA_ITEMS_INDEXED);
           $indexed[] = $item_id;
         }
@@ -435,6 +448,34 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         throw new SearchApiException($e->getMessage(), $e->getCode(), $e);
       }
     }
+  }
+
+  /**
+   * Retrieves the ingestion status of previously tracked documents.
+   *
+   * @param string[] $trackingIds
+   *   The Europa Search tracking IDs to check.
+   *
+   * @return \OpenEuropa\EuropaSearchClient\Model\IngestionTracking[]
+   *   The ingestion tracking statuses returned by Europa Search.
+   */
+  public function getIngestionTrackingStatuses(array $trackingIds): array {
+    if (!$this->isIngestionAvailable() || empty($this->getConfiguration()['ingestion']['endpoint']['tracking'])) {
+      return [];
+    }
+
+    try {
+      return $this->getClient()->getIngestionTrackingStatuses($trackingIds);
+    }
+    catch (InvalidStatusCodeException $e) {
+      $this->cacheBackend->delete('oe_search_auth_cached');
+      $this->getLogger()->warning($e->getMessage());
+    }
+    catch (\Exception $e) {
+      $this->getLogger()->warning($e->getMessage());
+    }
+
+    return [];
   }
 
   /**
@@ -759,7 +800,11 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
     }
 
     // At least one ingestion endpoint is missing.
-    foreach ($ingestion_configuration['endpoint'] as $url) {
+    foreach ($ingestion_configuration['endpoint'] as $key => $url) {
+      // The ingestion tracking status endpoint is optional.
+      if ($key === 'tracking') {
+        continue;
+      }
       if (empty($url)) {
         return FALSE;
       }
