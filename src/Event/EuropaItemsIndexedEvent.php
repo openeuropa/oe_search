@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\oe_search\Event;
 
+use Drupal\search_api\Entity\Index;
 use OpenEuropa\EuropaSearchClient\Model\Ingestion;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -17,7 +18,7 @@ class EuropaItemsIndexedEvent extends Event {
 
   /**
    * The name of the event dispatched when a new europa entity is indexed.
-    */
+   */
   const EUROPA_ITEMS_INDEXED = 'oe_search.europa_items_indexed';
 
   /**
@@ -26,6 +27,13 @@ class EuropaItemsIndexedEvent extends Event {
    * @var \OpenEuropa\EuropaSearchClient\Model\Ingestion
    */
   protected $ingestion;
+
+  /**
+   * The index.
+   *
+   * @var \Drupal\search_api\Entity\Index
+   */
+  protected $index;
 
   /**
    * Get the event ingestion.
@@ -45,6 +53,26 @@ class EuropaItemsIndexedEvent extends Event {
    */
   public function setIngestion(Ingestion $ingestion): void {
     $this->ingestion = $ingestion;
+  }
+
+  /**
+   * Gets the event index.
+   *
+   * @return \Drupal\search_api\Entity\Index
+   *   The index.
+   */
+  public function getIndex(): Index {
+    return $this->index;
+  }
+
+  /**
+   * Sets the event index.
+   *
+   * @param \Drupal\search_api\Entity\Index $index
+   *   The index.
+   */
+  public function setIndex(Index $index): void {
+    $this->index = $index;
   }
 
 }

@@ -34,6 +34,7 @@ class EuropaItemsIndexedTrackingSubscriber implements EventSubscriberInterface {
       $search_ingestion_tracking = SearchIngestionTracking::create([
         'tracking_id' => $event->getIngestion()
           ->getTrackingId(),
+        'index' => $event->getIndex()->id(),
         'entity_type' => $matches[3],
         'entity_id' => $matches[4],
         'langcode' => $matches[5],

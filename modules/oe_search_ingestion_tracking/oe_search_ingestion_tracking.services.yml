@@ -1,5 +1,8 @@
 services:
-  oe_search.europa_items_indexed_tracking_subscriber:
+  oe_search_ingestion.europa_items_indexed_tracking_subscriber:
     class: Drupal\oe_search_ingestion_tracking\EventSubscriber\EuropaItemsIndexedTrackingSubscriber
     tags:
       - { name: 'event_subscriber' }
+  oe_search_ingestion_tracking.status_checker:
+    class: Drupal\oe_search_ingestion_tracking\IngestionTrackingStatusChecker
+    arguments: ['@entity_type.manager', '@database']

@@ -82,6 +82,13 @@ class EuropaSearchMockServerConfigOverrider implements ConfigFactoryOverrideInte
   const ENDPOINT_INGESTION_DELETE_BY_QUERY = '/ingestion-api/acc/rest/document/bulk';
 
   /**
+   * Europa Search ingestion tracking status endpoint.
+   *
+   * @var string
+   */
+  const ENDPOINT_INGESTION_TRACKING_STATUS = '/ingestion-api/acc/rest/tracking/batch';
+
+  /**
    * The state service.
    *
    * @var \Drupal\Core\State\StateInterface
@@ -128,6 +135,7 @@ class EuropaSearchMockServerConfigOverrider implements ConfigFactoryOverrideInte
                 'text' => $mock_domain . self::ENDPOINT_INGESTION_TEXT,
                 'file' => $mock_domain . self::ENDPOINT_INGESTION_FILE,
                 'delete' => $mock_domain . self::ENDPOINT_INGESTION_DELETE,
+                'tracking' => $mock_domain . self::ENDPOINT_INGESTION_TRACKING_STATUS,
               ],
             ],
           ],
