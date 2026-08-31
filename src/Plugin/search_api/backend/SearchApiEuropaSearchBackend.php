@@ -16,6 +16,7 @@ use Drupal\Core\Utility\Error;
 use Drupal\oe_search\CacheableClient;
 use Drupal\oe_search\EntityMapper;
 use Drupal\oe_search\Event\DocumentCreationEvent;
+use Drupal\oe_search\Event\EuropaItemsIndexedEvent;
 use Drupal\oe_search\IngestionDocument;
 use Drupal\oe_search\QueryExpressionBuilder;
 use Drupal\oe_search\Utility;
@@ -382,6 +383,9 @@ class SearchApiEuropaSearchBackend extends BackendPluginBase implements PluginFo
         }
 
         if ($result && $result->getReference()) {
+          $europa_search_ingestion_event = new EuropaItemsIndexedEvent();
+          $europa_search_ingestion_event->setIngestion($result);
+          $this->eventDispatcher->dispatch($europa_search_ingestion_event, EuropaItemsIndexedEvent::EUROPA_ITEMS_INDEXED);
           $indexed[] = $item_id;
         }
       }
