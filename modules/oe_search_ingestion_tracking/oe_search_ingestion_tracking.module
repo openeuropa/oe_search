@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for the OE Search Ingestion Tracking module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_cron().
+ */
+function oe_search_ingestion_tracking_cron(): void {
+  /** @var \Drupal\oe_search_ingestion_tracking\IngestionTrackingStatusChecker $ingestion_checker */
+  $ingestion_checker = Drupal::service('oe_search_ingestion_tracking.status_checker');
+  $ingestion_checker->processUnfinishedIngestionsStatuses();
+  $ingestion_checker->purgeOldIngestionStatuses();
+}

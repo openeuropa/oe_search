@@ -55,6 +55,7 @@ class EuropaSearchMockEventSubscriber implements EventSubscriberInterface {
       'simple_search_response_page_3',
       'text_ingestion_response',
       'facets_response',
+      'ingestion_tracking_response',
     ];
     foreach ($responses_json as $response_name) {
       $resources[$response_name] = file_get_contents($this->moduleExtensionList->getPath('oe_search_mock') . '/responses/json/' . $response_name . '.json');

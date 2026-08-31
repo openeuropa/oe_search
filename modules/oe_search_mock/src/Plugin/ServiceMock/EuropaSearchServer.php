@@ -124,6 +124,10 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
         $response = $this->getIngestTextResponse($parameters['reference']);
         break;
 
+      case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_TRACKING_STATUS:
+        $response = $this->getIngestionTrackingResponse();
+        break;
+
       case EuropaSearchMockServerConfigOverrider::ENDPOINT_INGESTION_DELETE:
         $params = urldecode($request->getUri()->getQuery());
         // Make it fail on the 5th entity.
@@ -212,6 +216,16 @@ class EuropaSearchServer extends PluginBase implements ServiceMockPluginInterfac
     $json->reference = $reference;
     $json->trackingId = \Drupal::service('uuid')->generate();
     return new Response(200, [], json_encode($json) ?? '{}');
+  }
+
+  /**
+   * Get mocked ingestion tracking status response.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The mocked response.
+   */
+  protected function getIngestionTrackingResponse(): ResponseInterface {
+    return new Response(200, [], $this->mockedResponses['ingestion_tracking_response'] ?? '[]');
   }
 
   /**

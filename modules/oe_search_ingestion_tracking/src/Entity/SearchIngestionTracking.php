@@ -88,6 +88,11 @@ class SearchIngestionTracking extends ContentEntityBase implements ContentEntity
       ->setDescription(t('The entity type of the ingested entity.'))
       ->setRequired(TRUE);
 
+    $fields['index'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Index'))
+      ->setDescription(t('The index that for the ingested entity.'))
+      ->setRequired(TRUE);
+
     $fields['entity_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Entity ID'))
       ->setDescription(t('The ID of the ingested entity.'))
