@@ -48,6 +48,9 @@ plugin.plugin_configuration.search_api_backend.search_api_europa_search:
             delete:
               type: uri
               label: 'Delete API endpoint'
+            tracking:
+              type: uri
+              label: 'Tracking status API endpoint'
 
 search_api.index.*.third_party.oe_search:
   type: mapping

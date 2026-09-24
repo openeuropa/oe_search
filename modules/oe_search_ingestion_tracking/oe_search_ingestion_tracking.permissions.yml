@@ -1,0 +1,5 @@
+administer search ingestion tracking:
+  title: 'Administer search ingestion tracking'
+  restrict access: true
+access search ingestion tracking:
+  title: 'Access search ingestion tracking'

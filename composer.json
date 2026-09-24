@@ -60,8 +60,7 @@
             "locations": {
                 "web-root": "./build"
             }
-        },
-        "patches": {}
+        }
     },
     "config": {
         "sort-packages": true,
