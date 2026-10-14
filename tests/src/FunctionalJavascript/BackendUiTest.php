@@ -26,7 +26,7 @@ class BackendUiTest extends WebDriverTestBase {
   ];
 
   /**
-   * @covers \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::buildConfigurationForm()
+   * @covers \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::buildConfigurationForm
    */
   public function testBackendUi(): void {
     $admin_user = $this->drupalCreateUser([
@@ -122,7 +122,7 @@ class BackendUiTest extends WebDriverTestBase {
   }
 
   /**
-   * @covers oe_search_form_search_api_index_form_alter().
+   * @covers oe_search_form_search_api_index_form_alter
    */
   public function testIndexConfiguration() {
     $admin_user = $this->drupalCreateUser([
