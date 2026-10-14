@@ -217,7 +217,7 @@ abstract class BackendIngestionTestBase extends KernelTestBase {
   /**
    * Test Ingestion.
    *
-   * @covers ::indexItems
+   * @covers \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::indexItems
    */
   public function testIndexItems(): void {
     $field_helper = $this->container->get('search_api.fields_helper');
@@ -256,7 +256,7 @@ abstract class BackendIngestionTestBase extends KernelTestBase {
   /**
    * File ingestion.
    *
-   * @covers ::indexItems
+   * @covers \Drupal\oe_search\Plugin\search_api\backend\SearchApiEuropaSearchBackend::indexItems
    */
   public function testMediaIndexItems(): void {
     $field_helper = $this->container->get('search_api.fields_helper');
