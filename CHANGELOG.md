@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.18.0](https://github.com/openeuropa/oe_search/tree/2.18.0) (2026-10-14)
+
+[Full Changelog](https://github.com/openeuropa/oe_search/compare/2.17.1...2.18.0)
+
+**Merged pull requests:**
+
+- EWPP-7447: Fix phpstan errors. [\#174](https://github.com/openeuropa/oe_search/pull/174) ([nagyad](https://github.com/nagyad))
+- EWPP-7176: Europa search status ingestions. [\#172](https://github.com/openeuropa/oe_search/pull/172) ([hernani](https://github.com/hernani))
+- EWPP-6988: Trigger pipeline. [\#168](https://github.com/openeuropa/oe_search/pull/168) ([nagyad](https://github.com/nagyad))
+
 ## [2.17.1](https://github.com/openeuropa/oe_search/tree/2.17.1) (2026-06-02)
 
 [Full Changelog](https://github.com/openeuropa/oe_search/compare/2.17.0...2.17.1)
